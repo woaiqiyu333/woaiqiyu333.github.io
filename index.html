@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>私人聊天 · 无限存储</title>
+    <!-- Font Awesome (图标库) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, color 0.15s, border-color 0.2s;
+        }
+        body {
+            height: 100vh;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* 主容器 — 模拟手机卡片 */
+        .app-container {
+            width: 420px;
+            max-width: 98vw;
+            height: 780px;
+            max-height: 98vh;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        /* ===== 页面切换 ===== */
+        .page {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: inherit;
+        }
+        .page.active {
+            display: flex;
+        }
+        /* ===== 聊天主页面 ===== */
+        #chatPage {
+            background: var(--bg-primary, #f7f9fc);
+        }
+        /* 头部 */
+        .chat-header {
+            padding: 16px 20px 12px;
+            background: var(--header-bg, #ffffff);
+            border-bottom: 1px solid var(--border-light, #e9edf2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+        }
+        .chat-header .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #8b9bb5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+            background-image: var(--avatar-bg, linear-gradient(135deg, #6c7a8d, #3b4a5e));
+        }
+        .chat-header .info {
+            flex: 1;
+        }
+        .chat-header .info .name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary, #1f2a3a);
+        }
+        .chat-header .info .status {
+            font-size: 13px;
+            color: var(--text-secondary, #6b7a8f);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .chat-header .info .status i {
+            font-size: 10px;
+            color: #4caf50;
+        }
+        .chat-header .actions {
+            display: flex;
+            gap: 12px;
+            color: var(--text-secondary, #4b5a6f);
+            font-size: 18px;
+        }
+        .chat-header .actions i {
+            cursor: pointer;
+        }
+        /* 消息区域 */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--bg-messages, transparent);
+            background-image: var(--chat-bg-image, none);
+            background-size: cover;
+            background-position: center;
+        }
+        .message-bubble {
+            max-width: 78%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-break: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            position: relative;
+            animation: fadeIn 0.2s;
+        }
+        .message-bubble.me {
+            align-self: flex-end;
+            background: var(--bubble-me, #d1e7ff);
+            border-bottom-right-radius: 6px;
+            color: #0b1a2b;
+        }
+        .message-bubble.other {
+            align-self: flex-start;
+            background: var(--bubble-other, #ffffff);
+            border-bottom-left-radius: 6px;
+            color: #1f2a3a;
+            border: 1px solid var(--border-light, #e2e8f0);
+        }
+        .message-bubble .time {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 4px;
+            text-align: right;
+        }
+        .message-bubble .quote {
+            font-size: 13px;
+            background: rgba(0,0,0,0.04);
+            padding: 6px 10px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            border-left: 3px solid #6c7a8d;
+        }
+        .message-bubble img {
+            max-width: 160px;
+            border-radius: 12px;
+            margin: 4px 0;
+        }
+        .message-bubble .emoji-big {
+            font-size: 28px;
+        }
+        /* 输入区域 */
+        .input-area {
+            padding: 12px 16px 16px;
+            background: var(--input-bg, #ffffff);
+            border-top: 1px solid var(--border-light, #e9edf2);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .input-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .input-row .emoji-picker {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            max-height: 60px;
+            overflow-y: auto;
+            background: var(--bg-emoji, #f3f6fa);
+            border-radius: 30px;
+            padding: 6px 12px;
+        }
+        .input-row .emoji-picker span {
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .input-row .emoji-picker span:hover {
+            transform: scale(1.2);
+        }
+        .input-row textarea {
+            flex: 1;
+            border: 1px solid var(--border-light, #d0d7e2);
+            border-radius: 24px;
+            padding: 10px 16px;
+            resize: none;
+            font-size: 15px;
+            background: var(--input-field, #f7f9fc);
+            outline: none;
+            min-height: 44px;
+            max-height: 100px;
+        }
+        .input-row .send-btn {
+            background: var(--send-bg, #0b84ff);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 18px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .input-actions {
+            display: flex;
+            gap: 16px;
+            color: var(--text-secondary, #5b6f85);
+            font-size: 20px;
+            padding: 0 6px;
+        }
+        .input-actions i {
+            cursor: pointer;
+        }
+        /* ===== 设置页面 ===== */
+        #settingsPage {
+            background: var(--bg-primary, #f7f9fc);
+        }
+        .settings-header {
+            padding: 16px 20px;
+            background: var(--header-bg, #fff);
+            border-bottom: 1px solid var(--border-light, #e9edf2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-header .back {
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 100px;
+        }
+        .settings-group {
+            margin-bottom: 24px;
+        }
+        .settings-group h4 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary, #1f2a3a);
+            border-bottom: 1px solid var(--border-light, #e2e8f0);
+            padding-bottom: 6px;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light, #edf0f5);
+        }
+        .settings-item label {
+            font-size: 14px;
+            color: var(--text-secondary, #3b4a5e);
+        }
+        .settings-item select, .settings-item input[type="file"] {
+            max-width: 140px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 1px solid #d0d7e2;
+            background: white;
+        }
+        .color-options, .bg-options, .bubble-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .color-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .color-dot.active {
+            border-color: #0b84ff;
+        }
+        .bg-preview {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            border: 2px solid #d0d7e2;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        .bg-preview.active {
+            border-color: #0b84ff;
+        }
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0b84ff;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 16px;
+            margin: 20px 0 10px;
+            cursor: pointer;
+        }
+        /* ===== 自动回复管理 (内嵌) ===== */
+        .reply-manager {
+            margin-top: 8px;
+        }
+        .reply-manager .search-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .reply-manager .search-bar input, .reply-manager .search-bar select {
+            padding: 6px 10px;
+            border-radius: 30px;
+            border: 1px solid #d0d7e2;
+            flex: 1;
+        }
+        .reply-tag {
+            display: inline-block;
+            background: #eef2f7;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            margin: 2px 4px 2px 0;
+            cursor: pointer;
+        }
+        .reply-item {
+            background: var(--bg-item, #f3f6fa);
+            padding: 8px 12px;
+            border-radius: 16px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .reply-item .reply-text {
+            font-size: 14px;
+        }
+        .reply-item .reply-actions i {
+            margin-left: 10px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        .reply-item .reply-actions i:hover { opacity: 1; }
+        /* 小工具 */
+        .flex { display: flex; align-items: center; gap: 8px; }
+        .mt-2 { margin-top: 8px; }
+        .text-small { font-size: 13px; color: #6b7a8f; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* 滚动条 */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #bcc8d6; border-radius: 20px; }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+    <!-- 聊天页面 -->
+    <div id="chatPage" class="page active">
+        <div class="chat-header">
+            <div class="avatar" id="chatAvatar">J</div>
+            <div class="info">
+                <div class="name" id="chatName">Jason</div>
+                <div class="status"><i class="fas fa-circle"></i> <span id="chatStatus">在线</span></div>
+            </div>
+            <div class="actions">
+                <i class="fas fa-moon" id="themeToggle" onclick="toggleTheme()"></i>
+                <i class="fas fa-cog" onclick="openSettings()"></i>
+            </div>
+        </div>
+        <div class="messages-area" id="messagesArea">
+            <!-- 动态消息 -->
+        </div>
+        <div class="input-area">
+            <div class="input-row">
+                <div class="emoji-picker" id="emojiPicker">
+                    <span>😊</span><span>😂</span><span>🥰</span><span>😎</span><span>🤔</span><span>😭</span><span>🔥</span><span>❤️</span><span>👍</span><span>🎉</span><span>✨</span><span>💯</span>
+                </div>
+            </div>
+            <div class="input-row">
+                <textarea id="msgInput" rows="1" placeholder="输入消息..."></textarea>
+                <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="input-actions">
+                <i class="fas fa-image" onclick="document.getElementById('imgUpload').click()"></i>
+                <i class="fas fa-reply" onclick="insertQuote()"></i>
+                <input type="file" id="imgUpload" accept="image/*" style="display:none" onchange="uploadImage(event)">
+                <span style="flex:1; text-align:right; font-size:13px; color:#6b7a8f;" id="charCount">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置页面 -->
+    <div id="settingsPage" class="page">
+        <div class="settings-header">
+            <span class="back" onclick="closeSettings()"><i class="fas fa-arrow-left"></i></span>
+            <span style="font-weight:600; font-size:18px;">设置</span>
+        </div>
+        <div class="settings-content" id="settingsContent">
+            <!-- 动态渲染设置 -->
+        </div>
+    </div>
+</div>
+<script>
+    // ============================================================
+    // 数据层 (无限存储模拟 localStorage)
+    // ============================================================
+    const DB = {
+        get(key, def) { 
+            try { return JSON.parse(localStorage.getItem('chat_'+key)) || def; } 
+            catch(e){ return def; }
+        },
+        set(key, val) { localStorage.setItem('chat_'+key, JSON.stringify(val)); }
+    };
+
+    // 默认数据
+    const DEFAULT_REPLIES = [
+        { id: 's1', category: '称呼', type: '熟男', text: '亲爱的' },
+        { id: 's2', category: '称呼', type: '奶狗', text: '宝贝' },
+        { id: 's3', category: '情绪', type: '通用', text: '我有点想你' },
+        { id: 's4', category: '情绪', type: '熟男', text: '最近还好吗' },
+        { id: 's5', category: '日常', type: '通用', text: '吃饭了吗' },
+        { id: 's6', category: '日常', type: '奶狗', text: '好想你呀' },
+        { id: 's7', category: '情绪', type: '熟男', text: '晚安' },
+        { id: 's8', category: '称呼', type: '通用', text: '朋友' },
+        { id: 's9', category: '情绪', type: '奶狗', text: '嘻嘻' },
+        { id: 's10', category: '日常', type: '通用', text: '在干嘛' },
+    ];
+    // 扩展至16种主题类别，此处精简但保留305条模拟（实际用循环生成）
+    for (let i=11; i<=305; i++) {
+        const cats = ['称呼','情绪','日常','问候','玩笑','关心','告别','鼓励','吐槽','分享','求助','赞同','反对','感慨','好奇','祝福'];
+        const types = ['熟男','奶狗','通用'];
+        DEFAULT_REPLIES.push({
+            id: 's'+i,
+            category: cats[i%cats.length],
+            type: types[i%3],
+            text: `自动回复 #${i} (${cats[i%cats.length]})`
+        });
+    }
+
+    // 初始化数据
+    let appState = DB.get('state', {
+        userName: 'Jason',
+        userStatus: '在线',
+        avatarColor: '#6c7a8d',
+        theme: 'light',
+        themeColor: '#0b84ff',
+        bgImage: '',
+        bubbleStyle: 'default',
+        replies: [...DEFAULT_REPLIES],
+        messages: [
+            { id: 'm1', from: 'other', text: '你好呀！', time: Date.now()-3600000, quote: '' },
+            { id: 'm2', from: 'me', text: '嗨！今天天气不错', time: Date.now()-1800000, quote: '' },
+        ],
+        emojis: [],
+        settings: { sound: 'default', autoReplyFreq: 5, notify: true }
+    });
+    // 兼容旧数据
+    if (!appState.replies || appState.replies.length<10) appState.replies = [...DEFAULT_REPLIES];
+    // 保存
+    function saveState() { DB.set('state', appState); }
+
+    // 当前引用回复
+    let quoteMsg = '';
+
+    // ============================================================
+    // 渲染函数
+    // ============================================================
+    function renderChat() {
+        const area = document.getElementById('messagesArea');
+        area.innerHTML = appState.messages.map(m => {
+            const cls = m.from === 'me' ? 'me' : 'other';
+            const time = new Date(m.time).toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+            let content = m.text || '';
+            if (m.image) content += `<img src="${m.image}" alt="图片">`;
+            const quoteHtml = m.quote ? `<div class="quote">${m.quote}</div>` : '';
+            return `<div class="message-bubble ${cls}">${quoteHtml}${content}<div class="time">${time}</div></div>`;
+        }).join('');
+        area.scrollTop = area.scrollHeight;
+        document.getElementById('chatName').innerText = appState.userName;
+        document.getElementById('chatStatus').innerText = appState.userStatus;
+        // 头像
+        const av = document.getElementById('chatAvatar');
+        av.style.background = appState.avatarColor || '#6c7a8d';
+        av.innerText = appState.userName.charAt(0).toUpperCase();
+        // 主题
+        applyTheme();
+    }
+
+    function applyTheme() {
+        const root = document.documentElement;
+        const isDark = appState.theme === 'dark';
+        const bg = isDark ? '#1e2632' : '#f7f9fc';
+        const header = isDark ? '#2a3342' : '#ffffff';
+        const bubbleMe = isDark ? '#3b4f6a' : '#d1e7ff';
+        const bubbleOther = isDark ? '#364153' : '#ffffff';
+        const text = isDark ? '#eaf0f6' : '#1f2a3a';
+        const border = isDark ? '#3f4b5e' : '#e9edf2';
+        document.getElementById('chatPage').style.setProperty('--bg-primary', bg);
+        document.getElementById('chatPage').style.setProperty('--header-bg', header);
+        document.getElementById('chatPage').style.setProperty('--bubble-me', bubbleMe);
+        document.getElementById('chatPage').style.setProperty('--bubble-other', bubbleOther);
+        document.getElementById('chatPage').style.setProperty('--text-primary', text);
+        document.getElementById('chatPage').style.setProperty('--border-light', border);
+        // 背景图片
+        if (appState.bgImage) {
+            document.querySelector('.messages-area').style.setProperty('--chat-bg-image', `url(${appState.bgImage})`);
+        } else {
+            document.querySelector('.messages-area').style.setProperty('--chat-bg-image', 'none');
+        }
+        // 主题色
+        document.querySelector('.send-btn').style.background = appState.themeColor || '#0b84ff';
+    }
+
+    function renderSettings() {
+        const container = document.getElementById('settingsContent');
+        container.innerHTML = `
+            <div class="settings-group"><h4>用户信息</h4>
+                <div class="settings-item"><label>昵称</label><input id="sName" value="${appState.userName}"></div>
+                <div class="settings-item"><label>状态</label>
+                    <select id="sStatus">${['在线','忙碌','勿扰','离线','隐身','发呆','学习中','工作中','健身中','游戏中','阅读中','旅行中','美食中','购物中','追剧中'].map(s => `<option ${appState.userStatus===s?'selected':''}>${s}</option>`).join('')}</select>
+                </div>
+                <div class="settings-item"><label>头像颜色</label><input type="color" id="sAvatarColor" value="${appState.avatarColor||'#6c7a8d'}"></div>
+            </div>
+            <div class="settings-group"><h4>聊天外观</h4>
+                <div class="settings-item"><label>主题色</label><div class="color-options" id="colorOptions"></div></div>
+                <div class="settings-item"><label>背景</label><div class="bg-options" id="bgOptions"></div><input type="file" accept="image/*" id="bgUpload" style="display:none" onchange="uploadBg(event)"></div>
+                <div class="settings-item"><label>气泡</label><div class="bubble-options" id="bubbleOptions"></div></div>
+            </div>
+            <div class="settings-group"><h4>通知与声音</h4>
+                <div class="settings-item"><label>提示音</label><select id="sSound"><option ${appState.settings.sound==='default'?'selected':''}>默认</option><option>柔和</option><option>清脆</option><option>低沉</option><option>轻快</option></select></div>
+                <div class="settings-item"><label>自动回复频率(1-5)</label><input type="range" id="sFreq" min="1" max="5" value="${appState.settings.autoReplyFreq||5}"></div>
+            </div>
+            <div class="settings-group"><h4>自动回复管理</h4>
+                <div class="reply-manager" id="replyManager"></div>
+            </div>
+            <div class="settings-group"><h4>数据管理</h4>
+                <div class="settings-item"><button onclick="exportData()">导出聊天记录</button><button onclick="importData()">导入</button></div>
+                <div class="settings-item"><button onclick="clearAll()" style="color:red;">清空全部数据</button></div>
+            </div>
+            <button class="save-btn" onclick="saveSettings()">保存设置</button>
+        `;
+        // 渲染主题色
+        const colors = ['#0b84ff','#e74c3c','#2ecc71','#f39c12','#9b59b6','#1abc9c','#e67e22','#3498db','#e84393','#00b894','#fd79a8','#6c5ce7','#fdcb6e','#00cec9','#e17055'];
+        const colorDiv = document.getElementById('colorOptions');
+        colors.forEach(c => {
+            const dot = document.createElement('div');
+            dot.className = `color-dot ${appState.themeColor===c?'active':''}`;
+            dot.style.background = c;
+            dot.onclick = () => { appState.themeColor = c; renderSettings(); };
+            colorDiv.appendChild(dot);
+        });
+        // 背景预设
+        const bgPresets = ['linear-gradient(135deg,#f5f7fa,#c3cfe2)','#f0f2f5','#d4e0f0','#fde2e2','#e8f5e9','#fff3e0','#f3e5f5','#e0f7fa','#fbe9e7','#ede7f6','#f1f8e9','#fce4ec'];
+        const bgDiv = document.getElementById('bgOptions');
+        bgPresets.forEach((bg, idx) => {
+            const div = document.createElement('div');
+            div.className = `bg-preview ${appState.bgImage===bg?'active':''}`;
+            div.style.background = bg;
+            div.onclick = () => { appState.bgImage = bg; renderSettings(); };
+            bgDiv.appendChild(div);
+        });
+        // 气泡
+        const bubbleDiv = document.getElementById('bubbleOptions');
+        ['default','rounded','sharp','soft','modern','classic','minimal'].forEach(b => {
+            const span = document.createElement('span');
+            span.style.padding = '4px 12px';
+            span.style.borderRadius = b==='sharp'?'0':'30px';
+            span.style.border = '1px solid #d0d7e2';
+            span.style.cursor = 'pointer';
+            span.style.background = appState.bubbleStyle===b?'#0b84ff':'white';
+            span.style.color = appState.bubbleStyle===b?'white':'black';
+            span.innerText = b;
+            span.onclick = () => { appState.bubbleStyle = b; renderSettings(); };
+            bubbleDiv.appendChild(span);
+        });
+        // 自动回复管理
+        renderReplyManager();
+    }
+
+    function renderReplyManager() {
+        const container = document.getElementById('replyManager');
+        if (!container) return;
+        const replies = appState.replies || [];
+        const cats = [...new Set(replies.map(r=>r.category))];
+        let html = `<div class="search-bar"><input id="replySearch" placeholder="搜索内容/分类" oninput="filterReplies()"><select id="replyCatFilter" onchange="filterReplies()"><option value="">全部分类</option>${cats.map(c=>`<option>${c}</option>`).join('')}</select><select id="replyTypeFilter" onchange="filterReplies()"><option value="">全部类型</option><option>熟男</option><option>奶狗</option><option>通用</option></select></div>
+        <div>${cats.map(c=>`<span class="reply-tag" onclick="document.getElementById('replyCatFilter').value='${c}';filterReplies();">${c}</span>`).join('')}</div>
+        <div id="replyList"></div>
+        <div class="flex mt-2"><input id="newReplyText" placeholder="新回复内容" style="flex:1"><select id="newReplyCat">${cats.map(c=>`<option>${c}</option>`).join('')}</select><select id="newReplyType"><option>熟男</option><option>奶狗</option><option>通用</option></select><button onclick="addReply()">添加</button></div>
+        <button onclick="importDefaultReplies()" style="margin-top:8px;">导入默认回复</button>
+        `;
+        container.innerHTML = html;
+        filterReplies();
+    }
+
+    function filterReplies() {
+        const list = document.getElementById('replyList');
+        if (!list) return;
+        const search = document.getElementById('replySearch')?.value?.toLowerCase() || '';
+        const cat = document.getElementById('replyCatFilter')?.value || '';
+        const type = document.getElementById('replyTypeFilter')?.value || '';
+        let filtered = appState.replies.filter(r => {
+            let match = true;
+            if (search && !r.text.toLowerCase().includes(search) && !r.category.toLowerCase().includes(search)) match = false;
+            if (cat && r.category !== cat) match = false;
+            if (type && r.type !== type) match = false;
+            return match;
+        });
+        list.innerHTML = filtered.map(r => `
+            <div class="reply-item"><span class="reply-text">${r.text} <small style="color:#6b7a8f;">[${r.category}] ${r.type}</small></span>
+            <span class="reply-actions"><i class="fas fa-edit" onclick="editReply('${r.id}')"></i><i class="fas fa-trash" onclick="deleteReply('${r.id}')"></i></span></div>
+        `).join('');
+    }
+
+    // ============================================================
+    // 操作函数
+    // ============================================================
+    function sendMessage() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+        if (!text) return;
+        const msg = { id: 'm'+Date.now(), from: 'me', text, time: Date.now(), quote: quoteMsg };
+        appState.messages.push(msg);
+        quoteMsg = '';
+        input.value = '';
+        saveState();
+        renderChat();
+        // 自动回复 (1-3条)
+        const freq = appState.settings.autoReplyFreq || 5;
+        if (Math.random() < freq/5) {
+            const count = 1 + Math.floor(Math.random() * 3);
+            const candidates = appState.replies.filter(r => r.text !== text);
+            for (let i=0; i<count && candidates.length>0; i++) {
+                const idx = Math.floor(Math.random() * candidates.length);
+                const reply = candidates.splice(idx,1)[0];
+                appState.messages.push({ id: 'm'+Date.now()+i, from: 'other', text: reply.text, time: Date.now(), quote: '' });
+            }
+            saveState();
+            renderChat();
+        }
+    }
+
+    function uploadImage(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const msg = { id: 'm'+Date.now(), from: 'me', text: '', image: ev.target.result, time: Date.now(), quote: quoteMsg };
+            appState.messages.push(msg);
+            quoteMsg = '';
+            saveState();
+            renderChat();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function insertQuote() {
+        const last = appState.messages.filter(m => m.from === 'other').pop();
+        if (last) {
+            quoteMsg = last.text || '图片';
+            document.getElementById('msgInput').placeholder = `引用: ${quoteMsg}`;
+        }
+    }
+
+    function toggleTheme() {
+        appState.theme = appState.theme === 'dark' ? 'light' : 'dark';
+        saveState();
+        renderChat();
+    }
+
+    function openSettings() {
+        document.getElementById('chatPage').classList.remove('active');
+        document.getElementById('settingsPage').classList.add('active');
+        renderSettings();
+    }
+    function closeSettings() {
+        document.getElementById('settingsPage').classList.remove('active');
+        document.getElementById('chatPage').classList.add('active');
+        renderChat();
+    }
+
+    function saveSettings() {
+        const name = document.getElementById('sName')?.value;
+        if (name) appState.userName = name;
+        const status = document.getElementById('sStatus')?.value;
+        if (status) appState.userStatus = status;
+        const color = document.getElementById('sAvatarColor')?.value;
+        if (color) appState.avatarColor = color;
+        const sound = document.getElementById('sSound')?.value;
+        if (sound) appState.settings.sound = sound;
+        const freq = parseInt(document.getElementById('sFreq')?.value);
+        if (freq) appState.settings.autoReplyFreq = freq;
+        saveState();
+        renderChat();
+        closeSettings();
+    }
+
+    function uploadBg(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            appState.bgImage = ev.target.result;
+            saveState();
+            renderSettings();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 回复管理
+    function addReply() {
+        const text = document.getElementById('newReplyText')?.value.trim();
+        const cat = document.getElementById('newReplyCat')?.value;
+        const type = document.getElementById('newReplyType')?.value;
+        if (!text || !cat) return;
+        appState.replies.push({ id: 'u'+Date.now(), category: cat, type, text });
+        saveState();
+        renderReplyManager();
+    }
+
+    function deleteReply(id) {
+        appState.replies = appState.replies.filter(r => r.id !== id);
+        saveState();
+        renderReplyManager();
+    }
+
+    function editReply(id) {
+        const r = appState.replies.find(r => r.id === id);
+        if (!r) return;
+        const newText = prompt('编辑回复内容', r.text);
+        if (newText !== null) r.text = newText;
+        saveState();
+        renderReplyManager();
+    }
+
+    function importDefaultReplies() {
+        // 恢复默认 (不覆盖自定义)
+        const defaultIds = DEFAULT_REPLIES.map(d => d.id);
+        const existingIds = new Set(appState.replies.map(r => r.id));
+        const toAdd = DEFAULT_REPLIES.filter(d => !existingIds.has(d.id));
+        appState.replies.push(...toAdd);
+        saveState();
+        renderReplyManager();
+    }
+
+    function exportData() {
+        const data = JSON.stringify(appState.messages);
+        const blob = new Blob([data], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'chat_history.json';
+        a.click();
+    }
+
+    function importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (Array.isArray(data)) {
+                        appState.messages = data;
+                        saveState();
+                        renderChat();
+                    }
+                } catch(e) {}
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    function clearAll() {
+        if (confirm('确定清空所有数据？将恢复初始状态
