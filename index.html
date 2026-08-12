@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>传讯 · 字卡聊天</title>
     <style>
-        /* ===== 全局重置 & 基础 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +12,7 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
         body {
-            background: #e8e0f0;
+            background: #0b0710;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,28 +24,25 @@
             max-width: 100%;
             height: 780px;
             max-height: 95vh;
-            background: #f5f0fa;
+            background: #120d1a;
             border-radius: 36px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(180, 150, 220, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(120, 80, 200, 0.15);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
-            transition: all 0.2s;
         }
         .status-bar {
             padding: 12px 20px 6px;
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            color: rgba(60, 40, 80, 0.5);
-            background: transparent;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
             flex-shrink: 0;
-            letter-spacing: 0.3px;
         }
         .status-bar .time {
             font-weight: 600;
-            color: rgba(60, 40, 80, 0.7);
+            color: rgba(255, 255, 255, 0.6);
         }
         .status-bar .icons {
             display: flex;
@@ -59,19 +55,14 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            background: #f5f0fa;
         }
         .chat-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 16px 10px;
+            padding: 8px 16px 12px;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(120, 80, 160, 0.08);
-            position: relative;
-            z-index: 2;
-            background: rgba(245, 240, 250, 0.6);
-            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
         .chat-header .back {
             width: 36px;
@@ -79,23 +70,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(60, 40, 80, 0.4);
-            font-size: 22px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
             cursor: pointer;
             border-radius: 50%;
-            transition: 0.2s;
             background: transparent;
             border: none;
         }
         .chat-header .back:hover {
-            background: rgba(120, 80, 160, 0.06);
+            background: rgba(255, 255, 255, 0.06);
         }
         .chat-header .title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2d1b3d;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #8b6bb0, #b28ad0);
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #c084fc, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -106,13 +96,13 @@
             align-items: center;
         }
         .chat-header .actions button {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: none;
-            background: rgba(120, 80, 160, 0.06);
-            color: rgba(60, 40, 80, 0.5);
-            font-size: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
@@ -120,73 +110,69 @@
             justify-content: center;
         }
         .chat-header .actions button:hover {
-            background: rgba(120, 80, 160, 0.12);
-            color: #2d1b3d;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
         .chat-avatars {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 32px;
-            padding: 14px 0 10px;
+            gap: 28px;
+            padding: 12px 0 8px;
             flex-shrink: 0;
-            position: relative;
         }
         .chat-avatars .avatar-group {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             cursor: pointer;
             position: relative;
         }
         .chat-avatars .avatar-group .avatar {
-            width: 64px;
-            height: 64px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            border: 2px solid rgba(139, 107, 176, 0.25);
+            border: 2px solid rgba(167, 139, 250, 0.3);
             object-fit: cover;
-            transition: 0.3s;
-            background: #e8def0;
+            background: #1a1425;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
-            color: rgba(60, 40, 80, 0.3);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.3);
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: 0.3s;
         }
         .chat-avatars .avatar-group .avatar:hover {
-            border-color: #8b6bb0;
+            border-color: #a78bfa;
             transform: scale(1.03);
         }
         .chat-avatars .avatar-group .label {
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(60, 40, 80, 0.5);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
             letter-spacing: 1px;
         }
         .chat-avatars .vs {
-            color: rgba(60, 40, 80, 0.12);
-            font-size: 16px;
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 14px;
             font-weight: 300;
             letter-spacing: 2px;
         }
         .chat-avatars .avatar-group .upload-hint {
             position: absolute;
-            bottom: 2px;
-            right: -2px;
-            background: rgba(139, 107, 176, 0.15);
+            bottom: -2px;
+            right: -4px;
+            background: rgba(167, 139, 250, 0.25);
             border-radius: 50%;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: rgba(60, 40, 80, 0.5);
-            border: 1px solid rgba(139, 107, 176, 0.15);
-            backdrop-filter: blur(4px);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(167, 139, 250, 0.2);
         }
         .chat-avatars .avatar-group input[type="file"] {
             display: none;
@@ -197,29 +183,26 @@
             padding: 12px 16px 8px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             scroll-behavior: smooth;
         }
         .message-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .message-list::-webkit-scrollbar-track {
-            background: transparent;
+            width: 3px;
         }
         .message-list::-webkit-scrollbar-thumb {
-            background: rgba(139, 107, 176, 0.15);
+            background: rgba(167, 139, 250, 0.25);
             border-radius: 10px;
         }
         .message {
             display: flex;
             flex-direction: column;
-            max-width: 82%;
+            max-width: 80%;
             animation: msgIn 0.25s ease-out;
         }
         @keyframes msgIn {
             from {
                 opacity: 0;
-                transform: translateY(6px) scale(0.97);
+                transform: translateY(8px) scale(0.97);
             }
             to {
                 opacity: 1;
@@ -235,44 +218,40 @@
             align-items: flex-start;
         }
         .message .bubble {
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 17px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
             line-height: 1.6;
             word-break: break-word;
-            color: #1e1428;
-            position: relative;
-            background: #fff;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            color: #f0edf5;
+            background: #1e1830;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             transition: background 0.3s;
         }
         .message.self .bubble {
-            background: #d4c4e8;
-            color: #1e1428;
+            background: #7c3aed;
+            color: #fff;
             border-bottom-right-radius: 4px;
         }
         .message.other .bubble {
-            background: #ffffff;
+            background: #1e1830;
             border-bottom-left-radius: 4px;
         }
         .message .bubble .time-tag {
-            font-size: 11px;
-            color: rgba(60, 40, 80, 0.25);
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
             margin-top: 4px;
             display: block;
             text-align: right;
-            letter-spacing: 0.3px;
         }
         .message.other .bubble .time-tag {
             text-align: left;
         }
         .message .sender-name {
-            font-size: 12px;
-            font-weight: 500;
-            color: rgba(60, 40, 80, 0.35);
-            margin-bottom: 4px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            margin-bottom: 2px;
             padding-left: 4px;
-            letter-spacing: 0.5px;
         }
         .message.self .sender-name {
             text-align: right;
@@ -280,26 +259,24 @@
         }
         .typing-indicator {
             align-self: flex-start;
-            padding: 8px 18px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 16px;
+            border-radius: 18px;
+            background: rgba(30, 24, 48, 0.6);
             display: none;
             align-items: center;
-            gap: 8px;
-            font-size: 15px;
-            color: rgba(60, 40, 80, 0.4);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(139, 107, 176, 0.06);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            gap: 6px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(167, 139, 250, 0.08);
         }
         .typing-indicator.show {
             display: flex;
         }
         .typing-indicator .dot {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: rgba(139, 107, 176, 0.3);
+            background: rgba(167, 139, 250, 0.4);
             animation: dotBounce 1.2s infinite;
         }
         .typing-indicator .dot:nth-child(2) {
@@ -323,58 +300,52 @@
         .chat-input-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 10px 16px 14px;
             flex-shrink: 0;
-            border-top: 1px solid rgba(120, 80, 160, 0.06);
-            background: rgba(245, 240, 250, 0.7);
-            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            background: rgba(18, 13, 26, 0.6);
         }
         .chat-input-area input {
             flex: 1;
-            padding: 12px 18px;
-            border-radius: 28px;
-            border: 1px solid rgba(120, 80, 160, 0.1);
-            background: rgba(255, 255, 255, 0.6);
-            color: #1e1428;
-            font-size: 16px;
+            padding: 10px 16px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.04);
+            color: #f0edf5;
+            font-size: 14px;
             outline: none;
             transition: 0.3s;
         }
         .chat-input-area input::placeholder {
-            color: rgba(60, 40, 80, 0.25);
+            color: rgba(255, 255, 255, 0.2);
         }
         .chat-input-area input:focus {
-            border-color: rgba(139, 107, 176, 0.25);
-            background: #fff;
+            border-color: rgba(167, 139, 250, 0.3);
+            background: rgba(255, 255, 255, 0.06);
         }
         .chat-input-area .send-btn {
-            width: 48px;
-            height: 48px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(135deg, #9b7ab8, #b28ad0);
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             transition: 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 16px rgba(139, 107, 176, 0.2);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
         }
         .chat-input-area .send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 24px rgba(139, 107, 176, 0.25);
+            transform: scale(1.04);
+            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.35);
         }
         .chat-input-area .send-btn:active {
             transform: scale(0.94);
-        }
-        .chat-input-area .send-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: none;
         }
         .overlay {
             position: absolute;
@@ -382,8 +353,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(245, 240, 250, 0.92);
-            backdrop-filter: blur(16px);
+            background: rgba(8, 5, 14, 0.7);
+            backdrop-filter: blur(12px);
             z-index: 10;
             display: none;
             flex-direction: column;
@@ -410,22 +381,22 @@
             justify-content: space-between;
             padding: 16px 20px 12px;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(120, 80, 160, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         .overlay-header .title {
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 600;
-            color: #2d1b3d;
+            color: #fff;
             letter-spacing: 1px;
         }
         .overlay-header .close-btn {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             border: none;
-            background: rgba(120, 80, 160, 0.06);
-            color: rgba(60, 40, 80, 0.4);
-            font-size: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
@@ -433,8 +404,8 @@
             justify-content: center;
         }
         .overlay-header .close-btn:hover {
-            background: rgba(120, 80, 160, 0.1);
-            color: #2d1b3d;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
         .overlay-body {
             flex: 1;
@@ -442,61 +413,57 @@
             padding: 16px 20px 24px;
         }
         .overlay-body::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         .overlay-body::-webkit-scrollbar-thumb {
-            background: rgba(139, 107, 176, 0.15);
+            background: rgba(167, 139, 250, 0.2);
             border-radius: 10px;
         }
         .setting-group {
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
         .setting-group .group-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(60, 40, 80, 0.35);
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.25);
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .setting-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(120, 80, 160, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
         .setting-row .label {
-            font-size: 15px;
-            color: rgba(60, 40, 80, 0.75);
-        }
-        .setting-row .value {
             font-size: 14px;
-            color: rgba(60, 40, 80, 0.4);
+            color: rgba(255, 255, 255, 0.7);
         }
         .setting-row .action-btn {
-            padding: 4px 16px;
+            padding: 4px 14px;
             border-radius: 16px;
-            border: 1px solid rgba(139, 107, 176, 0.12);
-            background: rgba(139, 107, 176, 0.04);
-            color: rgba(60, 40, 80, 0.6);
-            font-size: 13px;
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            background: rgba(167, 139, 250, 0.06);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
             cursor: pointer;
             transition: 0.2s;
         }
         .setting-row .action-btn:hover {
-            background: rgba(139, 107, 176, 0.08);
-            border-color: rgba(139, 107, 176, 0.2);
-            color: #2d1b3d;
+            background: rgba(167, 139, 250, 0.12);
+            border-color: rgba(167, 139, 250, 0.25);
+            color: #fff;
         }
         .color-picker {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .color-picker .color-opt {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
@@ -507,18 +474,18 @@
             transform: scale(1.08);
         }
         .color-picker .color-opt.active {
-            border-color: #2d1b3d;
-            box-shadow: 0 0 0 2px rgba(139, 107, 176, 0.15);
+            border-color: #fff;
+            box-shadow: 0 0 16px rgba(167, 139, 250, 0.3);
         }
         .bg-picker {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .bg-picker .bg-opt {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             border: 2px solid transparent;
             cursor: pointer;
             transition: 0.2s;
@@ -530,82 +497,61 @@
             transform: scale(1.05);
         }
         .bg-picker .bg-opt.active {
-            border-color: #8b6bb0;
-            box-shadow: 0 0 0 2px rgba(139, 107, 176, 0.1);
-        }
-        .setting-row input[type="number"],
-        .setting-row input[type="text"] {
-            width: 64px;
-            padding: 4px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(120, 80, 160, 0.08);
-            background: rgba(255, 255, 255, 0.5);
-            color: #1e1428;
-            font-size: 14px;
-            text-align: center;
-            outline: none;
-            transition: 0.2s;
-        }
-        .setting-row input[type="number"]:focus,
-        .setting-row input[type="text"]:focus {
-            border-color: rgba(139, 107, 176, 0.2);
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.2);
         }
         .setting-row .range-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         .setting-row .range-group input[type="range"] {
-            width: 120px;
-            accent-color: #8b6bb0;
+            width: 100px;
+            accent-color: #a78bfa;
             background: transparent;
         }
         .setting-row .range-group .val {
-            min-width: 36px;
+            min-width: 30px;
             text-align: center;
-            color: rgba(60, 40, 80, 0.6);
-            font-size: 14px;
-            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
         }
         .toggle-switch {
-            width: 44px;
-            height: 24px;
-            border-radius: 14px;
-            background: rgba(120, 80, 160, 0.12);
+            width: 40px;
+            height: 22px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
             cursor: pointer;
             transition: 0.3s;
             position: relative;
             flex-shrink: 0;
         }
         .toggle-switch.active {
-            background: rgba(139, 107, 176, 0.4);
+            background: rgba(124, 58, 237, 0.6);
         }
         .toggle-switch .knob {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             background: #fff;
             position: absolute;
             top: 2px;
             left: 2px;
             transition: 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         .toggle-switch.active .knob {
-            left: 22px;
-            background: #fff;
+            left: 20px;
         }
         .card-group-item {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(120, 80, 160, 0.04);
-            transition: 0.2s;
-            backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
         .card-group-item:hover {
-            border-color: rgba(139, 107, 176, 0.08);
+            border-color: rgba(167, 139, 250, 0.1);
         }
         .card-group-item .group-header {
             display: flex;
@@ -614,334 +560,296 @@
             margin-bottom: 8px;
         }
         .card-group-item .group-header .name {
-            font-size: 16px;
-            font-weight: 600;
-            color: rgba(45, 27, 61, 0.8);
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
         }
         .card-group-item .group-header .count {
-            font-size: 13px;
-            color: rgba(60, 40, 80, 0.3);
-        }
-        .card-group-item .group-header .actions {
-            display: flex;
-            gap: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.25);
         }
         .card-group-item .group-header .actions button {
             background: transparent;
             border: none;
-            color: rgba(60, 40, 80, 0.25);
+            color: rgba(255, 255, 255, 0.25);
             cursor: pointer;
-            font-size: 14px;
-            padding: 2px 8px;
+            font-size: 13px;
+            padding: 2px 6px;
             border-radius: 4px;
-            transition: 0.2s;
         }
         .card-group-item .group-header .actions button:hover {
-            background: rgba(120, 80, 160, 0.06);
-            color: rgba(60, 40, 80, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
         }
         .card-group-item .card-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 6px;
+            margin-top: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .card-group-item .card-list::-webkit-scrollbar {
+            width: 2px;
+        }
+        .card-group-item .card-list::-webkit-scrollbar-thumb {
+            background: rgba(167, 139, 250, 0.2);
+            border-radius: 10px;
         }
         .card-group-item .card-list .card-tag {
-            padding: 4px 14px;
-            border-radius: 18px;
-            background: rgba(139, 107, 176, 0.06);
-            border: 1px solid rgba(139, 107, 176, 0.04);
-            font-size: 14px;
-            color: rgba(45, 27, 61, 0.7);
+            padding: 4px 12px;
+            border-radius: 16px;
+            background: rgba(167, 139, 250, 0.08);
+            border: 1px solid rgba(167, 139, 250, 0.06);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.2s;
+            gap: 6px;
         }
         .card-group-item .card-list .card-tag .del {
             cursor: pointer;
-            color: rgba(60, 40, 80, 0.15);
-            font-size: 13px;
-            transition: 0.2s;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 12px;
         }
         .card-group-item .card-list .card-tag .del:hover {
-            color: #b07a7a;
+            color: #f87171;
         }
         .card-group-item .add-card-row {
             display: flex;
-            gap: 8px;
-            margin-top: 10px;
+            gap: 6px;
+            margin-top: 8px;
         }
         .card-group-item .add-card-row input {
             flex: 1;
-            padding: 8px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(120, 80, 160, 0.06);
-            background: rgba(255, 255, 255, 0.5);
-            color: #1e1428;
-            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
             outline: none;
         }
         .card-group-item .add-card-row input:focus {
-            border-color: rgba(139, 107, 176, 0.15);
+            border-color: rgba(167, 139, 250, 0.2);
         }
         .card-group-item .add-card-row button {
-            padding: 8px 18px;
-            border-radius: 14px;
+            padding: 6px 14px;
+            border-radius: 12px;
             border: none;
-            background: rgba(139, 107, 176, 0.08);
-            color: rgba(60, 40, 80, 0.6);
-            font-size: 14px;
+            background: rgba(167, 139, 250, 0.12);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .card-group-item .add-card-row button:hover {
-            background: rgba(139, 107, 176, 0.12);
-            color: #2d1b3d;
+            background: rgba(167, 139, 250, 0.2);
+            color: #fff;
+        }
+        .card-group-item .batch-add-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .card-group-item .batch-add-row textarea {
+            flex: 1;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            outline: none;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        .card-group-item .batch-add-row textarea:focus {
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+        .card-group-item .batch-add-row textarea::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+        .card-group-item .batch-add-row button {
+            padding: 6px 14px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(167, 139, 250, 0.12);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .card-group-item .batch-add-row button:hover {
+            background: rgba(167, 139, 250, 0.2);
+            color: #fff;
         }
         .add-group-row {
             display: flex;
-            gap: 10px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 6px;
         }
         .add-group-row input {
             flex: 1;
-            padding: 10px 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(120, 80, 160, 0.06);
-            background: rgba(255, 255, 255, 0.5);
-            color: #1e1428;
-            font-size: 14px;
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
             outline: none;
         }
         .add-group-row input:focus {
-            border-color: rgba(139, 107, 176, 0.15);
+            border-color: rgba(167, 139, 250, 0.2);
         }
         .add-group-row button {
-            padding: 10px 22px;
-            border-radius: 14px;
+            padding: 8px 18px;
+            border-radius: 12px;
             border: none;
-            background: rgba(139, 107, 176, 0.08);
-            color: rgba(60, 40, 80, 0.6);
-            font-size: 14px;
+            background: rgba(167, 139, 250, 0.12);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .add-group-row button:hover {
-            background: rgba(139, 107, 176, 0.12);
-            color: #2d1b3d;
+            background: rgba(167, 139, 250, 0.2);
+            color: #fff;
         }
         .import-export-row {
             display: flex;
-            gap: 12px;
-            margin-top: 14px;
+            gap: 10px;
+            margin-top: 12px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .import-export-row button {
-            padding: 8px 24px;
-            border-radius: 14px;
-            border: 1px solid rgba(139, 107, 176, 0.08);
-            background: rgba(139, 107, 176, 0.04);
-            color: rgba(60, 40, 80, 0.5);
-            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(167, 139, 250, 0.1);
+            background: rgba(167, 139, 250, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
         }
         .import-export-row button:hover {
-            background: rgba(139, 107, 176, 0.08);
-            color: #2d1b3d;
-            border-color: rgba(139, 107, 176, 0.12);
+            background: rgba(167, 139, 250, 0.1);
+            color: #fff;
+            border-color: rgba(167, 139, 250, 0.2);
+        }
+        .import-export-row .import-options {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .import-export-row .import-options label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .import-export-row .import-options input[type="radio"] {
+            accent-color: #a78bfa;
         }
         .import-export-row input[type="file"] {
             display: none;
         }
         .letter-form textarea {
             width: 100%;
-            padding: 16px 18px;
-            border-radius: 18px;
-            border: 1px solid rgba(120, 80, 160, 0.06);
-            background: rgba(255, 255, 255, 0.6);
-            color: #1e1428;
-            font-size: 16px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
+            color: #f0edf5;
+            font-size: 15px;
             line-height: 1.7;
             resize: vertical;
-            min-height: 140px;
+            min-height: 120px;
             outline: none;
-            transition: 0.3s;
             font-family: inherit;
         }
         .letter-form textarea:focus {
-            border-color: rgba(139, 107, 176, 0.15);
-            background: #fff;
+            border-color: rgba(167, 139, 250, 0.2);
         }
         .letter-form textarea::placeholder {
-            color: rgba(60, 40, 80, 0.2);
+            color: rgba(255, 255, 255, 0.2);
         }
         .letter-form .send-letter-btn {
-            margin-top: 16px;
-            padding: 14px 32px;
-            border-radius: 28px;
+            margin-top: 14px;
+            padding: 12px 28px;
+            border-radius: 24px;
             border: none;
-            background: linear-gradient(135deg, #9b7ab8, #b28ad0);
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
             color: #fff;
-            font-size: 17px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(139, 107, 176, 0.15);
-            letter-spacing: 0.5px;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.2);
         }
         .letter-form .send-letter-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(139, 107, 176, 0.2);
-        }
-        .letter-form .send-letter-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.3);
         }
         .letter-history {
-            margin-top: 20px;
-        }
-        .letter-history .group-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(60, 40, 80, 0.3);
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+            margin-top: 18px;
         }
         .letter-history .item {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border-left: 3px solid rgba(139, 107, 176, 0.12);
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 2px solid rgba(167, 139, 250, 0.15);
         }
         .letter-history .item .meta {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            color: rgba(60, 40, 80, 0.25);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
             margin-bottom: 4px;
         }
         .letter-history .item .content {
-            font-size: 15px;
-            color: rgba(45, 27, 61, 0.8);
-            line-height: 1.6;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
         }
         .letter-history .item .reply-status {
-            font-size: 12px;
-            color: rgba(139, 107, 176, 0.4);
+            font-size: 11px;
+            color: rgba(167, 139, 250, 0.4);
             margin-top: 4px;
         }
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 10px;
         }
         .stat-grid .stat-card {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 14px;
-            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 14px;
             text-align: center;
-            border: 1px solid rgba(120, 80, 160, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
         .stat-grid .stat-card .num {
-            font-size: 28px;
-            font-weight: 700;
-            color: #8b6bb0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #a78bfa;
         }
         .stat-grid .stat-card .lbl {
-            font-size: 12px;
-            color: rgba(60, 40, 80, 0.3);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
             margin-top: 4px;
-        }
-        @media (max-width: 440px) {
-            body {
-                padding: 0;
-            }
-            .phone {
-                width: 100%;
-                height: 100vh;
-                max-height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-            }
-            .overlay {
-                border-radius: 0;
-            }
-        }
-        @media (max-height: 700px) {
-            .chat-avatars {
-                padding: 8px 0 4px;
-            }
-            .chat-avatars .avatar-group .avatar {
-                width: 52px;
-                height: 52px;
-                font-size: 26px;
-            }
-            .chat-header {
-                padding: 4px 12px 6px;
-            }
-            .chat-header .title {
-                font-size: 17px;
-            }
-            .message-list {
-                padding: 6px 12px 4px;
-                gap: 8px;
-            }
-            .message .bubble {
-                padding: 8px 14px;
-                font-size: 15px;
-            }
-            .chat-input-area {
-                padding: 6px 12px 10px;
-            }
-            .chat-input-area input {
-                padding: 8px 14px;
-                font-size: 14px;
-            }
-            .chat-input-area .send-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 17px;
-            }
-        }
-        .hidden {
-            display: none !important;
-        }
-        .text-muted {
-            color: rgba(60, 40, 80, 0.25);
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mb-8 {
-            margin-bottom: 8px;
-        }
-        .flex {
-            display: flex;
-        }
-        .flex-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .w-full {
-            width: 100%;
         }
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: rgba(60, 40, 80, 0.15);
-            font-size: 16px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 14px;
             letter-spacing: 0.5px;
         }
         .empty-state .icon {
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 10px;
             opacity: 0.4;
         }
@@ -960,37 +868,1169 @@
             position: relative;
             z-index: 1;
         }
+        .phone .bg-overlay {
+            background: radial-gradient(ellipse at 30% 20%, rgba(124, 58, 237, 0.04), transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(167, 139, 250, 0.03), transparent 50%);
+        }
         .letter-list .letter-item {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(120, 80, 160, 0.04);
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
         .letter-list .letter-item .top {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            color: rgba(60, 40, 80, 0.25);
+            color: rgba(255, 255, 255, 0.2);
         }
         .letter-list .letter-item .top .badge {
-            color: rgba(139, 107, 176, 0.3);
+            color: rgba(167, 139, 250, 0.4);
         }
         .letter-list .letter-item .content {
-            font-size: 15px;
-            color: rgba(45, 27, 61, 0.75);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 4px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         .letter-list .letter-item .reply-status {
             font-size: 12px;
-            color: rgba(139, 107, 176, 0.4);
+            color: rgba(167, 139, 250, 0.4);
             margin-top: 4px;
+        }
+        .batch-import-hint {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.2);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        @media (max-width: 440px) {
+            body {
+                padding: 0;
+            }
+            .phone {
+                width: 100%;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .overlay {
+                border-radius: 0;
+            }
+        }
+        @media (max-height: 700px) {
+            .chat-avatars {
+                padding: 6px 0 4px;
+            }
+            .chat-avatars .avatar-group .avatar {
+                width: 40px;
+                height: 40px;
+            }
+            .chat-header .title {
+                font-size: 15px;
+            }
+            .message .bubble {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            .chat-input-area input {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+            .chat-input-area .send-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="phone" id="app">
         <div class="bg-overlay" id="bgOverlay"></div>
-        <div class="status
+
+        <div class="status-bar">
+            <span class="time" id="statusTime">14:44</span>
+            <span class="icons">📶 📶 🔋</span>
+        </div>
+
+        <div class="app-container" id="appContainer">
+            <div class="chat-header">
+                <button class="back" id="backBtn">‹</button>
+                <span class="title">传讯</span>
+                <div class="actions">
+                    <button id="envelopeBtn">✉</button>
+                    <button id="settingsBtn">⚙</button>
+                </div>
+            </div>
+
+            <div class="chat-avatars">
+                <div class="avatar-group" id="myAvatarGroup">
+                    <div class="avatar" id="myAvatar">😊</div>
+                    <span class="label">我</span>
+                    <span class="upload-hint">✎</span>
+                    <input type="file" id="myAvatarInput" accept="image/*" />
+                </div>
+                <span class="vs">✦</span>
+                <div class="avatar-group" id="partnerAvatarGroup">
+                    <div class="avatar" id="partnerAvatar">🌟</div>
+                    <span class="label">鱼鱼</span>
+                                       <span class="upload-hint">✎</span>
+                    <input type="file" id="partnerAvatarInput" accept="image/*" />
+                </div>
+            </div>
+
+            <div class="message-list" id="messageList">
+                <div class="empty-state" id="emptyState">
+                    <div class="icon">💬</div>
+                    <div>开始你们的对话吧</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span>鱼鱼正在输入</span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="输入消息..." autocomplete="off" />
+                <button class="send-btn" id="sendBtn">➤</button>
+            </div>
+
+            <!-- 设置 -->
+            <div class="overlay" id="settingsOverlay">
+                <div class="overlay-header">
+                    <span class="title">⚙ 设置</span>
+                    <button class="close-btn" id="closeSettings">✕</button>
+                </div>
+                <div class="overlay-body">
+                    <div class="setting-group">
+                        <div class="group-title">头像</div>
+                        <div class="setting-row">
+                            <span class="label">我的头像</span>
+                            <button class="action-btn" id="changeMyAvatarBtn">更换</button>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">对方头像</span>
+                            <button class="action-btn" id="changePartnerAvatarBtn">更换</button>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="group-title">气泡颜色</div>
+                        <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
+                            <div class="color-picker" id="bubbleColorPicker">
+                                <div class="color-opt active" style="background:#7c3aed;" data-color="#7c3aed"></div>
+                                <div class="color-opt" style="background:#d946ef;" data-color="#d946ef"></div>
+                                <div class="color-opt" style="background:#3b82f6;" data-color="#3b82f6"></div>
+                                <div class="color-opt" style="background:#ec4899;" data-color="#ec4899"></div>
+                                <div class="color-opt" style="background:#8b5cf6;" data-color="#8b5cf6"></div>
+                                <div class="color-opt" style="background:#06b6d4;" data-color="#06b6d4"></div>
+                                <div class="color-opt" style="background:#f59e0b;" data-color="#f59e0b"></div>
+                                <div class="color-opt" style="background:#10b981;" data-color="#10b981"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="group-title">聊天背景</div>
+                        <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
+                            <div class="bg-picker" id="bgPicker">
+                                <div class="bg-opt active" style="background:#120d1a;" data-bg="#120d1a"></div>
+                                <div class="bg-opt" style="background:#1a1425;" data-bg="#1a1425"></div>
+                                <div class="bg-opt" style="background:#0f0a1a;" data-bg="#0f0a1a"></div>
+                                <div class="bg-opt" style="background:linear-gradient(135deg,#120d1a,#1a0f2a);" data-bg="gradient1"></div>
+                                <div class="bg-opt" style="background:linear-gradient(135deg,#0d0a1a,#0f1a2a);" data-bg="gradient2"></div>
+                                <div class="bg-opt" style="background:linear-gradient(135deg,#1a0d1a,#2a0f1a);" data-bg="gradient3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="group-title">回复设置</div>
+                        <div class="setting-row">
+                            <span class="label">最短等待</span>
+                            <div class="range-group">
+                                <input type="range" id="minWaitRange" min="0" max="60" value="23" />
+                                <span class="val" id="minWaitVal">23s</span>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">最长等待</span>
+                            <div class="range-group">
+                                <input type="range" id="maxWaitRange" min="0" max="120" value="23" />
+                                <span class="val" id="maxWaitVal">23s</span>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">回复条数</span>
+                            <div class="range-group">
+                                <input type="range" id="replyCountRange" min="1" max="10" value="2" />
+                                <span class="val" id="replyCountVal">2</span>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">主动发送间隔</span>
+                            <div class="range-group">
+                                <input type="range" id="intervalRange" min="5" max="60" value="31" />
+                                <span class="val" id="intervalVal">31min</span>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">显示时间戳</span>
+                            <div class="toggle-switch active" id="toggleTimestamp">
+                                <div class="knob"></div>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">已读回执</span>
+                            <div class="toggle-switch active" id="toggleReadReceipt">
+                                <div class="knob"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <div class="group-title">快捷</div>
+                        <div class="setting-row">
+                            <span class="label">📮 信封投递</span>
+                            <button class="action-btn" id="gotoLetterBtn">写信</button>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">📚 字卡库管理</span>
+                            <button class="action-btn" id="gotoCardLibBtn">管理</button>
+                        </div>
+                        <div class="setting-row">
+                            <span class="label">📊 消息统计</span>
+                            <button class="action-btn" id="gotoStatsBtn">查看</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 字卡库 -->
+            <div class="overlay" id="cardLibOverlay">
+                <div class="overlay-header">
+                    <span class="title">📚 字卡库</span>
+                    <button class="close-btn" id="closeCardLib">✕</button>
+                </div>
+                <div class="overlay-body" id="cardLibBody">
+                    <div id="cardLibContent"></div>
+                </div>
+            </div>
+
+            <!-- 信封投递 -->
+            <div class="overlay" id="letterOverlay">
+                <div class="overlay-header">
+                    <span class="title">✉ 信封投递</span>
+                    <button class="close-btn" id="closeLetter">✕</button>
+                </div>
+                <div class="overlay-body" id="letterBody">
+                    <div class="letter-form">
+                        <textarea id="letterInput" placeholder="写一封信… 对方会从字卡库中挑选内容回信 💌"></textarea>
+                        <button class="send-letter-btn" id="sendLetterBtn">📤 寄出</button>
+                    </div>
+                    <div class="letter-history" id="letterHistory">
+                        <div class="group-title" style="color:rgba(255,255,255,0.2); margin-top:16px; font-size:12px; letter-spacing:1px;">📬 历史</div>
+                        <div id="letterList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 消息统计 -->
+            <div class="overlay" id="statsOverlay">
+                <div class="overlay-header">
+                    <span class="title">📊 消息统计</span>
+                    <button class="close-btn" id="closeStats">✕</button>
+                </div>
+                <div class="overlay-body">
+                    <div class="stat-grid" id="statsGrid">
+                        <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">总消息</div></div>
+                        <div class="stat-card"><div class="num" id="statSent">0</div><div class="lbl">我发的</div></div>
+                        <div class="stat-card"><div class="num" id="statReceived">0</div><div class="lbl">对方发的</div></div>
+                        <div class="stat-card"><div class="num" id="statLetters">0</div><div class="lbl">信件</div></div>
+                    </div>
+                    <div style="margin-top:20px; text-align:center;">
+                        <button id="clearChatBtn" style="padding:8px 24px; border-radius:16px; border:1px solid rgba(239,68,68,0.15); background:rgba(239,68,68,0.05); color:rgba(239,68,68,0.4); font-size:13px; cursor:pointer; transition:0.2s;">🗑 清空聊天</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  传讯 · 完整应用逻辑
+        // ================================================================
+
+        const STORAGE_KEY = 'chuanxun_data';
+
+        const defaultData = {
+            settings: {
+                myAvatar: '😊',
+                partnerAvatar: '🌟',
+                bubbleColor: '#7c3aed',
+                bg: '#120d1a',
+                minWait: 23,
+                maxWait: 23,
+                replyCount: 2,
+                interval: 31,
+                showTimestamp: true,
+                showReadReceipt: true,
+                myAvatarType: 'emoji',
+                partnerAvatarType: 'emoji',
+            },
+            messages: [],
+            wordCards: {
+                '关心/提醒': [
+                    '记得多喝水哦 💧',
+                    '今天要早点休息 ~',
+                    '工作别太累了 🫂',
+                    '加油！你是最棒的 💪',
+                    '我一直在你身边 ❤️',
+                    '今天天气不错，出去走走吧 🌤',
+                ],
+                '情绪': [
+                    '抱抱你 🫂 一切都会好起来的',
+                    '今天心情怎么样？',
+                    '别难过，我陪着你 😢',
+                    '好开心呀！和你聊天真快乐 😊',
+                    '有点小emo… 不过还好有你在',
+                    '今天是个好日子！🎉',
+                ],
+                '身体状况': [
+                    '记得按时吃饭 🍚',
+                    '多运动，身体棒 🏃',
+                    '睡够8小时了吗？😴',
+                    '注意保暖哦 🧣',
+                    '身体是革命的本钱 💪',
+                    '今天有没有好好照顾自己？',
+                ],
+                '关于网站/系统/链接': [
+                    '新链接试过了吗？',
+                    '网站加载有点慢…',
+                    '这个功能好棒！',
+                    '链接打不开，再发一次？',
+                    'UI 设计得真好看 ✨',
+                    '系统升级中，稍等～',
+                ],
+                '吵架': [
+                    '我错了 😢 原谅我好不好',
+                    '别生气啦，请你吃糖 🍬',
+                    '我们和好吧 🫂',
+                    '对不起，是我不好',
+                    '不要冷战了… 我好想你',
+                    '你赢了，我认输 🙈',
+                ],
+            },
+            letters: {
+                sent: [],
+                received: [],
+            },
+        };
+
+        let data = loadData();
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return deepMerge(defaultData, parsed);
+                }
+            } catch (e) {}
+            return JSON.parse(JSON.stringify(defaultData));
+        }
+
+        function deepMerge(target, source) {
+            const result = { ...target };
+            for (const key in source) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    result[key] = deepMerge(target[key] || {}, source[key]);
+                } else {
+                    result[key] = source[key];
+                }
+            }
+            return result;
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const messageList = $('#messageList');
+        const chatInput = $('#chatInput');
+        const sendBtn = $('#sendBtn');
+        const emptyState = $('#emptyState');
+        const typingIndicator = $('#typingIndicator');
+
+        const myAvatar = $('#myAvatar');
+        const partnerAvatar = $('#partnerAvatar');
+        const myAvatarInput = $('#myAvatarInput');
+        const partnerAvatarInput = $('#partnerAvatarInput');
+
+        const settingsBtn = $('#settingsBtn');
+        const settingsOverlay = $('#settingsOverlay');
+        const closeSettings = $('#closeSettings');
+
+        const cardLibOverlay = $('#cardLibOverlay');
+        const closeCardLib = $('#closeCardLib');
+        const cardLibContent = $('#cardLibContent');
+
+        const letterOverlay = $('#letterOverlay');
+        const closeLetter = $('#closeLetter');
+        const letterInput = $('#letterInput');
+        const sendLetterBtn = $('#sendLetterBtn');
+        const letterList = $('#letterList');
+
+        const statsOverlay = $('#statsOverlay');
+        const closeStats = $('#closeStats');
+
+        const envelopeBtn = $('#envelopeBtn');
+        const gotoLetterBtn = $('#gotoLetterBtn');
+        const gotoCardLibBtn = $('#gotoCardLibBtn');
+        const gotoStatsBtn = $('#gotoStatsBtn');
+
+        const bubbleColorPicker = $('#bubbleColorPicker');
+        const bgPicker = $('#bgPicker');
+
+        const minWaitRange = $('#minWaitRange');
+        const maxWaitRange = $('#maxWaitRange');
+        const replyCountRange = $('#replyCountRange');
+        const intervalRange = $('#intervalRange');
+        const minWaitVal = $('#minWaitVal');
+        const maxWaitVal = $('#maxWaitVal');
+        const replyCountVal = $('#replyCountVal');
+        const intervalVal = $('#intervalVal');
+
+        const toggleTimestamp = $('#toggleTimestamp');
+        const toggleReadReceipt = $('#toggleReadReceipt');
+
+        const statusTime = $('#statusTime');
+
+        let isReplying = false;
+        let replyTimer = null;
+        let autoSendTimer = null;
+        let currentBubbleColor = data.settings.bubbleColor;
+        let currentBg = data.settings.bg;
+
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function formatDate(ts) {
+            const d = new Date(ts);
+            return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0') + ' ' + formatTime(ts);
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickRandom(arr) {
+            if (!arr || arr.length === 0) return null;
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function sleep(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        function renderMessages() {
+            const msgs = data.messages;
+            messageList.innerHTML = '';
+            if (msgs.length === 0) {
+                messageList.appendChild(emptyState);
+                return;
+            }
+            msgs.forEach((msg, idx) => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.sender === 'self' ? 'self' : 'other'}`;
+                const showName = (idx === 0 || msgs[idx - 1].sender !== msg.sender);
+                let senderLabel = msg.sender === 'self' ? '我' : '鱼鱼';
+                let nameHtml = showName ? `<div class="sender-name">${senderLabel}</div>` : '';
+                const timeHtml = data.settings.showTimestamp ?
+                    `<span class="time-tag">${formatTime(msg.timestamp)}</span>` :
+                    '';
+                div.innerHTML = `
+                    ${msg.sender === 'other' ? nameHtml : ''}
+                    <div class="bubble" style="background:${msg.sender === 'self' ? currentBubbleColor : '#1e1830'}">
+                        ${msg.content}
+                        ${timeHtml}
+                    </div>
+                    ${msg.sender === 'self' ? nameHtml : ''}
+                `;
+                messageList.appendChild(div);
+            });
+            messageList.scrollTop = messageList.scrollHeight;
+        }
+
+        function addMessage(sender, content, timestamp) {
+            const ts = timestamp || Date.now();
+            data.messages.push({ sender, content, timestamp: ts });
+            saveData();
+            renderMessages();
+            updateStats();
+            return ts;
+        }
+
+        async function simulateReply() {
+            if (isReplying) return;
+            isReplying = true;
+
+            const minWait = data.settings.minWait || 3;
+            const maxWait = data.settings.maxWait || 8;
+            const count = data.settings.replyCount || 1;
+
+            const waitTime = randomInt(minWait, maxWait) * 1000;
+            typingIndicator.classList.add('show');
+            await sleep(waitTime);
+            typingIndicator.classList.remove('show');
+
+            const allCards = getAllCards();
+            if (allCards.length === 0) {
+                isReplying = false;
+                return;
+            }
+
+            const replyCount = Math.min(count, allCards.length);
+            const shuffled = [...allCards].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, replyCount);
+
+            for (let i = 0; i < selected.length; i++) {
+                const card = selected[i];
+                addMessage('other', card);
+                if (i < selected.length - 1) {
+                    await sleep(randomInt(400, 1200));
+                }
+            }
+
+            isReplying = false;
+            updateStats();
+        }
+
+        function getAllCards() {
+            const groups = data.wordCards;
+            const all = [];
+            for (const key in groups) {
+                if (Array.isArray(groups[key])) {
+                    all.push(...groups[key]);
+                }
+            }
+            return all;
+        }
+
+        function sendMessage(text) {
+            if (!text || text.trim() === '') return;
+            const content = text.trim();
+            addMessage('self', content);
+            chatInput.value = '';
+            chatInput.focus();
+
+            if (!isReplying) {
+                if (replyTimer) clearTimeout(replyTimer);
+                const minWait = data.settings.minWait || 3;
+                const maxWait = data.settings.maxWait || 8;
+                const delay = randomInt(minWait, maxWait) * 1000;
+                replyTimer = setTimeout(() => {
+                    simulateReply();
+                }, delay);
+            }
+        }
+
+        function updateStats() {
+            const total = data.messages.length;
+            const sent = data.messages.filter(m => m.sender === 'self').length;
+            const received = data.messages.filter(m => m.sender === 'other').length;
+            const letters = data.letters.sent.length + data.letters.received.length;
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statSent').textContent = sent;
+            document.getElementById('statReceived').textContent = received;
+            document.getElementById('statLetters').textContent = letters;
+        }
+
+        function renderCardLib() {
+            const groups = data.wordCards;
+            let html = '';
+            for (const [groupName, cards] of Object.entries(groups)) {
+                if (!Array.isArray(cards)) continue;
+                html += `
+                    <div class="card-group-item" data-group="${groupName}">
+                        <div class="group-header">
+                            <span class="name">📂 ${groupName}</span>
+                            <span class="count">${cards.length} 条</span>
+                            <div class="actions">
+                                <button class="del-group-btn" data-group="${groupName}" title="删除分组">✕</button>
+                            </div>
+                        </div>
+                        <div class="card-list">
+                            ${cards.map((c, idx) => `
+                                <span class="card-tag">
+                                    ${c}
+                                    <span class="del" data-group="${groupName}" data-index="${idx}">✕</span>
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="add-card-row">
+                            <input type="text" placeholder="添加单条字卡…" class="new-card-input" data-group="${groupName}" />
+                            <button class="add-card-btn" data-group="${groupName}">+ 添加</button>
+                        </div>
+                        <div class="batch-add-row">
+                            <textarea placeholder="批量添加，每行一条字卡…" class="batch-card-input" data-group="${groupName}"></textarea>
+                            <button class="batch-add-btn" data-group="${groupName}">📋 批量</button>
+                        </div>
+                    </div>
+                `;
+            }
+            html += `
+                <div class="add-group-row">
+                    <input type="text" id="newGroupName" placeholder="新分组名称…" />
+                    <button id="addGroupBtn">+ 新建分组</button>
+                </div>
+                <div class="import-export-row">
+                    <button id="exportCardsBtn">📤 导出字卡</button>
+                    <div class="import-options">
+                        <label><input type="radio" name="importMode" value="append" checked /> 追加</label>
+                        <label><input type="radio" name="importMode" value="overwrite" /> 覆盖</label>
+                        <button id="importCardsBtn">📥 导入</button>
+                    </div>
+                    <input type="file" id="importCardsInput" accept=".json" />
+                </div>
+                <div class="batch-import-hint">💡 导入时选择"追加"会合并到现有分组，"覆盖"会替换整个字卡库</div>
+            `;
+            cardLibContent.innerHTML = html;
+
+            // 删除分组
+            cardLibContent.querySelectorAll('.del-group-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const group = this.dataset.group;
+                    if (confirm(`确定要删除分组「${group}」及其所有字卡吗？`)) {
+                        delete data.wordCards[group];
+                        saveData();
+                        renderCardLib();
+                    }
+                });
+            });
+
+            // 删除字卡
+            cardLibContent.querySelectorAll('.card-tag .del').forEach(el => {
+                el.addEventListener('click', function() {
+                    const group = this.dataset.group;
+                    const idx = parseInt(this.dataset.index);
+                    if (data.wordCards[group] && Array.isArray(data.wordCards[group])) {
+                        data.wordCards[group].splice(idx, 1);
+                        saveData();
+                        renderCardLib();
+                    }
+                });
+            });
+
+            // 添加单条字卡
+            cardLibContent.querySelectorAll('.add-card-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const group = this.dataset.group;
+                    const input = document.querySelector(`.new-card-input[data-group="${group}"]`);
+                    if (!input) return;
+                    const val = input.value.trim();
+                    if (!val) return;
+                    if (!data.wordCards[group]) data.wordCards[group] = [];
+                    data.wordCards[group].push(val);
+                    saveData();
+                    renderCardLib();
+                });
+            });
+
+            // 批量添加字卡
+            cardLibContent.querySelectorAll('.batch-add-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const group = this.dataset.group;
+                    const textarea = document.querySelector(`.batch-card-input[data-group="${group}"]`);
+                    if (!textarea) return;
+                    const text = textarea.value.trim();
+                    if (!text) return;
+                    const lines = text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+                    if (lines.length === 0) return;
+                    if (!data.wordCards[group]) data.wordCards[group] = [];
+                    data.wordCards[group].push(...lines);
+                    saveData();
+                    renderCardLib();
+                    textarea.value = '';
+                });
+            });
+
+            // 回车提交单条
+            cardLibContent.querySelectorAll('.new-card-input').forEach(inp => {
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        const group = this.dataset.group;
+                        const btn = document.querySelector(`.add-card-btn[data-group="${group}"]`);
+                        if (btn) btn.click();
+                    }
+                });
+            });
+
+            // Ctrl+Enter 提交批量
+            cardLibContent.querySelectorAll('.batch-card-input').forEach(inp => {
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        const group = this.dataset.group;
+                        const btn = document.querySelector(`.batch-add-btn[data-group="${group}"]`);
+                        if (btn) btn.click();
+                    }
+                });
+            });
+
+            // 新建分组
+            const addGroupBtn = document.getElementById('addGroupBtn');
+            const newGroupName = document.getElementById('newGroupName');
+            if (addGroupBtn && newGroupName) {
+                addGroupBtn.addEventListener('click', function() {
+                    const name = newGroupName.value.trim();
+                    if (!name) return;
+                    if (data.wordCards[name]) {
+                        alert('分组已存在');
+                        return;
+                    }
+                    data.wordCards[name] = [];
+                    saveData();
+                    renderCardLib();
+                    newGroupName.value = '';
+                });
+                newGroupName.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') addGroupBtn.click();
+                });
+            }
+
+            // 导出
+            const exportBtn = document.getElementById('exportCardsBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    const json = JSON.stringify(data.wordCards, null, 2);
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `字卡库_${new Date().toISOString().slice(0,10)}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            }
+
+            // 导入 - 支持覆盖/追加
+            const importBtn = document.getElementById('importCardsBtn');
+            const importInput = document.getElementById('importCardsInput');
+            if (importBtn && importInput) {
+                importBtn.addEventListener('click', function() {
+                    importInput.click();
+                });
+                importInput.addEventListener('change', function(e) {
+                    const file = this.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        try {
+                            const imported = JSON.parse(ev.target.result);
+                            if (typeof imported === 'object' && !Array.isArray(imported)) {
+                                const mode = document.querySelector('input[name="importMode"]:checked');
+                                const isAppend = mode && mode.value === 'append';
+                                
+                                if (isAppend) {
+                                    // 追加模式
+                                    for (const key in imported) {
+                                        if (Array.isArray(imported[key])) {
+                                            if (!data.wordCards[key]) data.wordCards[key] = [];
+                                            data.wordCards[key] = [...new Set([...data.wordCards[key], ...imported[key]])];
+                                        }
+                                    }
+                                } else {
+                                    // 覆盖模式
+                                    data.wordCards = {};
+                                    for (const key in imported) {
+                                        if (Array.isArray(imported[key])) {
+                                            data.wordCards[key] = [...imported[key]];
+                                        }
+                                    }
+                                }
+                                saveData();
+                                renderCardLib();
+                                alert(`导入成功！${isAppend ? '（追加模式）' : '（覆盖模式）'}`);
+                            } else {
+                                alert('格式错误：请导入有效的字卡库 JSON');
+                            }
+                        } catch (err) {
+                            alert('解析失败：' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                    this.value = '';
+                });
+            }
+        }
+
+        function renderLetters() {
+            const sent = data.letters.sent || [];
+            const received = data.letters.received || [];
+            let html = '';
+            if (sent.length === 0 && received.length === 0) {
+                html = '<div class="empty-state"><div class="icon">💌</div><div>还没有信件</div></div>';
+            } else {
+                const all = [];
+                sent.forEach(l => all.push({ ...l, type: 'sent' }));
+                received.forEach(l => all.push({ ...l, type: 'received' }));
+                all.sort((a, b) => b.timestamp - a.timestamp);
+                all.forEach(l => {
+                    const label = l.type === 'sent' ? '📤 寄出' : '📥 收到';
+                    const time = formatDate(l.timestamp);
+                    const content = l.content || '(空)';
+                    const replyStatus = l.type === 'sent' ?
+                        (l.replied ? '✅ 已收到回信' : '⏳ 等待回信') :
+                        '';
+                    html += `
+                        <div class="letter-item">
+                            <div class="top">
+                                <span>${label}</span>
+                                <span class="badge">${time}</span>
+                            </div>
+                            <div class="content">${content}</div>
+                            ${replyStatus ? `<div class="reply-status">${replyStatus}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+            letterList.innerHTML = html;
+        }
+
+        function sendLetter() {
+            const content = letterInput.value.trim();
+            if (!content) return;
+
+            const sentItem = {
+                content: content,
+                timestamp: Date.now(),
+                replied: false,
+            };
+            data.letters.sent.push(sentItem);
+            saveData();
+
+            const allCards = getAllCards();
+            let replyContent = '（对方没有回复）';
+            if (allCards.length > 0) {
+                replyContent = pickRandom(allCards);
+            }
+            const receivedItem = {
+                content: replyContent,
+                timestamp: Date.now(),
+            };
+            data.letters.received.push(receivedItem);
+            sentItem.replied = true;
+            saveData();
+
+            letterInput.value = '';
+            renderLetters();
+            addMessage('self', `📮 信件：「${content}」`);
+            setTimeout(() => {
+                addMessage('other', `📬 回信：「${replyContent}」`);
+            }, 800);
+            alert('💌 信件已寄出，并收到回信！');
+            updateStats();
+        }
+
+        function setupAvatar(avatarEl, inputEl, storageKey, typeKey) {
+            const group = avatarEl.closest('.avatar-group');
+            group.addEventListener('click', function(e) {
+                if (e.target.closest('.upload-hint') || e.target === inputEl) return;
+                inputEl.click();
+            });
+            group.querySelector('.upload-hint')?.addEventListener('click', function(e) {
+                e.stopPropagation();
+                inputEl.click();
+            });
+            inputEl.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const dataUrl = ev.target.result;
+                    avatarEl.style.backgroundImage = `url(${dataUrl})`;
+                    avatarEl.style.backgroundSize = 'cover';
+                    avatarEl.style.backgroundPosition = 'center';
+                    avatarEl.textContent = '';
+                    avatarEl.style.fontSize = '0';
+                    data.settings[storageKey] = dataUrl;
+                    data.settings[typeKey] = 'image';
+                    saveData();
+                };
+                reader.readAsDataURL(file);
+                this.value = '';
+            });
+            if (data.settings[typeKey] === 'image' && data.settings[storageKey]) {
+                avatarEl.style.backgroundImage = `url(${data.settings[storageKey]})`;
+                avatarEl.style.backgroundSize = 'cover';
+                avatarEl.style.backgroundPosition = 'center';
+                avatarEl.textContent = '';
+                avatarEl.style.fontSize = '0';
+            } else if (data.settings[storageKey] && !data.settings[storageKey].startsWith('data:')) {
+                avatarEl.textContent = data.settings[storageKey];
+                avatarEl.style.fontSize = '24px';
+                avatarEl.style.backgroundImage = 'none';
+            }
+        }
+
+        function openOverlay(overlay) {
+            document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
+            overlay.classList.add('open');
+        }
+
+        function closeAllOverlays() {
+            document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
+        }
+
+        function applyBg(bg) {
+            const overlay = document.getElementById('bgOverlay');
+            if (!overlay) return;
+            if (bg === 'gradient1') {
+                overlay.style.background = 'linear-gradient(135deg, #120d1a, #1a0f2a)';
+            } else if (bg === 'gradient2') {
+                overlay.style.background = 'linear-gradient(135deg, #0d0a1a, #0f1a2a)';
+            } else if (bg === 'gradient3') {
+                overlay.style.background = 'linear-gradient(135deg, #1a0d1a, #2a0f1a)';
+            } else {
+                overlay.style.background = bg || '#120d1a';
+            }
+        }
+
+        function applyBubbleColor(color) {
+            document.querySelectorAll('.message.self .bubble').forEach(el => {
+                el.style.background = color;
+            });
+        }
+
+        function resetAutoSend() {
+            if (autoSendTimer) {
+                clearInterval(autoSendTimer);
+                autoSendTimer = null;
+            }
+            const interval = data.settings.interval || 31;
+            if (interval > 0) {
+                autoSendTimer = setInterval(() => {
+                    const allCards = getAllCards();
+                    if (allCards.length > 0 && !isReplying) {
+                        const card = pickRandom(allCards);
+                        if (card) {
+                            addMessage('other', '💬 ' + card);
+                            updateStats();
+                        }
+                    }
+                }, interval * 60 * 1000);
+            }
+        }
+
+        function init() {
+            function updateTime() {
+                const d = new Date();
+                statusTime.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            }
+            updateTime();
+            setInterval(updateTime, 30000);
+
+            setupAvatar(myAvatar, myAvatarInput, 'myAvatar', 'myAvatarType');
+            setupAvatar(partnerAvatar, partnerAvatarInput, 'partnerAvatar', 'partnerAvatarType');
+
+            applyBg(data.settings.bg);
+            currentBubbleColor = data.settings.bubbleColor;
+            applyBubbleColor(currentBubbleColor);
+
+            renderMessages();
+            updateStats();
+
+            minWaitRange.value = data.settings.minWait || 23;
+            maxWaitRange.value = data.settings.maxWait || 23;
+            replyCountRange.value = data.settings.replyCount || 2;
+            intervalRange.value = data.settings.interval || 31;
+            minWaitVal.textContent = data.settings.minWait + 's';
+            maxWaitVal.textContent = data.settings.maxWait + 's';
+            replyCountVal.textContent = data.settings.replyCount;
+            intervalVal.textContent = data.s            intervalVal.textContent = data.settings.interval + 'min';
+
+            if (data.settings.showTimestamp !== false) {
+                toggleTimestamp.classList.add('active');
+            } else {
+                toggleTimestamp.classList.remove('active');
+            }
+            if (data.settings.showReadReceipt !== false) {
+                toggleReadReceipt.classList.add('active');
+            } else {
+                toggleReadReceipt.classList.remove('active');
+            }
+
+            bubbleColorPicker.querySelectorAll('.color-opt').forEach(el => {
+                el.classList.toggle('active', el.dataset.color === currentBubbleColor);
+            });
+
+            bgPicker.querySelectorAll('.bg-opt').forEach(el => {
+                const isActive = (el.dataset.bg === data.settings.bg) ||
+                    (data.settings.bg === 'gradient1' && el.dataset.bg === 'gradient1') ||
+                    (data.settings.bg === 'gradient2' && el.dataset.bg === 'gradient2') ||
+                    (data.settings.bg === 'gradient3' && el.dataset.bg === 'gradient3');
+                el.classList.toggle('active', isActive);
+            });
+
+            sendBtn.addEventListener('click', function() {
+                sendMessage(chatInput.value);
+            });
+            chatInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(this.value);
+                }
+            });
+
+            settingsBtn.addEventListener('click', function() {
+                openOverlay(settingsOverlay);
+            });
+            closeSettings.addEventListener('click', closeAllOverlays);
+
+            gotoCardLibBtn.addEventListener('click', function() {
+                closeAllOverlays();
+                renderCardLib();
+                openOverlay(cardLibOverlay);
+            });
+            closeCardLib.addEventListener('click', closeAllOverlays);
+
+            envelopeBtn.addEventListener('click', function() {
+                closeAllOverlays();
+                renderLetters();
+                openOverlay(letterOverlay);
+            });
+            gotoLetterBtn.addEventListener('click', function() {
+                closeAllOverlays();
+                renderLetters();
+                openOverlay(letterOverlay);
+            });
+            closeLetter.addEventListener('click', closeAllOverlays);
+            sendLetterBtn.addEventListener('click', sendLetter);
+            letterInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendLetter();
+                }
+            });
+
+            gotoStatsBtn.addEventListener('click', function() {
+                closeAllOverlays();
+                updateStats();
+                openOverlay(statsOverlay);
+            });
+            closeStats.addEventListener('click', closeAllOverlays);
+
+            document.getElementById('clearChatBtn')?.addEventListener('click', function() {
+                if (confirm('确定要清空所有聊天记录吗？')) {
+                    data.messages = [];
+                    saveData();
+                    renderMessages();
+                    updateStats();
+                    closeAllOverlays();
+                }
+            });
+
+            bubbleColorPicker.addEventListener('click', function(e) {
+                const opt = e.target.closest('.color-opt');
+                if (!opt) return;
+                const color = opt.dataset.color;
+                if (!color) return;
+                currentBubbleColor = color;
+                data.settings.bubbleColor = color;
+                saveData();
+                applyBubbleColor(color);
+                bubbleColorPicker.querySelectorAll('.color-opt').forEach(el => el.classList.remove('active'));
+                opt.classList.add('active');
+            });
+
+            bgPicker.addEventListener('click', function(e) {
+                const opt = e.target.closest('.bg-opt');
+                if (!opt) return;
+                const bg = opt.dataset.bg;
+                if (!bg) return;
+                data.settings.bg = bg;
+                currentBg = bg;
+                saveData();
+                applyBg(bg);
+                bgPicker.querySelectorAll('.bg-opt').forEach(el => el.classList.remove('active'));
+                opt.classList.add('active');
+            });
+
+            minWaitRange.addEventListener('input', function() {
+                const val = parseInt(this.value);
+                minWaitVal.textContent = val + 's';
+                data.settings.minWait = val;
+                saveData();
+            });
+            maxWaitRange.addEventListener('input', function() {
+                const val = parseInt(this.value);
+                maxWaitVal.textContent = val + 's';
+                data.settings.maxWait = val;
+                saveData();
+            });
+            replyCountRange.addEventListener('input', function() {
+                const val = parseInt(this.value);
+                replyCountVal.textContent = val;
+                data.settings.replyCount = val;
+                saveData();
+            });
+            intervalRange.addEventListener('input', function() {
+                const val = parseInt(this.value);
+                intervalVal.textContent = val + 'min';
+                data.settings.interval = val;
+                saveData();
+                resetAutoSend();
+            });
+
+            toggleTimestamp.addEventListener('click', function() {
+                this.classList.toggle('active');
+                data.settings.showTimestamp = this.classList.contains('active');
+                saveData();
+                renderMessages();
+            });
+            toggleReadReceipt.addEventListener('click', function() {
+                this.classList.toggle('active');
+                data.settings.showReadReceipt = this.classList.contains('active');
+                saveData();
+            });
+
+            document.getElementById('changeMyAvatarBtn')?.addEventListener('click', function() {
+                myAvatarInput.click();
+            });
+            document.getElementById('changePartnerAvatarBtn')?.addEventListener('click', function() {
+                partnerAvatarInput.click();
+            });
+
+            resetAutoSend();
+
+            document.querySelectorAll('.overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('open');
+                    }
+                });
+            });
+
+            document.getElementById('backBtn')?.addEventListener('click', function() {
+                if (document.querySelector('.overlay.open')) {
+                    closeAllOverlays();
+                }
+            });
+
+            console.log('📡 传讯已启动！');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        window.__chuanxun = { data, saveData, renderMessages, addMessage, sendMessage, getAllCards };
+    </script>
+</body>
+</html>
