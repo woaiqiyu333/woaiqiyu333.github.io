@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>传讯 · 字卡聊天</title>
     <style>
-        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
         }
         body {
-            background: #eef1f5;
+            background: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,7 +26,7 @@
             max-height: 95vh;
             background: #ffffff;
             border-radius: 36px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -38,15 +37,15 @@
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            color: rgba(0, 0, 0, 0.35);
+            color: rgba(0, 0, 0, 0.3);
             flex-shrink: 0;
             background: transparent;
-            position: relative;
             z-index: 2;
+            position: relative;
         }
         .status-bar .time {
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.4);
         }
         .app-container {
             flex: 1;
@@ -105,7 +104,7 @@
             border-radius: 50%;
             border: none;
             background: rgba(0, 0, 0, 0.03);
-            color: rgba(0, 0, 0, 0.4);
+            color: rgba(0, 0, 0, 0.3);
             font-size: 18px;
             cursor: pointer;
             transition: 0.2s;
@@ -136,31 +135,31 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            border: 2px solid rgba(124, 58, 237, 0.12);
+            border: 2px solid rgba(124, 58, 237, 0.08);
             object-fit: cover;
             background: #eef1f5;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            color: rgba(0, 0, 0, 0.15);
+            color: rgba(0, 0, 0, 0.1);
             overflow: hidden;
             transition: 0.3s;
         }
         .chat-avatars .avatar-group .avatar:hover {
-            border-color: #7c3aed;
+            border-color: #a78bfa;
             transform: scale(1.03);
         }
         .chat-avatars .avatar-group .label {
             font-size: 11px;
-            color: rgba(0, 0, 0, 0.3);
+            color: rgba(0, 0, 0, 0.25);
             font-weight: 500;
         }
         .chat-avatars .avatar-group .upload-hint {
             position: absolute;
             bottom: -2px;
             right: -4px;
-            background: rgba(124, 58, 237, 0.08);
+            background: rgba(124, 58, 237, 0.06);
             border-radius: 50%;
             width: 18px;
             height: 18px;
@@ -168,14 +167,14 @@
             align-items: center;
             justify-content: center;
             font-size: 10px;
-            color: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(124, 58, 237, 0.06);
+            color: rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.04);
         }
         .chat-avatars .avatar-group input[type="file"] {
             display: none;
         }
         .chat-avatars .vs {
-            color: rgba(0, 0, 0, 0.06);
+            color: rgba(0, 0, 0, 0.04);
             font-size: 14px;
         }
         .message-list {
@@ -192,7 +191,7 @@
             width: 3px;
         }
         .message-list::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.08);
+            background: rgba(0, 0, 0, 0.06);
             border-radius: 10px;
         }
         .message {
@@ -230,7 +229,7 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
         }
         .message .bubble-wrapper {
             display: flex;
@@ -245,7 +244,7 @@
             word-break: break-word;
             background: #ffffff;
             color: #1a1a2e;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
         }
         .message .bubble img {
             max-width: 150px;
@@ -255,8 +254,8 @@
             margin: 4px 0;
         }
         .message.self .bubble {
-            background: #7c3aed;
-            color: #ffffff;
+            background: #f3e5f5;
+            color: #1a1a2e;
             border-bottom-right-radius: 4px;
         }
         .message.other .bubble {
@@ -265,17 +264,17 @@
         }
         .message .bubble .time-tag {
             font-size: 10px;
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
             margin-top: 4px;
             display: block;
             text-align: right;
         }
         .message.self .bubble .time-tag {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(0, 0, 0, 0.2);
         }
         .message .sender-name {
             font-size: 11px;
-            color: rgba(0, 0, 0, 0.25);
+            color: rgba(0, 0, 0, 0.2);
             font-weight: 500;
         }
         .message.self .sender-name {
@@ -291,8 +290,8 @@
             align-items: center;
             gap: 6px;
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.25);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+            color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
         }
         .typing-indicator.show {
             display: flex;
@@ -301,7 +300,7 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: rgba(124, 58, 237, 0.3);
+            background: rgba(124, 58, 237, 0.2);
             animation: dotBounce 1.2s infinite;
         }
         .typing-indicator .dot:nth-child(2) {
@@ -315,7 +314,7 @@
             60%,
             100% {
                 transform: translateY(0);
-                opacity: 0.3;
+                opacity: 0.2;
             }
             30% {
                 transform: translateY(-6px);
@@ -336,18 +335,18 @@
             flex: 1;
             padding: 10px 16px;
             border-radius: 24px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.4);
             color: #1a1a2e;
             font-size: 16px;
             outline: none;
             transition: 0.3s;
         }
         .chat-input-area input::placeholder {
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
         }
         .chat-input-area input:focus {
-            border-color: rgba(124, 58, 237, 0.2);
+            border-color: rgba(124, 58, 237, 0.15);
             background: #ffffff;
         }
         .chat-input-area .send-btn {
@@ -355,7 +354,7 @@
             height: 42px;
             border-radius: 50%;
             border: none;
-            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            background: linear-gradient(135deg, #c084fc, #a78bfa);
             color: #fff;
             font-size: 18px;
             cursor: pointer;
@@ -364,11 +363,11 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.15);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.08);
         }
         .chat-input-area .send-btn:hover {
             transform: scale(1.04);
-            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.25);
+            box-shadow: 0 6px 24px rgba(124, 58, 237, 0.12);
         }
         .chat-input-area .send-btn:active {
             transform: scale(0.94);
@@ -378,15 +377,15 @@
             height: 36px;
             border-radius: 50%;
             border: none;
-            background: rgba(0, 0, 0, 0.03);
-            color: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.02);
+            color: rgba(0, 0, 0, 0.2);
             font-size: 18px;
             cursor: pointer;
             transition: 0.2s;
             flex-shrink: 0;
         }
         .chat-input-area .emoji-btn:hover {
-            background: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.05);
             color: #1a1a2e;
         }
         .emoji-panel {
@@ -432,7 +431,7 @@
             top: -4px;
             right: -4px;
             font-size: 10px;
-            color: rgba(0, 0, 0, 0.15);
+            color: rgba(0, 0, 0, 0.12);
             background: #fff;
             border-radius: 50%;
             width: 16px;
@@ -440,7 +439,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
             cursor: pointer;
         }
         .emoji-panel .emoji-item:hover .del-emoji {
@@ -452,7 +451,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(20px);
             z-index: 10;
             display: none;
@@ -494,28 +493,28 @@
             height: 34px;
             border-radius: 50%;
             border: none;
-            background: rgba(0, 0, 0, 0.03);
-            color: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.02);
+            color: rgba(0, 0, 0, 0.25);
             font-size: 18px;
             cursor: pointer;
             transition: 0.2s;
         }
         .overlay-header .close-btn:hover {
-            background: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.05);
             color: #1a1a2e;
         }
         .overlay-body {
             flex: 1;
             overflow-y: auto;
             padding: 16px 20px 24px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(8px);
         }
         .overlay-body::-webkit-scrollbar {
             width: 3px;
         }
         .overlay-body::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.08);
+            background: rgba(0, 0, 0, 0.06);
             border-radius: 10px;
         }
         .setting-group {
@@ -524,7 +523,7 @@
         .setting-group .group-title {
             font-size: 12px;
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
             letter-spacing: 1.5px;
             text-transform: uppercase;
             margin-bottom: 10px;
@@ -534,25 +533,25 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
         }
         .setting-row .label {
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(0, 0, 0, 0.5);
         }
         .setting-row .action-btn {
             padding: 4px 14px;
             border-radius: 16px;
-            border: 1px solid rgba(124, 58, 237, 0.08);
-            background: rgba(124, 58, 237, 0.04);
-            color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(124, 58, 237, 0.06);
+            background: rgba(124, 58, 237, 0.03);
+            color: rgba(0, 0, 0, 0.35);
             font-size: 12px;
             cursor: pointer;
             transition: 0.2s;
         }
         .setting-row .action-btn:hover {
-            background: rgba(124, 58, 237, 0.08);
-            border-color: rgba(124, 58, 237, 0.15);
+            background: rgba(124, 58, 237, 0.06);
+            border-color: rgba(124, 58, 237, 0.1);
             color: #1a1a2e;
         }
         .color-picker {
@@ -605,7 +604,7 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            color: rgba(0, 0, 0, 0.15);
+            color: rgba(0, 0, 0, 0.1);
         }
         .bg-picker .bg-opt input[type="file"] {
             display: none;
@@ -614,14 +613,14 @@
             width: 40px;
             height: 22px;
             border-radius: 12px;
-            background: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.04);
             cursor: pointer;
             transition: 0.3s;
             position: relative;
             flex-shrink: 0;
         }
         .toggle-switch.active {
-            background: rgba(124, 58, 237, 0.35);
+            background: rgba(124, 58, 237, 0.25);
         }
         .toggle-switch .knob {
             width: 18px;
@@ -632,7 +631,7 @@
             top: 2px;
             left: 2px;
             transition: 0.3s;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
         .toggle-switch.active .knob {
             left: 20px;
@@ -644,22 +643,22 @@
         }
         .range-group input[type="range"] {
             width: 100px;
-            accent-color: #7c3aed;
+            accent-color: #a78bfa;
             background: transparent;
         }
         .range-group .val {
             min-width: 30px;
             text-align: center;
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.4);
             font-size: 13px;
         }
         .letter-form textarea {
             width: 100%;
             padding: 14px 16px;
             border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             background: rgba(255, 255, 255, 0.4);
-            color: rgba(0, 0, 0, 0.7);
+            color: rgba(0, 0, 0, 0.6);
             font-size: 15px;
             line-height: 1.7;
             resize: vertical;
@@ -668,24 +667,24 @@
             font-family: inherit;
         }
         .letter-form textarea:focus {
-            border-color: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.1);
         }
         .letter-form .send-letter-btn {
             margin-top: 14px;
             padding: 12px 28px;
             border-radius: 24px;
             border: none;
-            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            background: linear-gradient(135deg, #c084fc, #a78bfa);
             color: #fff;
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: 0.3s;
-            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.12);
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
         }
         .letter-form .send-letter-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.12);
         }
         .letter-history {
             margin-top: 18px;
@@ -696,18 +695,18 @@
             backdrop-filter: blur(8px);
             border-radius: 10px;
             margin-bottom: 8px;
-            border-left: 2px solid rgba(124, 58, 237, 0.08);
+            border-left: 2px solid rgba(124, 58, 237, 0.06);
         }
         .letter-history .item .meta {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
             margin-bottom: 4px;
         }
         .letter-history .item .content {
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(0, 0, 0, 0.5);
             line-height: 1.5;
         }
         .letter-history .item .reply-status {
@@ -720,7 +719,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(16px);
             color: #ffffff;
             padding: 16px 28px;
@@ -769,7 +768,7 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: rgba(0, 0, 0, 0.12);
+            color: rgba(0, 0, 0, 0.1);
             font-size: 14px;
         }
         .empty-state .icon {
@@ -793,18 +792,17 @@
         .stat-grid .stat-card .num {
             font-size: 24px;
             font-weight: 600;
-            color: #7c3aed;
+            color: #a78bfa;
         }
         .stat-grid .stat-card .lbl {
             font-size: 11px;
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
             margin-top: 4px;
         }
         .hidden {
             display: none !important;
         }
 
-        /* 字卡库专用样式 - 左右布局 */
         .card-lib-layout {
             display: flex;
             gap: 12px;
@@ -826,7 +824,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.4);
             transition: 0.2s;
             display: flex;
             justify-content: space-between;
@@ -834,15 +832,15 @@
             margin-bottom: 2px;
         }
         .card-lib-left .group-item:hover {
-            background: rgba(124, 58, 237, 0.05);
+            background: rgba(124, 58, 237, 0.04);
         }
         .card-lib-left .group-item.active {
-            background: rgba(124, 58, 237, 0.08);
+            background: rgba(124, 58, 237, 0.06);
             color: #7c3aed;
             font-weight: 500;
         }
         .card-lib-left .group-item .del-group {
-            color: rgba(0, 0, 0, 0.12);
+            color: rgba(0, 0, 0, 0.1);
             cursor: pointer;
             font-size: 12px;
             padding: 0 4px;
@@ -854,14 +852,14 @@
             width: 100%;
             padding: 6px 8px;
             border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             background: rgba(255, 255, 255, 0.4);
             font-size: 12px;
             outline: none;
             margin-top: 6px;
         }
         .card-lib-left .add-group-input:focus {
-            border-color: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.1);
         }
         .card-lib-left .add-group-btn {
             width: 100%;
@@ -869,13 +867,13 @@
             padding: 6px;
             border-radius: 8px;
             border: none;
-            background: rgba(124, 58, 237, 0.06);
-            color: rgba(0, 0, 0, 0.4);
+            background: rgba(124, 58, 237, 0.04);
+            color: rgba(0, 0, 0, 0.3);
             font-size: 12px;
             cursor: pointer;
         }
         .card-lib-left .add-group-btn:hover {
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(124, 58, 237, 0.08);
             color: #1a1a2e;
         }
         .card-lib-right {
@@ -896,11 +894,11 @@
         .card-lib-right .right-header .group-name {
             font-size: 15px;
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.7);
+            color: rgba(0, 0, 0, 0.6);
         }
         .card-lib-right .right-header .card-count {
             font-size: 12px;
-            color: rgba(0, 0, 0, 0.2);
+            color: rgba(0, 0, 0, 0.15);
         }
         .card-lib-right .card-list {
             display: flex;
@@ -911,17 +909,17 @@
         .card-lib-right .card-list .card-tag {
             padding: 4px 12px;
             border-radius: 16px;
-            background: rgba(124, 58, 237, 0.05);
-            border: 1px solid rgba(124, 58, 237, 0.04);
+            background: rgba(124, 58, 237, 0.04);
+            border: 1px solid rgba(124, 58, 237, 0.03);
             font-size: 13px;
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.45);
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .card-lib-right .card-list .card-tag .del {
             cursor: pointer;
-            color: rgba(0, 0, 0, 0.12);
+            color: rgba(0, 0, 0, 0.1);
             font-size: 12px;
         }
         .card-lib-right .card-list .card-tag .del:hover {
@@ -936,27 +934,27 @@
             flex: 1;
             padding: 6px 12px;
             border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             background: rgba(255, 255, 255, 0.4);
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(0, 0, 0, 0.5);
             font-size: 13px;
             outline: none;
         }
         .card-lib-right .add-card-row input:focus {
-            border-color: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.1);
         }
         .card-lib-right .add-card-row button {
             padding: 6px 14px;
             border-radius: 12px;
             border: none;
-            background: rgba(124, 58, 237, 0.06);
-            color: rgba(0, 0, 0, 0.4);
+            background: rgba(124, 58, 237, 0.04);
+            color: rgba(0, 0, 0, 0.35);
             font-size: 13px;
             cursor: pointer;
             transition: 0.2s;
         }
         .card-lib-right .add-card-row button:hover {
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(124, 58, 237, 0.08);
             color: #1a1a2e;
         }
         .card-lib-right .batch-area {
@@ -966,9 +964,9 @@
             width: 100%;
             padding: 8px 12px;
             border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.04);
             background: rgba(255, 255, 255, 0.4);
-            color: rgba(0, 0, 0, 0.6);
+            color: rgba(0, 0, 0, 0.5);
             font-size: 13px;
             resize: vertical;
             min-height: 60px;
@@ -976,25 +974,25 @@
             font-family: inherit;
         }
         .card-lib-right .batch-area textarea:focus {
-            border-color: rgba(124, 58, 237, 0.15);
+            border-color: rgba(124, 58, 237, 0.1);
         }
         .card-lib-right .batch-area .batch-btn {
             margin-top: 6px;
             padding: 6px 14px;
             border-radius: 12px;
             border: none;
-            background: rgba(124, 58, 237, 0.06);
-            color: rgba(0, 0, 0, 0.4);
+            background: rgba(124, 58, 237, 0.04);
+            color: rgba(0, 0, 0, 0.35);
             font-size: 13px;
             cursor: pointer;
             transition: 0.2s;
         }
         .card-lib-right .batch-area .batch-btn:hover {
-            background: rgba(124, 58, 237, 0.1);
+            background: rgba(124, 58, 237, 0.08);
             color: #1a1a2e;
         }
         .card-lib-right .empty-tip {
-            color: rgba(0, 0, 0, 0.12);
+            color: rgba(0, 0, 0, 0.1);
             font-size: 13px;
             text-align: center;
             padding: 20px 0;
@@ -1008,9 +1006,9 @@
         .card-lib-footer button {
             padding: 8px 20px;
             border-radius: 12px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.03);
             background: rgba(255, 255, 255, 0.3);
-            color: rgba(0, 0, 0, 0.4);
+            color: rgba(0, 0, 0, 0.35);
             font-size: 13px;
             cursor: pointer;
             transition: 0.2s;
@@ -1030,11 +1028,11 @@
         }
         .import-options label {
             font-size: 13px;
-            color: rgba(0, 0, 0, 0.4);
+            color: rgba(0, 0, 0, 0.35);
             cursor: pointer;
         }
         .import-options input[type="radio"] {
-            accent-color: #7c3aed;
+            accent-color: #a78bfa;
             margin-right: 2px;
         }
 
@@ -1137,7 +1135,7 @@
 
             <div class="pat-popup" id="patPopup"></div>
 
-            <!-- ========== 设置覆盖层 ========== -->
+            <!-- 设置 -->
             <div class="overlay" id="settingsOverlay">
                 <div class="overlay-header">
                     <span class="title">⚙ 设置</span>
@@ -1159,14 +1157,19 @@
                         <div class="group-title">气泡颜色</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
                             <div class="color-picker" id="bubbleColorPicker">
-                                <div class="color-opt active" style="background:#7c3aed;" data-color="#7c3aed"></div>
-                                <div class="color-opt" style="background:#d946ef;" data-color="#d946ef"></div>
-                                <div class="color-opt" style="background:#3b82f6;" data-color="#3b82f6"></div>
-                                <div class="color-opt" style="background:#ec4899;" data-color="#ec4899"></div>
-                                <div class="color-opt" style="background:#8b5cf6;" data-color="#8b5cf6"></div>
-                                <div class="color-opt" style="background:#06b6d4;" data-color="#06b6d4"></div>
-                                <div class="color-opt" style="background:#f59e0b;" data-color="#f59e0b"></div>
-                                <div class="color-opt" style="background:#10b981;" data-color="#10b981"></div>
+                                <!-- 12 种浅色/柔和色 -->
+                                <div class="color-opt active" style="background:#f3e5f5;" data-color="#f3e5f5"></div>
+                                <div class="color-opt" style="background:#e8eaf6;" data-color="#e8eaf6"></div>
+                                <div class="color-opt" style="background:#e3f2fd;" data-color="#e3f2fd"></div>
+                                <div class="color-opt" style="background:#e0f7fa;" data-color="#e0f7fa"></div>
+                                <div class="color-opt" style="background:#e8f5e9;" data-color="#e8f5e9"></div>
+                                <div class="color-opt" style="background:#fff8e1;" data-color="#fff8e1"></div>
+                                <div class="color-opt" style="background:#fff3e0;" data-color="#fff3e0"></div>
+                                <div class="color-opt" style="background:#fce4ec;" data-color="#fce4ec"></div>
+                                <div class="color-opt" style="background:#f3e5f5;" data-color="#f3e5f5"></div>
+                                <div class="color-opt" style="background:#ede7f6;" data-color="#ede7f6"></div>
+                                <div class="color-opt" style="background:#f8f0f5;" data-color="#f8f0f5"></div>
+                                <div class="color-opt" style="background:#f1f8e9;" data-color="#f1f8e9"></div>
                             </div>
                         </div>
                     </div>
@@ -1174,7 +1177,8 @@
                         <div class="group-title">聊天背景</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
                             <div class="bg-picker" id="bgPicker">
-                                <!-- 浅色系 8 种 -->
+                                <div class="bg-opt" style="background:#f5f7fa;" data-bg="#f5f7fa"></div>
+                                <div class="bg-opt" style="background:#ffffff;" data-bg="#ffffff"></div>
                                 <div class="bg-opt" style="background:#fce4ec;" data-bg="#fce4ec"></div>
                                 <div class="bg-opt" style="background:#f3e5f5;" data-bg="#f3e5f5"></div>
                                 <div class="bg-opt" style="background:#e3f2fd;" data-bg="#e3f2fd"></div>
@@ -1183,15 +1187,9 @@
                                 <div class="bg-opt" style="background:#fff3e0;" data-bg="#fff3e0"></div>
                                 <div class="bg-opt" style="background:#ede7f6;" data-bg="#ede7f6"></div>
                                 <div class="bg-opt" style="background:#e8eaf6;" data-bg="#e8eaf6"></div>
-                                <!-- 中色系 2 种 -->
-                                <div class="bg-opt" style="background:#f8f0f5;" data-bg="#f8f0f5"></div>
-                                <div class="bg-opt" style="background:#f1f8e9;" data-bg="#f1f8e9"></div>
-                                <!-- 深色系 4 种 -->
                                 <div class="bg-opt" style="background:#2d1b3d;" data-bg="#2d1b3d"></div>
                                 <div class="bg-opt" style="background:#0d1b2a;" data-bg="#0d1b2a"></div>
-                                <div class="bg-opt" style="background:#000000;" data-bg="#000000"></div>
                                 <div class="bg-opt" style="background:#1a1a2e;" data-bg="#1a1a2e"></div>
-                                <!-- 自定义上传 -->
                                 <div class="bg-opt custom-bg" id="customBgOpt">
                                     📷
                                     <input type="file" id="customBgInput" accept="image/*" />
@@ -1205,35 +1203,35 @@
                             <span class="label">最短等待</span>
                             <div class="range-group">
                                 <input type="range" id="minWaitRange" min="0" max="60" value="3" />
-                                <span class="val" id="minWaitVal">3s</span>
+                                <span class="val" id="minWaitVal">3秒</span>
                             </div>
                         </div>
                         <div class="setting-row">
                             <span class="label">最长等待</span>
                             <div class="range-group">
                                 <input type="range" id="maxWaitRange" min="0" max="120" value="8" />
-                                <span class="val" id="maxWaitVal">8s</span>
+                                <span class="val" id="maxWaitVal">8秒</span>
                             </div>
                         </div>
                         <div class="setting-row">
                             <span class="label">最少回复条数</span>
                             <div class="range-group">
                                 <input type="range" id="minReplyRange" min="1" max="10" value="1" />
-                                <span class="val" id="minReplyVal">1</span>
+                                <span class="val" id="minReplyVal">1条</span>
                             </div>
                         </div>
                         <div class="setting-row">
                             <span class="label">最多回复条数</span>
                             <div class="range-group">
                                 <input type="range" id="maxReplyRange" min="1" max="10" value="3" />
-                                <span class="val" id="maxReplyVal">3</span>
+                                <span class="val" id="maxReplyVal">3条</span>
                             </div>
                         </div>
                         <div class="setting-row">
                             <span class="label">主动发送间隔</span>
                             <div class="range-group">
                                 <input type="range" id="intervalRange" min="5" max="120" value="31" />
-                                <span class="val" id="intervalVal">31min</span>
+                                <span class="val" id="intervalVal">31分钟</span>
                             </div>
                         </div>
                         <div class="setting-row">
@@ -1248,8 +1246,8 @@
                         <div class="setting-row" style="flex-wrap:wrap; gap:4px;">
                             <div id="patContentList" style="display:flex; flex-wrap:wrap; gap:6px; width:100%;"></div>
                             <div style="display:flex; gap:6px; width:100%; margin-top:6px;">
-                                <input type="text" id="patInput" placeholder="新增拍一拍内容..." style="flex:1; padding:6px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); background:rgba(255,255,255,0.4); outline:none; font-size:13px;" />
-                                <button id="addPatBtn" style="padding:6px 14px; border-radius:12px; border:none; background:rgba(124,58,237,0.06); color:rgba(0,0,0,0.4); cursor:pointer;">+添加</button>
+                                <input type="text" id="patInput" placeholder="新增拍一拍内容..." style="flex:1; padding:6px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.04); background:rgba(255,255,255,0.4); outline:none; font-size:13px;" />
+                                <button id="addPatBtn" style="padding:6px 14px; border-radius:12px; border:none; background:rgba(124,58,237,0.04); color:rgba(0,0,0,0.35); cursor:pointer;">+ 添加</button>
                             </div>
                         </div>
                     </div>
@@ -1258,8 +1256,8 @@
                         <div class="setting-row" style="flex-wrap:wrap; gap:4px;">
                             <div id="emojiManageList" style="display:flex; flex-wrap:wrap; gap:6px; width:100%;"></div>
                             <div style="display:flex; gap:6px; width:100%; margin-top:6px;">
-                                <input type="text" id="emojiInput" placeholder="输入文字或图片链接..." style="flex:1; padding:6px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.05); background:rgba(255,255,255,0.4); outline:none; font-size:13px;" />
-                                <button id="addEmojiBtn" style="padding:6px 14px; border-radius:12px; border:none; background:rgba(124,58,237,0.06); color:rgba(0,0,0,0.4); cursor:pointer;">+添加</button>
+                                <input type="text" id="emojiInput" placeholder="输入文字或图片链接..." style="flex:1; padding:6px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.04); background:rgba(255,255,255,0.4); outline:none; font-size:13px;" />
+                                <button id="addEmojiBtn" style="padding:6px 14px; border-radius:12px; border:none; background:rgba(124,58,237,0.04); color:rgba(0,0,0,0.35); cursor:pointer;">+ 添加</button>
                             </div>
                         </div>
                     </div>
@@ -1281,7 +1279,7 @@
                 </div>
             </div>
 
-            <!-- ========== 字卡库覆盖层 ========== -->
+            <!-- 字卡库 -->
             <div class="overlay" id="cardLibOverlay">
                 <div class="overlay-header">
                     <span class="title">📚 字卡库</span>
@@ -1292,7 +1290,7 @@
                 </div>
             </div>
 
-            <!-- ========== 信封覆盖层 ========== -->
+            <!-- 信封 -->
             <div class="overlay" id="letterOverlay">
                 <div class="overlay-header">
                     <span class="title">✉ 信封投递</span>
@@ -1304,13 +1302,13 @@
                         <button class="send-letter-btn" id="sendLetterBtn">📤 寄出</button>
                     </div>
                     <div class="letter-history" id="letterHistory">
-                        <div style="color:rgba(0,0,0,0.12); font-size:12px; letter-spacing:1px; margin-top:16px;">📬 历史</div>
+                        <div style="color:rgba(0,0,0,0.1); font-size:12px; letter-spacing:1px; margin-top:16px;">📬 历史</div>
                         <div id="letterList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- ========== 统计覆盖层 ========== -->
+            <!-- 统计 -->
             <div class="overlay" id="statsOverlay">
                 <div class="overlay-header">
                     <span class="title">📊 消息统计</span>
@@ -1324,7 +1322,7 @@
                         <div class="stat-card"><div class="num" id="statLetters">0</div><div class="lbl">信件</div></div>
                     </div>
                     <div style="margin-top:20px; text-align:center;">
-                        <button id="clearChatBtn" style="padding:8px 24px; border-radius:16px; border:1px solid rgba(0,0,0,0.04); background:rgba(0,0,0,0.02); color:rgba(0,0,0,0.3); font-size:13px; cursor:pointer; transition:0.2s;">🗑 清空聊天</button>
+                        <button id="clearChatBtn" style="padding:8px 24px; border-radius:16px; border:1px solid rgba(0,0,0,0.03); background:rgba(0,0,0,0.02); color:rgba(0,0,0,0.25); font-size:13px; cursor:pointer;">🗑 清空聊天</button>
                     </div>
                 </div>
             </div>
@@ -1333,15 +1331,15 @@
 
     <script>
         // ================================================================
-        //  完整 JavaScript 逻辑
+        //  完整 JavaScript 逻辑（中文版）
         // ================================================================
 
-        const STORAGE_KEY = 'chuanxun_data_v3';
+        const STORAGE_KEY = 'chuanxun_data_v4';
         const defaultData = {
             settings: {
                 myAvatar: '😊',
                 partnerAvatar: '🌟',
-                bubbleColor: '#7c3aed',
+                bubbleColor: '#f3e5f5',
                 bg: '#f5f7fa',
                 bgImage: '',
                 minWait: 3,
@@ -1436,12 +1434,11 @@
         const statusTime = $('#statusTime');
         const patPopup = $('#patPopup');
 
-        let currentBubbleColor = data.settings.bubbleColor;
+        let currentBubbleColor = data.settings.bubbleColor || '#f3e5f5';
         let isReplying = false;
         let replyTimer = null;
         let autoSendTimer = null;
 
-        // ===== 工具函数 =====
         function formatTime(ts) {
             const d = new Date(ts);
             return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -1481,7 +1478,6 @@
             return Object.keys(data.wordCards);
         }
 
-        // ===== 拍一拍 =====
         function showPat(content) {
             patPopup.textContent = '🫳 ' + content;
             patPopup.classList.remove('hide', 'show');
@@ -1494,7 +1490,6 @@
             }, 1200);
         }
 
-        // ===== 消息渲染 =====
         function renderMessages() {
             const msgs = data.messages;
             messageList.innerHTML = '';
@@ -1519,11 +1514,12 @@
                 } else if (msg.content.startsWith('data:image/')) {
                     bubbleContent = `<img src="${msg.content}" alt="表情" />`;
                 }
+                const bubbleColor = msg.sender === 'self' ? currentBubbleColor : '#ffffff';
                 div.innerHTML = `
                     ${msg.sender === 'other' ? avatarHtml : ''}
                     <div class="bubble-wrapper">
                         <div class="sender-name">${nameLabel}</div>
-                        <div class="bubble" style="background:${msg.sender === 'self' ? currentBubbleColor : '#ffffff'}">
+                        <div class="bubble" style="background:${bubbleColor}">
                             ${bubbleContent}
                             ${timeHtml}
                         </div>
@@ -1544,7 +1540,6 @@
             return ts;
         }
 
-        // ===== 模拟回复 =====
         async function simulateReply() {
             if (isReplying) return;
             isReplying = true;
@@ -1569,7 +1564,6 @@
             updateStats();
         }
 
-        // ===== 发送消息 =====
         function sendMessage(text) {
             if (!text || text.trim() === '') return;
             const content = text.trim();
@@ -1585,7 +1579,6 @@
             }
         }
 
-        // ===== 更新统计 =====
         function updateStats() {
             const total = data.messages.length;
             const sent = data.messages.filter(m => m.sender === 'self').length;
@@ -1597,7 +1590,6 @@
             document.getElementById('statLetters').textContent = letters;
         }
 
-        // ===== 字卡库渲染（左右布局 + 无预设分组） =====
         function renderCardLib() {
             const groups = data.wordCards;
             const groupNames = Object.keys(groups);
@@ -1612,10 +1604,9 @@
             }
 
             let html = `<div class="card-lib-layout">`;
-            // 左侧分组列表
             html += `<div class="card-lib-left">`;
             if (groupNames.length === 0) {
-                html += `<div style="color:rgba(0,0,0,0.15); font-size:12px; padding:8px 0; text-align:center;">暂无分组<br/>👇 在下方创建</div>`;
+                html += `<div style="color:rgba(0,0,0,0.1); font-size:12px; padding:8px 0; text-align:center;">暂无分组<br/>👇 在下方创建</div>`;
             } else {
                 groupNames.forEach(name => {
                     const active = (name === selected) ? 'active' : '';
@@ -1628,7 +1619,6 @@
                 <input type="text" class="add-group-input" id="newGroupInput" placeholder="新分组名…" />
                 <button class="add-group-btn" id="addGroupBtn">+ 创建分组</button>
             </div>`;
-            // 右侧字卡列表
             html += `<div class="card-lib-right">`;
             if (selected && groups[selected]) {
                 const cards = groups[selected] || [];
@@ -1647,7 +1637,7 @@
                     </div>
                     <div class="add-card-row">
                         <input type="text" id="newCardInput" placeholder="添加字卡…" />
-                        <button id="addCardBtn">+</button>
+                        <button id="addCardBtn">+ 添加</button>
                     </div>
                     <div class="batch-area">
                         <textarea id="batchCardInput" placeholder="批量添加，每行一条…"></textarea>
@@ -1659,7 +1649,6 @@
             }
             html += `</div></div>`;
 
-            // 底部导入导出
             html += `
                 <div class="card-lib-footer">
                     <button id="exportCardsBtn">📤 导出字卡</button>
@@ -1675,7 +1664,6 @@
             cardLibContent.innerHTML = html;
 
             // ---- 事件绑定 ----
-            // 点击分组切换
             cardLibContent.querySelectorAll('.group-item').forEach(el => {
                 el.addEventListener('click', function(e) {
                     if (e.target.closest('.del-group')) return;
@@ -1685,7 +1673,6 @@
                     renderCardLib();
                 });
             });
-            // 删除分组
             cardLibContent.querySelectorAll('.del-group').forEach(el => {
                 el.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1698,7 +1685,6 @@
                     }
                 });
             });
-            // 删除字卡
             cardLibContent.querySelectorAll('.card-list .del').forEach(el => {
                 el.addEventListener('click', function() {
                     const group = this.dataset.group;
@@ -1710,7 +1696,6 @@
                     }
                 });
             });
-            // 添加单条字卡
             const addCardBtn = document.getElementById('addCardBtn');
             const newCardInput = document.getElementById('newCardInput');
             if (addCardBtn && newCardInput && selected) {
@@ -1726,7 +1711,6 @@
                     if (e.key === 'Enter') addCardBtn.click();
                 });
             }
-            // 批量添加
             const batchBtn = document.getElementById('batchAddBtn');
             const batchInput = document.getElementById('batchCardInput');
             if (batchBtn && batchInput && selected) {
@@ -1739,7 +1723,6 @@
                     renderCardLib();
                 });
             }
-            // 创建分组
             const addGroupBtn = document.getElementById('addGroupBtn');
             const newGroupInput = document.getElementById('newGroupInput');
             if (addGroupBtn && newGroupInput) {
@@ -1756,7 +1739,6 @@
                     if (e.key === 'Enter') addGroupBtn.click();
                 });
             }
-            // 导出
             document.getElementById('exportCardsBtn')?.addEventListener('click', function() {
                 const json = JSON.stringify(data.wordCards, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
@@ -1767,7 +1749,6 @@
                 a.click();
                 URL.revokeObjectURL(url);
             });
-            // 导入
             const importBtn = document.getElementById('importCardsBtn');
             const importInput = document.getElementById('importCardsInput');
             if (importBtn && importInput) {
@@ -1811,7 +1792,6 @@
             }
         }
 
-        // ===== 信件 =====
         function renderLetters() {
             const sent = data.letters.sent || [];
             const received = data.letters.received || [];
@@ -1866,7 +1846,6 @@
             alert('💌 信件已寄出！对方将在6-12小时后回信。');
         }
 
-        // ===== 头像设置 =====
         function setupAvatar(avatarEl, inputEl, storageKey) {
             const group = avatarEl.closest('.avatar-group');
             group.addEventListener('click', function(e) {
@@ -1909,7 +1888,6 @@
             }
         }
 
-        // ===== 背景 =====
         function applyBg(bg, bgImage) {
             const layer = document.getElementById('bgLayer');
             const img = document.getElementById('bgImage');
@@ -1924,7 +1902,6 @@
             }
         }
 
-        // ===== 表情包 =====
         function renderEmojis() {
             const panel = emojiPanel;
             panel.innerHTML = '';
@@ -1933,7 +1910,7 @@
                 item.className = 'emoji-item';
                 if (emoji.startsWith('http') || emoji.startsWith('data:image')) {
                     item.innerHTML =
-                    `<img src="${emoji}" alt="表情" /><span class="del-emoji" data-idx="${idx}">✕</span>`;
+                        `<img src="${emoji}" alt="表情" /><span class="del-emoji" data-idx="${idx}">✕</span>`;
                 } else {
                     item.textContent = emoji;
                     const del = document.createElement('span');
@@ -1960,7 +1937,7 @@
             });
             if (data.emojis.length === 0) {
                 panel.innerHTML =
-                    '<div style="color:rgba(0,0,0,0.12); font-size:13px; padding:8px 0;">还没有表情包，去设置里添加吧</div>';
+                    '<div style="color:rgba(0,0,0,0.1); font-size:13px; padding:8px 0;">还没有表情包，去设置里添加吧</div>';
             }
         }
 
@@ -1992,11 +1969,10 @@
                 list.appendChild(tag);
             });
             if (data.emojis.length === 0) {
-                list.innerHTML = '<span style="color:rgba(0,0,0,0.12); font-size:13px;">还没有表情包</span>';
+                list.innerHTML = '<span style="color:rgba(0,0,0,0.1); font-size:13px;">还没有表情包</span>';
             }
         }
 
-        // ===== 拍一拍管理 =====
         function renderPatManage() {
             const list = document.getElementById('patContentList');
             if (!list) return;
@@ -2017,11 +1993,10 @@
                 list.appendChild(tag);
             });
             if (data.pats.length === 0) {
-                list.innerHTML = '<span style="color:rgba(0,0,0,0.12); font-size:13px;">还没有拍一拍内容</span>';
+                list.innerHTML = '<span style="color:rgba(0,0,0,0.1); font-size:13px;">还没有拍一拍内容</span>';
             }
         }
 
-        // ===== 打开覆盖层 =====
         function openOverlay(overlay) {
             document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
             overlay.classList.add('open');
@@ -2031,7 +2006,6 @@
             document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
         }
 
-        // ===== 自动发送 =====
         function resetAutoSend() {
             if (autoSendTimer) { clearInterval(autoSendTimer);
                 autoSendTimer = null; }
@@ -2050,7 +2024,6 @@
             }
         }
 
-        // ===== 初始化 =====
         function init() {
             function updateTime() {
                 const d = new Date();
@@ -2063,7 +2036,7 @@
             setupAvatar(myAvatar, myAvatarInput, 'myAvatar');
             setupAvatar(partnerAvatar, partnerAvatarInput, 'partnerAvatar');
 
-            currentBubbleColor = data.settings.bubbleColor;
+            currentBubbleColor = data.settings.bubbleColor || '#f3e5f5';
             applyBg(data.settings.bg, data.settings.bgImage);
             renderMessages();
             updateStats();
@@ -2071,31 +2044,28 @@
             renderPatManage();
             renderEmojiManage();
 
-            // 设置面板值
             minWaitRange.value = data.settings.minWait || 3;
             maxWaitRange.value = data.settings.maxWait || 8;
             minReplyRange.value = data.settings.minReply || 1;
             maxReplyRange.value = data.settings.maxReply || 3;
             intervalRange.value = data.settings.interval || 31;
-            minWaitVal.textContent = data.settings.minWait + 's';
-            maxWaitVal.textContent = data.settings.maxWait + 's';
-            minReplyVal.textContent = data.settings.minReply;
-            maxReplyVal.textContent = data.settings.maxReply;
-            intervalVal.textContent = data.settings.interval + 'min';
+            minWaitVal.textContent = data.settings.minWait + '秒';
+            maxWaitVal.textContent = data.settings.maxWait + '秒';
+            minReplyVal.textContent = data.settings.minReply + '条';
+            maxReplyVal.textContent = data.settings.maxReply + '条';
+            intervalVal.textContent = data.settings.interval + '分钟';
             toggleTimestamp.classList.toggle('active', data.settings.showTimestamp !== false);
 
             bubbleColorPicker.querySelectorAll('.color-opt').forEach(el => {
                 el.classList.toggle('active', el.dataset.color === currentBubbleColor);
             });
 
-            // 背景高亮
             bgPicker.querySelectorAll('.bg-opt').forEach(el => {
                 const isActive = (el.dataset.bg === data.settings.bg) ||
                     (data.settings.bgImage && el.classList.contains('custom-bg'));
                 el.classList.toggle('active', isActive);
             });
 
-            // ===== 事件 =====
             sendBtn.addEventListener('click', function() { sendMessage(chatInput.value); });
             chatInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -2188,23 +2158,23 @@
             });
 
             minWaitRange.addEventListener('input', function() { const v = parseInt(this.value);
-                minWaitVal.textContent = v + 's';
+                minWaitVal.textContent = v + '秒';
                 data.settings.minWait = v;
                 saveData(); });
             maxWaitRange.addEventListener('input', function() { const v = parseInt(this.value);
-                maxWaitVal.textContent = v + 's';
+                maxWaitVal.textContent = v + '秒';
                 data.settings.maxWait = v;
                 saveData(); });
             minReplyRange.addEventListener('input', function() { const v = parseInt(this.value);
-                minReplyVal.textContent = v;
+                minReplyVal.textContent = v + '条';
                 data.settings.minReply = v;
                 saveData(); });
             maxReplyRange.addEventListener('input', function() { const v = parseInt(this.value);
-                maxReplyVal.textContent = v;
+                maxReplyVal.textContent = v + '条';
                 data.settings.maxReply = v;
                 saveData(); });
             intervalRange.addEventListener('input', function() { const v = parseInt(this.value);
-                intervalVal.textContent = v + 'min';
+                intervalVal.textContent = v + '分钟';
                 data.settings.interval = v;
                 saveData();
                 resetAutoSend(); });
