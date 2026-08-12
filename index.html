@@ -451,7 +451,7 @@
             display: none;
         }
 
-        /* ===== 其他原有样式 ===== */
+        /* ===== 覆盖层 ===== */
         .overlay {
             position: absolute;
             top: 0;
@@ -1367,9 +1367,7 @@
                 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
 
-            <div class="emoji-panel" id="emojiPanel"></div>
-
-            <!-- 输入区域 -->
+            <!-- 输入区域 - 没有 😊 按钮 -->
             <div class="chat-input-area">
                 <button class="plus-btn" id="plusBtn">+</button>
                 <input type="text" id="chatInput" placeholder="输入消息..." autocomplete="off" />
@@ -1604,7 +1602,7 @@
         //  完整 JavaScript
         // ================================================================
 
-        const STORAGE_KEY = 'chuanxun_data_v8';
+        const STORAGE_KEY = 'chuanxun_data_v9';
         const defaultData = {
             settings: {
                 myAvatar: '😊',
@@ -1665,8 +1663,6 @@
         const sendBtn = $('#sendBtn');
         const emptyState = $('#emptyState');
         const typingIndicator = $('#typingIndicator');
-        const emojiPanel = $('#emojiPanel');
-        const emojiBtn = $('#emojiBtn');
         const plusBtn = $('#plusBtn');
         const plusMenu = $('#plusMenu');
         const menuCall = $('#menuCall');
@@ -1710,7 +1706,6 @@
         const statusTime = $('#statusTime');
         const patPopup = $('#patPopup');
 
-        // 电话元素
         const callWindow = $('#callWindow');
         const callName = $('#callName');
         const callStatus = $('#callStatus');
@@ -1834,7 +1829,6 @@
                     '';
                 const nameLabel = msg.sender === 'self' ? '我' : '鱼鱼';
                 let bubbleContent = msg.content;
-                // 判断是否是图片消息
                 if (typeof msg.content === 'string' && (msg.content.startsWith('data:image/') || (msg.content.startsWith(
                         'http') && msg.content.match(/\.(jpg|jpeg|png|gif|webp)/i)))) {
                     bubbleContent = `<img src="${msg.content}" alt="图片" />`;
@@ -1868,7 +1862,6 @@
         // ===== 发送图片 =====
         function sendImage(dataUrl) {
             addMessage('self', dataUrl);
-            // 触发回复
             if (!isReplying) {
                 if (replyTimer) clearTimeout(replyTimer);
                 const minWait = data.settings.minWait || 3;
@@ -1878,7 +1871,7 @@
             }
         }
 
-        // ===== 模拟回复（带表情包混入） =====
+        // ===== 模拟回复 =====
         async function simulateReply() {
             if (isReplying) return;
             isReplying = true;
@@ -2054,7 +2047,6 @@
 
             cardLibContent.innerHTML = html;
 
-            // ---- 事件绑定 ----
             cardLibContent.querySelectorAll('.group-item').forEach(el => {
                 el.addEventListener('click', function(e) {
                     if (e.target.closest('.del-group')) return;
@@ -2308,23 +2300,54 @@
         }
 
         // ===== 表情包 =====
+        let emojiPanel = null;
+        let emojiPanelOpen = false;
+
+        function createEmojiPanel() {
+            if (emojiPanel) return;
+            emojiPanel = document.createElement('div');
+            emojiPanel.className = 'emoji-panel';
+            emojiPanel.style.cssText =
+                'display:none; padding:12px 16px; background:rgba(255,255,255,0.95); backdrop-filter:blur(16px); border-top:1px solid rgba(0,0,0,0.04); flex-wrap:wrap; gap:8px; flex-shrink:0; max-height:150px; overflow-y:auto; position:relative; z-index:5;';
+            document.getElementById('appContainer').appendChild(emojiPanel);
+            renderEmojis();
+        }
+
+        function toggleEmojiPanel() {
+            if (!emojiPanel) createEmojiPanel();
+            emojiPanelOpen = !emojiPanelOpen;
+            emojiPanel.style.display = emojiPanelOpen ? 'flex' : 'none';
+        }
+
         function renderEmojis() {
-            const panel = emojiPanel;
-            panel.innerHTML = '';
+            if (!emojiPanel) return;
+            emojiPanel.innerHTML = '';
             data.emojis.forEach((emoji, idx) => {
                 const item = document.createElement('div');
                 item.className = 'emoji-item';
+                item.style.cssText =
+                    'width:44px;height:44px;border-radius:8px;border:1px solid rgba(0,0,0,0.04);background:#ffffff;cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;position:relative;transition:0.2s;';
                 if (emoji.startsWith('http') || emoji.startsWith('data:image')) {
                     item.innerHTML =
-                        `<img src="${emoji}" alt="表情" /><span class="del-emoji" data-idx="${idx}">✕</span>`;
+                        `<img src="${emoji}" alt="表情" style="width:36px;height:36px;object-fit:contain;" /><span class="del-emoji" data-idx="${idx}" style="position:absolute;top:-4px;right:-4px;font-size:10px;color:rgba(0,0,0,0.12);background:#fff;border-radius:50%;width:16px;height:16px;display:none;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,0.03);cursor:pointer;">✕</span>`;
                 } else {
                     item.textContent = emoji;
                     const del = document.createElement('span');
                     del.className = 'del-emoji';
                     del.dataset.idx = idx;
                     del.textContent = '✕';
+                    del.style.cssText =
+                        'position:absolute;top:-4px;right:-4px;font-size:10px;color:rgba(0,0,0,0.12);background:#fff;border-radius:50%;width:16px;height:16px;display:none;align-items:center;justify-content:center;border:1px solid rgba(0,0,0,0.03);cursor:pointer;';
                     item.appendChild(del);
                 }
+                item.addEventListener('mouseenter', function() {
+                    const del = this.querySelector('.del-emoji');
+                    if (del) del.style.display = 'flex';
+                });
+                item.addEventListener('mouseleave', function() {
+                    const del = this.querySelector('.del-emoji');
+                    if (del) del.style.display = 'none';
+                });
                 item.addEventListener('click', function(e) {
                     if (e.target.closest('.del-emoji')) return;
                     const emojiContent = emoji;
@@ -2339,10 +2362,10 @@
                     renderEmojis();
                     renderEmojiManage();
                 });
-                panel.appendChild(item);
+                emojiPanel.appendChild(item);
             });
             if (data.emojis.length === 0) {
-                panel.innerHTML =
+                emojiPanel.innerHTML =
                     '<div style="color:rgba(0,0,0,0.1); font-size:13px; padding:8px 0;">还没有表情包，去设置里添加吧</div>';
             }
         }
@@ -2354,15 +2377,18 @@
             data.emojis.forEach((emoji, idx) => {
                 const tag = document.createElement('span');
                 tag.className = 'card-tag';
+                tag.style.cssText =
+                    'padding:4px 12px;border-radius:16px;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.03);font-size:13px;color:rgba(0,0,0,0.5);display:flex;align-items:center;gap:6px;';
                 if (emoji.startsWith('http') || emoji.startsWith('data:image')) {
                     tag.innerHTML =
-                        `<img src="${emoji}" style="width:24px;height:24px;object-fit:contain;" /><span class="del" data-idx="${idx}">✕</span>`;
+                        `<img src="${emoji}" style="width:24px;height:24px;object-fit:contain;" /><span class="del" data-idx="${idx}" style="cursor:pointer;color:rgba(0,0,0,0.12);font-size:12px;">✕</span>`;
                 } else {
                     tag.textContent = emoji;
                     const del = document.createElement('span');
                     del.className = 'del';
                     del.dataset.idx = idx;
                     del.textContent = '✕';
+                    del.style.cssText = 'cursor:pointer;color:rgba(0,0,0,0.12);font-size:12px;';
                     tag.appendChild(del);
                 }
                 tag.querySelector('.del')?.addEventListener('click', function() {
@@ -2387,10 +2413,13 @@
             data.pats.forEach((pat, idx) => {
                 const tag = document.createElement('span');
                 tag.className = 'card-tag';
+                tag.style.cssText =
+                    'padding:4px 12px;border-radius:16px;background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.03);font-size:13px;color:rgba(0,0,0,0.5);display:flex;align-items:center;gap:6px;';
                 tag.textContent = pat;
                 const del = document.createElement('span');
                 del.className = 'del';
                 del.textContent = '✕';
+                del.style.cssText = 'cursor:pointer;color:rgba(0,0,0,0.12);font-size:12px;';
                 del.addEventListener('click', function() {
                     data.pats.splice(idx, 1);
                     saveData();
@@ -2459,6 +2488,7 @@
             applyBg(data.settings.bg, data.settings.bgImage);
             renderMessages();
             updateStats();
+            createEmojiPanel();
             renderEmojis();
             renderPatManage();
             renderEmojiManage();
@@ -2491,26 +2521,22 @@
                 plusMenu.classList.toggle('show');
             });
 
-            // 点击其他地方关闭菜单
             document.addEventListener('click', function() {
                 plusMenu.classList.remove('show');
             });
 
-            // 菜单：打电话
             menuCall.addEventListener('click', function(e) {
                 e.stopPropagation();
                 plusMenu.classList.remove('show');
                 makeCall('鱼鱼');
             });
 
-            // 菜单：表情包（打开表情面板）
             menuEmoji.addEventListener('click', function(e) {
                 e.stopPropagation();
                 plusMenu.classList.remove('show');
-                emojiPanel.classList.toggle('show');
+                toggleEmojiPanel();
             });
 
-            // 菜单：发送图片
             menuImage.addEventListener('click', function(e) {
                 e.stopPropagation();
                 plusMenu.classList.remove('show');
@@ -2580,10 +2606,6 @@
                     e.preventDefault();
                     sendMessage(this.value);
                 }
-            });
-
-            emojiBtn.addEventListener('click', function() {
-                emojiPanel.classList.toggle('show');
             });
 
             settingsBtn.addEventListener('click', function() { openOverlay(settingsOverlay); });
@@ -2746,7 +2768,7 @@
                 if (!isCallActive && Math.random() < 0.25) {
                     makeCall('鱼鱼');
                 }
-            }, 120000); // 每2分钟检查一次
+            }, 120000);
 
             resetAutoSend();
             console.log('📡 传讯已启动！');
