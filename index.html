@@ -211,12 +211,15 @@
                 transform: translateY(0);
             }
         }
+        /* 自己（我）在右边，头像在右侧 */
         .message.self {
             align-self: flex-end;
             flex-direction: row-reverse;
         }
+        /* 对方（鱼鱼）在左边，头像在左侧 */
         .message.other {
             align-self: flex-start;
+            flex-direction: row;
         }
         .message .msg-avatar {
             width: 36px;
@@ -279,6 +282,9 @@
         }
         .message.self .sender-name {
             text-align: right;
+        }
+        .message.other .sender-name {
+            text-align: left;
         }
         .typing-indicator {
             align-self: flex-start;
@@ -803,6 +809,155 @@
             display: none !important;
         }
 
+        /* ===== 电话功能 ===== */
+        .call-window {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 30;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .call-window.show {
+            display: block;
+            animation: callIn 0.4s ease-out;
+        }
+        @keyframes callIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.85) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) translateY(0);
+            }
+        }
+        .call-window .call-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #eef1f5;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            border: 2px solid rgba(124, 58, 237, 0.08);
+        }
+        .call-window .call-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .call-window .call-status {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.3);
+            margin: 4px 0 16px;
+        }
+        .call-window .call-actions {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+        .call-window .call-actions button {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .call-window .call-actions .call-end {
+            background: #ef4444;
+            color: #fff;
+        }
+        .call-window .call-actions .call-end:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        .call-window .call-actions .call-answer {
+            background: #22c55e;
+            color: #fff;
+        }
+        .call-window .call-actions .call-answer:hover {
+            background: #16a34a;
+            transform: scale(1.05);
+        }
+        .call-window .call-actions .call-minimize {
+            background: rgba(0, 0, 0, 0.04);
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 18px;
+        }
+        .call-window .call-actions .call-minimize:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+        .call-mini {
+            position: absolute;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #22c55e;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+            z-index: 25;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .call-mini.show {
+            display: flex;
+            animation: miniIn 0.3s ease-out;
+        }
+        @keyframes miniIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .call-mini:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 28px rgba(34, 197, 94, 0.4);
+        }
+        .call-mini .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            border-radius: 50%;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* ===== 字卡库 ===== */
         .card-lib-layout {
             display: flex;
             gap: 12px;
@@ -810,7 +965,7 @@
             min-height: 400px;
         }
         .card-lib-left {
-            width: 120px;
+            width: 140px;
             flex-shrink: 0;
             background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(8px);
@@ -819,12 +974,21 @@
             overflow-y: auto;
             max-height: 500px;
         }
+        .card-lib-left .lib-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
         .card-lib-left .group-item {
             padding: 8px 10px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
-            color: rgba(0, 0, 0, 0.4);
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
             transition: 0.2s;
             display: flex;
             justify-content: space-between;
@@ -835,9 +999,14 @@
             background: rgba(124, 58, 237, 0.04);
         }
         .card-lib-left .group-item.active {
-            background: rgba(124, 58, 237, 0.06);
+            background: rgba(124, 58, 237, 0.08);
             color: #7c3aed;
             font-weight: 500;
+        }
+        .card-lib-left .group-item .count {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.2);
+            font-weight: 400;
         }
         .card-lib-left .group-item .del-group {
             color: rgba(0, 0, 0, 0.1);
@@ -848,32 +1017,35 @@
         .card-lib-left .group-item .del-group:hover {
             color: #dc2626;
         }
-        .card-lib-left .add-group-input {
-            width: 100%;
+        .card-lib-left .add-group-row {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .card-lib-left .add-group-row input {
+            flex: 1;
             padding: 6px 8px;
             border-radius: 8px;
             border: 1px solid rgba(0, 0, 0, 0.04);
             background: rgba(255, 255, 255, 0.4);
             font-size: 12px;
             outline: none;
-            margin-top: 6px;
         }
-        .card-lib-left .add-group-input:focus {
+        .card-lib-left .add-group-row input:focus {
             border-color: rgba(124, 58, 237, 0.1);
         }
-        .card-lib-left .add-group-btn {
-            width: 100%;
-            margin-top: 4px;
-            padding: 6px;
+        .card-lib-left .add-group-row button {
+            padding: 6px 10px;
             border-radius: 8px;
             border: none;
-            background: rgba(124, 58, 237, 0.04);
+            background: rgba(124, 58, 237, 0.06);
             color: rgba(0, 0, 0, 0.3);
             font-size: 12px;
             cursor: pointer;
+            white-space: nowrap;
         }
-        .card-lib-left .add-group-btn:hover {
-            background: rgba(124, 58, 237, 0.08);
+        .card-lib-left .add-group-row button:hover {
+            background: rgba(124, 58, 237, 0.1);
             color: #1a1a2e;
         }
         .card-lib-right {
@@ -890,6 +1062,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .card-lib-right .right-header .group-name {
             font-size: 15px;
@@ -912,25 +1086,32 @@
             background: rgba(124, 58, 237, 0.04);
             border: 1px solid rgba(124, 58, 237, 0.03);
             font-size: 13px;
-            color: rgba(0, 0, 0, 0.45);
+            color: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .card-lib-right .card-list .card-tag .del {
             cursor: pointer;
-            color: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.12);
             font-size: 12px;
         }
         .card-lib-right .card-list .card-tag .del:hover {
             color: #dc2626;
         }
-        .card-lib-right .add-card-row {
-            display: flex;
-            gap: 6px;
+        .card-lib-right .add-area {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
             margin-top: 4px;
         }
-        .card-lib-right .add-card-row input {
+        .card-lib-right .add-area .add-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .card-lib-right .add-area .add-row input {
             flex: 1;
             padding: 6px 12px;
             border-radius: 12px;
@@ -939,28 +1120,40 @@
             color: rgba(0, 0, 0, 0.5);
             font-size: 13px;
             outline: none;
+            min-width: 100px;
         }
-        .card-lib-right .add-card-row input:focus {
+        .card-lib-right .add-area .add-row input:focus {
             border-color: rgba(124, 58, 237, 0.1);
         }
-        .card-lib-right .add-card-row button {
+        .card-lib-right .add-area .add-row select {
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.4);
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            max-width: 120px;
+        }
+        .card-lib-right .add-area .add-row select:focus {
+            border-color: rgba(124, 58, 237, 0.1);
+        }
+        .card-lib-right .add-area .add-row button {
             padding: 6px 14px;
             border-radius: 12px;
             border: none;
-            background: rgba(124, 58, 237, 0.04);
+            background: rgba(124, 58, 237, 0.06);
             color: rgba(0, 0, 0, 0.35);
             font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
+            white-space: nowrap;
         }
-        .card-lib-right .add-card-row button:hover {
-            background: rgba(124, 58, 237, 0.08);
+        .card-lib-right .add-area .add-row button:hover {
+            background: rgba(124, 58, 237, 0.1);
             color: #1a1a2e;
         }
-        .card-lib-right .batch-area {
-            margin-top: 8px;
-        }
-        .card-lib-right .batch-area textarea {
+        .card-lib-right .add-area .batch-area textarea {
             width: 100%;
             padding: 8px 12px;
             border-radius: 12px;
@@ -969,26 +1162,45 @@
             color: rgba(0, 0, 0, 0.5);
             font-size: 13px;
             resize: vertical;
-            min-height: 60px;
+            min-height: 50px;
             outline: none;
             font-family: inherit;
         }
-        .card-lib-right .batch-area textarea:focus {
+        .card-lib-right .add-area .batch-area textarea:focus {
             border-color: rgba(124, 58, 237, 0.1);
         }
-        .card-lib-right .batch-area .batch-btn {
-            margin-top: 6px;
+        .card-lib-right .add-area .batch-area .batch-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .card-lib-right .add-area .batch-area .batch-row select {
+            padding: 6px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.4);
+            color: rgba(0, 0, 0, 0.5);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            max-width: 120px;
+        }
+        .card-lib-right .add-area .batch-area .batch-row select:focus {
+            border-color: rgba(124, 58, 237, 0.1);
+        }
+        .card-lib-right .add-area .batch-area .batch-row button {
             padding: 6px 14px;
             border-radius: 12px;
             border: none;
-            background: rgba(124, 58, 237, 0.04);
+            background: rgba(124, 58, 237, 0.06);
             color: rgba(0, 0, 0, 0.35);
             font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .card-lib-right .batch-area .batch-btn:hover {
-            background: rgba(124, 58, 237, 0.08);
+        .card-lib-right .add-area .batch-area .batch-row button:hover {
+            background: rgba(124, 58, 237, 0.1);
             color: #1a1a2e;
         }
         .card-lib-right .empty-tip {
@@ -1035,6 +1247,29 @@
             accent-color: #a78bfa;
             margin-right: 2px;
         }
+        .emoji-import-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .emoji-import-row button {
+            padding: 6px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .emoji-import-row button:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: #1a1a2e;
+        }
+        .emoji-import-row input[type="file"] {
+            display: none;
+        }
 
         @media (max-width: 440px) {
             body {
@@ -1056,23 +1291,37 @@
             .card-lib-left {
                 width: 100%;
                 max-height: 150px;
-                flex-direction: row;
-                flex-wrap: wrap;
                 display: flex;
+                flex-wrap: wrap;
                 gap: 4px;
                 padding: 8px;
+                align-content: flex-start;
+            }
+            .card-lib-left .lib-title {
+                width: 100%;
+                padding: 2px 4px 4px;
             }
             .card-lib-left .group-item {
                 padding: 4px 10px;
                 font-size: 12px;
                 margin-bottom: 0;
             }
-            .card-lib-left .add-group-input,
-            .card-lib-left .add-group-btn {
+            .card-lib-left .add-group-row {
                 display: none;
             }
             .card-lib-right {
                 max-height: 300px;
+            }
+            .call-window {
+                width: 92%;
+                max-width: 280px;
+            }
+            .call-mini {
+                bottom: 90px;
+                right: 12px;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
             }
         }
     </style>
@@ -1092,6 +1341,7 @@
                 <button class="back" id="backBtn" title="返回">‹</button>
                 <span class="title">传讯</span>
                 <div class="actions">
+                    <button id="callHeaderBtn" title="打电话" style="color:#22c55e;">📞</button>
                     <button id="envelopeBtn" title="信封投递">✉</button>
                     <button id="settingsBtn" title="设置">⚙</button>
                 </div>
@@ -1135,6 +1385,24 @@
 
             <div class="pat-popup" id="patPopup"></div>
 
+            <!-- 呼叫浮窗 -->
+            <div class="call-window" id="callWindow">
+                <div class="call-avatar" id="callAvatar">📞</div>
+                <div class="call-name" id="callName">鱼鱼</div>
+                <div class="call-status" id="callStatus">正在呼叫...</div>
+                <div class="call-actions">
+                    <button class="call-minimize" id="callMinimizeBtn" title="最小化">─</button>
+                    <button class="call-end" id="callEndBtn" title="挂断">✕</button>
+                    <button class="call-answer" id="callAnswerBtn" title="接听">📞</button>
+                </div>
+            </div>
+
+            <!-- 最小化浮窗 -->
+            <button class="call-mini" id="callMiniBtn">
+                📞
+                <span class="badge">1</span>
+            </button>
+
             <!-- 设置 -->
             <div class="overlay" id="settingsOverlay">
                 <div class="overlay-header">
@@ -1153,11 +1421,19 @@
                             <button class="action-btn" id="changePartnerAvatarBtn">更换</button>
                         </div>
                     </div>
+
+                    <div class="setting-group">
+                        <div class="group-title">通话</div>
+                        <div class="setting-row">
+                            <span class="label">📞 打电话</span>
+                            <button class="action-btn" id="callSettingsBtn" style="background:#22c55e; color:#fff; border:none; padding:6px 16px; border-radius:16px;">呼叫鱼鱼</button>
+                        </div>
+                    </div>
+
                     <div class="setting-group">
                         <div class="group-title">气泡颜色</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
                             <div class="color-picker" id="bubbleColorPicker">
-                                <!-- 12 种浅色/柔和色 -->
                                 <div class="color-opt active" style="background:#f3e5f5;" data-color="#f3e5f5"></div>
                                 <div class="color-opt" style="background:#e8eaf6;" data-color="#e8eaf6"></div>
                                 <div class="color-opt" style="background:#e3f2fd;" data-color="#e3f2fd"></div>
@@ -1166,13 +1442,13 @@
                                 <div class="color-opt" style="background:#fff8e1;" data-color="#fff8e1"></div>
                                 <div class="color-opt" style="background:#fff3e0;" data-color="#fff3e0"></div>
                                 <div class="color-opt" style="background:#fce4ec;" data-color="#fce4ec"></div>
-                                <div class="color-opt" style="background:#f3e5f5;" data-color="#f3e5f5"></div>
                                 <div class="color-opt" style="background:#ede7f6;" data-color="#ede7f6"></div>
                                 <div class="color-opt" style="background:#f8f0f5;" data-color="#f8f0f5"></div>
                                 <div class="color-opt" style="background:#f1f8e9;" data-color="#f1f8e9"></div>
                             </div>
                         </div>
                     </div>
+
                     <div class="setting-group">
                         <div class="group-title">聊天背景</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:8px;">
@@ -1197,6 +1473,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="setting-group">
                         <div class="group-title">回复设置</div>
                         <div class="setting-row">
@@ -1241,6 +1518,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="setting-group">
                         <div class="group-title">拍一拍</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:4px;">
@@ -1251,6 +1529,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="setting-group">
                         <div class="group-title">表情包管理</div>
                         <div class="setting-row" style="flex-wrap:wrap; gap:4px;">
@@ -1259,8 +1538,13 @@
                                 <input type="text" id="emojiInput" placeholder="输入文字或图片链接..." style="flex:1; padding:6px 12px; border-radius:12px; border:1px solid rgba(0,0,0,0.04); background:rgba(255,255,255,0.4); outline:none; font-size:13px;" />
                                 <button id="addEmojiBtn" style="padding:6px 14px; border-radius:12px; border:none; background:rgba(124,58,237,0.04); color:rgba(0,0,0,0.35); cursor:pointer;">+ 添加</button>
                             </div>
+                            <div class="emoji-import-row">
+                                <button id="importEmojiBtn">📷 从相册导入</button>
+                                <input type="file" id="importEmojiInput" accept="image/*" multiple />
+                            </div>
                         </div>
                     </div>
+
                     <div class="setting-group">
                         <div class="group-title">快捷</div>
                         <div class="setting-row">
@@ -1282,7 +1566,7 @@
             <!-- 字卡库 -->
             <div class="overlay" id="cardLibOverlay">
                 <div class="overlay-header">
-                    <span class="title">📚 字卡库</span>
+                    <span class="title">📚 回复库管理</span>
                     <button class="close-btn" id="closeCardLib">✕</button>
                 </div>
                 <div class="overlay-body" id="cardLibBody">
@@ -1331,10 +1615,10 @@
 
     <script>
         // ================================================================
-        //  完整 JavaScript 逻辑（中文版）
+        //  完整 JavaScript（头像左右已修正）
         // ================================================================
 
-        const STORAGE_KEY = 'chuanxun_data_v4';
+        const STORAGE_KEY = 'chuanxun_data_v7';
         const defaultData = {
             settings: {
                 myAvatar: '😊',
@@ -1434,11 +1718,83 @@
         const statusTime = $('#statusTime');
         const patPopup = $('#patPopup');
 
+        // 电话元素
+        const callWindow = $('#callWindow');
+        const callMini = $('#callMiniBtn');
+        const callHeaderBtn = $('#callHeaderBtn');
+        const callSettingsBtn = $('#callSettingsBtn');
+        const callEndBtn = $('#callEndBtn');
+        const callAnswerBtn = $('#callAnswerBtn');
+        const callMinimizeBtn = $('#callMinimizeBtn');
+        const callName = $('#callName');
+        const callStatus = $('#callStatus');
+        const callAvatar = $('#callAvatar');
+
         let currentBubbleColor = data.settings.bubbleColor || '#f3e5f5';
         let isReplying = false;
         let replyTimer = null;
         let autoSendTimer = null;
+        let isCallActive = false;
+        let isCallMinimized = false;
 
+        // ===== 电话功能 =====
+        function showCallWindow(name, status, avatar) {
+            callName.textContent = name || '鱼鱼';
+            callStatus.textContent = status || '正在呼叫...';
+            callAvatar.textContent = avatar || '📞';
+            callWindow.classList.add('show');
+            callMini.classList.remove('show');
+            isCallActive = true;
+            isCallMinimized = false;
+        }
+
+        function hideCallWindow() {
+            callWindow.classList.remove('show');
+            callMini.classList.remove('show');
+            isCallActive = false;
+            isCallMinimized = false;
+        }
+
+        function minimizeCall() {
+            if (isCallActive) {
+                callWindow.classList.remove('show');
+                callMini.classList.add('show');
+                isCallMinimized = true;
+            }
+        }
+
+        function restoreCall() {
+            if (isCallActive && isCallMinimized) {
+                callWindow.classList.add('show');
+                callMini.classList.remove('show');
+                isCallMinimized = false;
+            }
+        }
+
+        function makeCall(name) {
+            showCallWindow(name || '鱼鱼', '📞 正在呼叫...', '📞');
+            let ringCount = 0;
+            const ringInterval = setInterval(() => {
+                ringCount++;
+                if (ringCount > 8) {
+                    clearInterval(ringInterval);
+                    if (isCallActive) {
+                        callStatus.textContent = '⏰ 对方未接听';
+                        setTimeout(() => {
+                            if (isCallActive) hideCallWindow();
+                        }, 1500);
+                    }
+                    return;
+                }
+                if (isCallActive) {
+                    callStatus.textContent = ringCount % 2 === 0 ? '📞 正在呼叫...' : '🔔 振铃中...';
+                } else {
+                    clearInterval(ringInterval);
+                }
+            }, 1000);
+        }
+
+        // ===== 工具函数 =====
         function formatTime(ts) {
             const d = new Date(ts);
             return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
@@ -1478,6 +1834,7 @@
             return Object.keys(data.wordCards);
         }
 
+        // ===== 拍一拍 =====
         function showPat(content) {
             patPopup.textContent = '🫳 ' + content;
             patPopup.classList.remove('hide', 'show');
@@ -1490,6 +1847,7 @@
             }, 1200);
         }
 
+        // ===== 消息渲染（头像左右已修正） =====
         function renderMessages() {
             const msgs = data.messages;
             messageList.innerHTML = '';
@@ -1501,6 +1859,7 @@
             const partnerAvatarUrl = data.settings.partnerAvatar;
             msgs.forEach((msg) => {
                 const div = document.createElement('div');
+                // self = 我（右侧），other = 鱼鱼（左侧）
                 div.className = `message ${msg.sender === 'self' ? 'self' : 'other'}`;
                 const avatarContent = msg.sender === 'self' ? myAvatarUrl : partnerAvatarUrl;
                 const avatarHtml =
@@ -1515,6 +1874,8 @@
                     bubbleContent = `<img src="${msg.content}" alt="表情" />`;
                 }
                 const bubbleColor = msg.sender === 'self' ? currentBubbleColor : '#ffffff';
+                // 自己（self）头像在右侧，对方（other）头像在左侧
+                // 通过 flex-direction: row-reverse / row 控制
                 div.innerHTML = `
                     ${msg.sender === 'other' ? avatarHtml : ''}
                     <div class="bubble-wrapper">
@@ -1540,6 +1901,7 @@
             return ts;
         }
 
+        // ===== 模拟回复（带表情包混入） =====
         async function simulateReply() {
             if (isReplying) return;
             isReplying = true;
@@ -1551,14 +1913,47 @@
             typingIndicator.classList.add('show');
             await sleep(waitTime);
             typingIndicator.classList.remove('show');
+
             const allCards = getAllCards();
-            if (allCards.length === 0) { isReplying = false; return; }
+            const emojis = data.emojis || [];
+            if (allCards.length === 0 && emojis.length === 0) { isReplying = false; return; }
+
             const count = randomInt(minReply, maxReply);
-            const shuffled = [...allCards].sort(() => Math.random() - 0.5);
-            const selected = shuffled.slice(0, Math.min(count, allCards.length));
-            for (let i = 0; i < selected.length; i++) {
-                addMessage('other', selected[i]);
-                if (i < selected.length - 1) await sleep(randomInt(400, 1200));
+            let replyContents = [];
+
+            const shuffledCards = [...allCards].sort(() => Math.random() - 0.5);
+            const cardCount = Math.min(count, allCards.length);
+            const selectedCards = shuffledCards.slice(0, cardCount);
+
+            for (let i = 0; i < count; i++) {
+                let content = '';
+                const roll = Math.random();
+                if (roll < 0.4 && selectedCards.length > 0 && emojis.length > 0) {
+                    const card = selectedCards[i % selectedCards.length];
+                    const emoji = pickRandom(emojis);
+                    content = card + ' ' + emoji;
+                } else if (roll < 0.7 && selectedCards.length > 0) {
+                    const card = selectedCards[i % selectedCards.length];
+                    content = card;
+                } else if (emojis.length > 0) {
+                    const emoji = pickRandom(emojis);
+                    content = emoji;
+                } else if (selectedCards.length > 0) {
+                    const card = selectedCards[i % selectedCards.length];
+                    content = card;
+                } else {
+                    content = '...';
+                }
+                if (content) replyContents.push(content);
+            }
+
+            if (replyContents.length === 0) {
+                replyContents = ['💬 嗯嗯', '好的～'];
+            }
+
+            for (let i = 0; i < replyContents.length; i++) {
+                addMessage('other', replyContents[i]);
+                if (i < replyContents.length - 1) await sleep(randomInt(400, 1200));
             }
             isReplying = false;
             updateStats();
@@ -1590,6 +1985,7 @@
             document.getElementById('statLetters').textContent = letters;
         }
 
+        // ===== 字卡库 =====
         function renderCardLib() {
             const groups = data.wordCards;
             const groupNames = Object.keys(groups);
@@ -1604,7 +2000,9 @@
             }
 
             let html = `<div class="card-lib-layout">`;
+
             html += `<div class="card-lib-left">`;
+            html += `<div class="lib-title">📂 分组</div>`;
             if (groupNames.length === 0) {
                 html += `<div style="color:rgba(0,0,0,0.1); font-size:12px; padding:8px 0; text-align:center;">暂无分组<br/>👇 在下方创建</div>`;
             } else {
@@ -1612,20 +2010,23 @@
                     const active = (name === selected) ? 'active' : '';
                     const count = groups[name] ? groups[name].length : 0;
                     html +=
-                        `<div class="group-item ${active}" data-group="${name}"><span>${name}</span><span class="del-group" data-group="${name}">✕</span></div>`;
+                        `<div class="group-item ${active}" data-group="${name}"><span>${name}</span><span class="count">${count}条</span><span class="del-group" data-group="${name}">✕</span></div>`;
                 });
             }
             html += `
-                <input type="text" class="add-group-input" id="newGroupInput" placeholder="新分组名…" />
-                <button class="add-group-btn" id="addGroupBtn">+ 创建分组</button>
+                <div class="add-group-row">
+                    <input type="text" id="newGroupInput" placeholder="新分组…" />
+                    <button id="addGroupBtn">+</button>
+                </div>
             </div>`;
+
             html += `<div class="card-lib-right">`;
             if (selected && groups[selected]) {
                 const cards = groups[selected] || [];
                 html += `
                     <div class="right-header">
                         <span class="group-name">${selected}</span>
-                        <span class="card-count">${cards.length} 条</span>
+                        <span class="card-count">共 ${cards.length} 条</span>
                     </div>
                     <div class="card-list">
                         ${cards.map((c, idx) => `
@@ -1635,13 +2036,26 @@
                             </span>
                         `).join('')}
                     </div>
-                    <div class="add-card-row">
-                        <input type="text" id="newCardInput" placeholder="添加字卡…" />
-                        <button id="addCardBtn">+ 添加</button>
-                    </div>
-                    <div class="batch-area">
-                        <textarea id="batchCardInput" placeholder="批量添加，每行一条…"></textarea>
-                        <button class="batch-btn" id="batchAddBtn">📥 批量添加</button>
+                `;
+
+                const groupOptions = groupNames.map(name =>
+                    `<option value="${name}" ${name === selected ? 'selected' : ''}>${name}</option>`
+                ).join('');
+
+                html += `
+                    <div class="add-area">
+                        <div class="add-row">
+                            <input type="text" id="newCardInput" placeholder="添加字卡…" />
+                            <select id="addCardGroupSelect">${groupOptions}</select>
+                            <button id="addCardBtn">+ 添加</button>
+                        </div>
+                        <div class="batch-area">
+                            <textarea id="batchCardInput" placeholder="批量添加，每行一条…"></textarea>
+                            <div class="batch-row">
+                                <select id="batchGroupSelect">${groupOptions}</select>
+                                <button id="batchAddBtn">📥 批量添加</button>
+                            </div>
+                        </div>
                     </div>
                 `;
             } else {
@@ -1696,14 +2110,18 @@
                     }
                 });
             });
+
             const addCardBtn = document.getElementById('addCardBtn');
             const newCardInput = document.getElementById('newCardInput');
-            if (addCardBtn && newCardInput && selected) {
+            const addCardGroupSelect = document.getElementById('addCardGroupSelect');
+            if (addCardBtn && newCardInput && addCardGroupSelect) {
                 addCardBtn.addEventListener('click', function() {
                     const val = newCardInput.value.trim();
                     if (!val) return;
-                    if (!data.wordCards[selected]) data.wordCards[selected] = [];
-                    data.wordCards[selected].push(val);
+                    const group = addCardGroupSelect.value;
+                    if (!data.wordCards[group]) data.wordCards[group] = [];
+                    data.wordCards[group].push(val);
+                    data.selectedGroup = group;
                     saveData();
                     renderCardLib();
                 });
@@ -1711,18 +2129,23 @@
                     if (e.key === 'Enter') addCardBtn.click();
                 });
             }
+
             const batchBtn = document.getElementById('batchAddBtn');
             const batchInput = document.getElementById('batchCardInput');
-            if (batchBtn && batchInput && selected) {
+            const batchGroupSelect = document.getElementById('batchGroupSelect');
+            if (batchBtn && batchInput && batchGroupSelect) {
                 batchBtn.addEventListener('click', function() {
                     const lines = batchInput.value.split('\n').map(s => s.trim()).filter(s => s);
                     if (lines.length === 0) return;
-                    if (!data.wordCards[selected]) data.wordCards[selected] = [];
-                    data.wordCards[selected].push(...lines);
+                    const group = batchGroupSelect.value;
+                    if (!data.wordCards[group]) data.wordCards[group] = [];
+                    data.wordCards[group].push(...lines);
+                    data.selectedGroup = group;
                     saveData();
                     renderCardLib();
                 });
             }
+
             const addGroupBtn = document.getElementById('addGroupBtn');
             const newGroupInput = document.getElementById('newGroupInput');
             if (addGroupBtn && newGroupInput) {
@@ -1739,6 +2162,7 @@
                     if (e.key === 'Enter') addGroupBtn.click();
                 });
             }
+
             document.getElementById('exportCardsBtn')?.addEventListener('click', function() {
                 const json = JSON.stringify(data.wordCards, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
@@ -1749,6 +2173,7 @@
                 a.click();
                 URL.revokeObjectURL(url);
             });
+
             const importBtn = document.getElementById('importCardsBtn');
             const importInput = document.getElementById('importCardsInput');
             if (importBtn && importInput) {
@@ -1792,6 +2217,7 @@
             }
         }
 
+        // ===== 信件 =====
         function renderLetters() {
             const sent = data.letters.sent || [];
             const received = data.letters.received || [];
@@ -1846,6 +2272,7 @@
             alert('💌 信件已寄出！对方将在6-12小时后回信。');
         }
 
+        // ===== 头像设置 =====
         function setupAvatar(avatarEl, inputEl, storageKey) {
             const group = avatarEl.closest('.avatar-group');
             group.addEventListener('click', function(e) {
@@ -1888,6 +2315,7 @@
             }
         }
 
+        // ===== 背景 =====
         function applyBg(bg, bgImage) {
             const layer = document.getElementById('bgLayer');
             const img = document.getElementById('bgImage');
@@ -1902,6 +2330,7 @@
             }
         }
 
+        // ===== 表情包 =====
         function renderEmojis() {
             const panel = emojiPanel;
             panel.innerHTML = '';
@@ -1973,6 +2402,7 @@
             }
         }
 
+        // ===== 拍一拍管理 =====
         function renderPatManage() {
             const list = document.getElementById('patContentList');
             if (!list) return;
@@ -1997,6 +2427,7 @@
             }
         }
 
+        // ===== 打开覆盖层 =====
         function openOverlay(overlay) {
             document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
             overlay.classList.add('open');
@@ -2006,6 +2437,7 @@
             document.querySelectorAll('.overlay').forEach(o => o.classList.remove('open'));
         }
 
+        // ===== 自动发送 =====
         function resetAutoSend() {
             if (autoSendTimer) { clearInterval(autoSendTimer);
                 autoSendTimer = null; }
@@ -2013,17 +2445,27 @@
             if (interval > 0) {
                 autoSendTimer = setInterval(() => {
                     const allCards = getAllCards();
-                    if (allCards.length > 0 && !isReplying) {
-                        const card = pickRandom(allCards);
-                        if (card) {
-                            addMessage('other', '💬 ' + card);
-                            updateStats();
+                    const emojis = data.emojis || [];
+                    if ((allCards.length > 0 || emojis.length > 0) && !isReplying) {
+                        let content = '';
+                        if (allCards.length > 0 && Math.random() < 0.6) {
+                            content = pickRandom(allCards);
+                            if (emojis.length > 0 && Math.random() < 0.3) {
+                                content += ' ' + pickRandom(emojis);
+                            }
+                        } else if (emojis.length > 0) {
+                            content = pickRandom(emojis);
+                        } else {
+                            content = '💬 嗨～';
                         }
+                        addMessage('other', '💬 ' + content);
+                        updateStats();
                     }
                 }, interval * 60 * 1000);
             }
         }
 
+        // ===== 初始化 =====
         function init() {
             function updateTime() {
                 const d = new Date();
@@ -2066,6 +2508,75 @@
                 el.classList.toggle('active', isActive);
             });
 
+            // ===== 电话事件 =====
+            function startCall() {
+                if (isCallActive) {
+                    restoreCall();
+                    return;
+                }
+                const name = '鱼鱼';
+                const avatar = data.settings.partnerAvatar || '🌟';
+                makeCall(name);
+            }
+
+            callHeaderBtn.addEventListener('click', startCall);
+            callSettingsBtn.addEventListener('click', function() {
+                closeAllOverlays();
+                setTimeout(startCall, 300);
+            });
+
+            callEndBtn.addEventListener('click', function() {
+                if (isCallActive) {
+                    callStatus.textContent = '📴 已挂断';
+                    setTimeout(() => {
+                        hideCallWindow();
+                    }, 600);
+                }
+            });
+
+            callAnswerBtn.addEventListener('click', function() {
+                if (isCallActive) {
+                    callStatus.textContent = '📞 通话中...';
+                    callAnswerBtn.style.display = 'none';
+                    setTimeout(() => {
+                        if (isCallActive) {
+                            callStatus.textContent = '⏱️ 通话中 00:30';
+                        }
+                    }, 2000);
+                }
+            });
+
+            callMinimizeBtn.addEventListener('click', function() {
+                minimizeCall();
+            });
+
+            callMini.addEventListener('click', function() {
+                restoreCall();
+            });
+
+            // ===== 表情包从相册导入 =====
+            document.getElementById('importEmojiBtn')?.addEventListener('click', function() {
+                document.getElementById('importEmojiInput')?.click();
+            });
+            document.getElementById('importEmojiInput')?.addEventListener('change', function(e) {
+                const files = this.files;
+                if (!files || files.length === 0) return;
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const dataUrl = ev.target.result;
+                        data.emojis.push(dataUrl);
+                        saveData();
+                        renderEmojis();
+                        renderEmojiManage();
+                    };
+                    reader.readAsDataURL(file);
+                }
+                this.value = '';
+                alert('✅ 表情包导入成功！');
+            });
+
+            // ===== 其他事件 =====
             sendBtn.addEventListener('click', function() { sendMessage(chatInput.value); });
             chatInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -2234,7 +2745,7 @@
             });
 
             resetAutoSend();
-            console.log('📡 传讯已启动！');
+            console.log('📡 传讯已启动！头像左右已修正：自己在右，对方在左');
         }
 
         document.addEventListener('DOMContentLoaded', init);
