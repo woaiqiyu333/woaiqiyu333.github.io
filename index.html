@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局柔和毛玻璃风格 ===== */
+        /* ===== 全局 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -249,7 +249,7 @@
             line-height: 1.2;
         }
 
-        /* ===== 系统消息 - 居中下方显示 ===== */
+        /* ===== 系统消息 ===== */
         .system-msg-wrapper {
             display: flex;
             justify-content: center;
@@ -336,7 +336,7 @@
             transform: scale(0.88);
         }
 
-        /* ===== +号面板 - 只有：表情、表情包、图片 ===== */
+        /* ===== +号面板 ===== */
         .plus-panel {
             position: absolute;
             bottom: 68px;
@@ -681,7 +681,7 @@
             margin-top: 4px;
         }
 
-        /* ===== 表情库 - 点击发送 + 批量导入 ===== */
+        /* ===== 表情库 ===== */
         .sticker-grid {
             display: flex;
             flex-wrap: wrap;
@@ -777,6 +777,11 @@
             align-items: center;
             gap: 5px;
             font-size: 12.5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .no-group-items .item:active {
+            background: rgba(255, 255, 255, 0.7);
         }
         .no-group-items .item .del {
             color: #ff3b30;
@@ -896,7 +901,7 @@
             background: rgba(255, 255, 255, 0.7);
         }
 
-        /* ===== 聊天设置 - 滑块样式 ===== */
+        /* ===== 聊天设置 - 滑块 ===== */
         .chat-settings-form {
             padding: 14px;
             flex: 1;
@@ -917,7 +922,7 @@
         .chat-settings-form .field label {
             font-size: 13px;
             font-weight: 500;
-            min-width: 80px;
+            min-width: 70px;
         }
         .chat-settings-form .field input[type="range"] {
             flex: 1;
@@ -951,14 +956,14 @@
         .chat-settings-form .field .range-value {
             font-size: 14px;
             font-weight: 600;
-            min-width: 32px;
+            min-width: 28px;
             text-align: center;
             color: var(--primary);
         }
         .chat-settings-form .field .range-unit {
             font-size: 12px;
             color: var(--text-secondary);
-            min-width: 20px;
+            min-width: 18px;
         }
         .chat-settings-form .toggle-row {
             display: flex;
@@ -1001,12 +1006,6 @@
         }
         .toggle-switch.on .thumb {
             transform: translateX(18px);
-        }
-
-        /* 字体大小滑块特殊样式 */
-        .font-size-field .range-value {
-            font-size: var(--font-size);
-            font-weight: 700;
         }
 
         /* ===== 信件 ===== */
@@ -1247,6 +1246,7 @@
             cursor: pointer;
             padding: 2px 4px;
             border-radius: 4px;
+            z-index: 5;
         }
         #call-panel .call-minimize-btn:active {
             background: rgba(255, 255, 255, 0.05);
@@ -1268,7 +1268,7 @@
             display: none !important;
         }
 
-        /* ===== 气泡预设 - 12种马卡龙色系 ===== */
+        /* ===== 气泡预设 ===== */
         .bubble-macaron-pink.self .bubble {
             background: rgba(255, 182, 193, 0.35);
             color: #3d2c2e;
@@ -1443,7 +1443,7 @@
             </div>
             <div class="plus-panel" id="plusPanel">
                 <button onclick="toggleEmojiPicker()">😊<span>表情</span></button>
-                <button onclick="sendStickerFromPlus()">🖼️<span>表情包</span></button>
+                <button onclick="openStickerPicker()">🖼️<span>表情包</span></button>
                 <button onclick="sendImageFromPlus()">🖼️<span>图片</span></button>
             </div>
             <div class="emoji-picker" id="emojiPicker">
@@ -1650,7 +1650,7 @@
 
     <script>
         // ============================================================
-        //  数据层 - 完整
+        //  📦 数据层
         // ============================================================
         const DEFAULT_DATA = {
             myName: '我',
@@ -1719,7 +1719,7 @@
         const pageStack = [];
 
         // ============================================================
-        //  数据持久化
+        //  💾 数据持久化
         // ============================================================
         function loadData() {
             try {
@@ -1754,7 +1754,7 @@
         function getPartnerName() { return appData.partnerName || '梦角'; }
 
         // ============================================================
-        //  页面导航
+        //  🧭 页面导航
         // ============================================================
         function openPage(pageId) {
             const el = document.getElementById(pageId);
@@ -1802,7 +1802,7 @@
         }
 
         // ============================================================
-        //  聊天核心
+        //  💬 聊天核心
         // ============================================================
         function renderMessages() {
             const list = document.getElementById('chatList');
@@ -1826,7 +1826,6 @@
                 if (m.type === 'text') contentHtml = m.content;
                 else if (m.type === 'sticker') contentHtml = `<img src="${m.content}" class="sticker" alt="sticker">`;
                 else if (m.type === 'emoji') contentHtml = `<span class="emoji-big">${m.content}</span>`;
-                else if (m.type === 'pat') contentHtml = `<span class="pat">${m.content}</span>`;
                 else contentHtml = m.content;
                 const time = m.time || '';
                 html += `<div class="msg ${cls}"><div class="avatar">${avatarHtml}</div><div class="bubble">${contentHtml}<span class="time">${time}</span></div></div>`;
@@ -1872,42 +1871,81 @@
         }
 
         // ============================================================
-        //  +号里的表情包和图片发送
+        //  🖼️ 加号里的「表情包」— 弹出字卡库表情列表供选择
         // ============================================================
-        function sendStickerFromPlus() {
+        function openStickerPicker() {
             document.getElementById('plusPanel').classList.remove('show');
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.onchange = function(e) {
-                const files = e.target.files;
-                for (const file of files) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        const dataUrl = ev.target.result;
-                        // 发送到聊天
-                        const msg = {
-                            sender: 'me',
-                            type: 'sticker',
-                            content: dataUrl,
-                            time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-                        };
-                        appData.messages.push(msg);
-                        // 同时保存到表情库
-                        const id = 's' + Date.now() + Math.random().toString(36).slice(2, 6);
-                        appData.replyLibrary.stickers.push({ id, dataUrl });
-                        saveData();
-                        renderMessages();
-                        // 触发回复
-                        triggerPartnerReply();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
+            const stickers = appData.replyLibrary.stickers || [];
+            if (stickers.length === 0) {
+                alert('表情库为空，请先在「设置 → 自定义回复 → 表情库」中导入表情包');
+                return;
+            }
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                    position:fixed; top:0; left:0; width:100%; height:100%;
+                    background:rgba(0,0,0,0.3); backdrop-filter:blur(6px);
+                    z-index:200; display:flex; align-items:center; justify-content:center;
+                    animation:fadeIn 0.25s ease;
+                `;
+
+            const panel = document.createElement('div');
+            panel.style.cssText = `
+                    background:rgba(255,255,255,0.85); backdrop-filter:blur(20px);
+                    border-radius:24px; padding:20px; max-width:320px; width:90%;
+                    max-height:60vh; overflow-y:auto; box-shadow:0 8px 48px rgba(0,0,0,0.15);
+                    border:1px solid rgba(255,255,255,0.2);
+                `;
+
+            panel.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span style="font-weight:600;font-size:16px;">🖼️ 选择表情包</span>
+                        <button onclick="this.closest('div[style]').parentElement.remove()" 
+                            style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+                `;
+
+            for (const s of stickers) {
+                panel.innerHTML += `
+                        <div onclick="sendStickerFromPicker('${s.id}')" 
+                            style="cursor:pointer;border-radius:12px;padding:6px;background:rgba(255,255,255,0.4);
+                                   border:1px solid rgba(255,255,255,0.1);transition:transform 0.15s;
+                                   display:flex;align-items:center;justify-content:center;">
+                            <img src="${s.dataUrl}" style="max-width:64px;max-height:64px;border-radius:8px;display:block;">
+                        </div>
+                    `;
+            }
+
+            panel.innerHTML += `</div>`;
+            overlay.appendChild(panel);
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) this.remove();
+            });
         }
 
+        function sendStickerFromPicker(id) {
+            const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
+            if (!sticker) return;
+            document.querySelectorAll('div[style*="position:fixed"]').forEach(el => {
+                if (el.style.zIndex === '200') el.remove();
+            });
+            const msg = {
+                sender: 'me',
+                type: 'sticker',
+                content: sticker.dataUrl,
+                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+            };
+            appData.messages.push(msg);
+            saveData();
+            renderMessages();
+            triggerPartnerReply();
+        }
+
+        // ============================================================
+        //  🖼️ 加号里的「图片」— 直接从相册选图发送（不入库）
+        // ============================================================
         function sendImageFromPlus() {
             document.getElementById('plusPanel').classList.remove('show');
             const input = document.createElement('input');
@@ -1938,7 +1976,7 @@
         }
 
         // ============================================================
-        //  梦角回复 - 从字卡/Emoji/表情包随机选
+        //  🤖 梦角回复
         // ============================================================
         function triggerPartnerReply() {
             if (replyTimeout) clearTimeout(replyTimeout);
@@ -1954,23 +1992,10 @@
             const emojis = appData.replyLibrary.emojis || [];
             const stickers = appData.replyLibrary.stickers || [];
             const allItems = [];
-
-            // 收集所有可用内容
-            for (const c of cards) {
-                allItems.push({ type: 'text', content: c.content });
-            }
-            for (const e of emojis) {
-                allItems.push({ type: 'emoji', content: e });
-            }
-            for (const s of stickers) {
-                allItems.push({ type: 'sticker', content: s.dataUrl });
-            }
-
-            if (allItems.length === 0) {
-                addPartnerMessage('嗯嗯', 'text');
-                return;
-            }
-
+            for (const c of cards) allItems.push({ type: 'text', content: c.content });
+            for (const e of emojis) allItems.push({ type: 'emoji', content: e });
+            for (const s of stickers) allItems.push({ type: 'sticker', content: s.dataUrl });
+            if (allItems.length === 0) { addPartnerMessage('嗯嗯', 'text'); return; }
             const settings = appData.settings;
             const minCnt = settings.minReplyCount || 1,
                 maxCnt = settings.maxReplyCount || 3;
@@ -2007,7 +2032,7 @@
         }
 
         // ============================================================
-        //  主动发送 & 主动拍一拍
+        //  ⏰ 主动发送 & 主动拍一拍
         // ============================================================
         function startAutoBehaviors() {
             if (autoSendTimer) clearInterval(autoSendTimer);
@@ -2039,7 +2064,7 @@
         }
 
         // ============================================================
-        //  拍一拍 (双击头像)
+        //  👋 拍一拍 (双击头像)
         // ============================================================
         document.addEventListener('dblclick', function(e) {
             const avatar = e.target.closest('.msg .avatar');
@@ -2059,7 +2084,7 @@
         });
 
         // ============================================================
-        //  字卡库 - 完整
+        //  📚 字卡库
         // ============================================================
         function switchLibTab(tab) {
             currentLibTab = tab;
@@ -2081,39 +2106,25 @@
             const pats = appData.replyLibrary.pats || [];
 
             let html = `
-                <div class="lib-header-actions">
-                    <button class="primary" onclick="addGroup()">＋ 新增分组</button>
-                    <button onclick="importCards()">📥 导入</button>
-                    <button onclick="exportCards()">📤 导出</button>
-                </div>
-                <div class="batch-import-area">
-                    <div style="font-size:12px;font-weight:500;margin-bottom:4px;">📥 批量导入字卡</div>
-                    <textarea id="batchCardInput" placeholder="每行一条字卡&#10;例如：&#10;今天天气真好&#10;你在干嘛呢～"></textarea>
-                    <div class="batch-actions">
-                        <select id="batchGroupSelect"></select>
-                        <button onclick="batchImportCards()">批量导入</button>
-                        <span class="hint">每行一条，导入到所选分组</span>
+                    <div class="lib-header-actions">
+                        <button class="primary" onclick="addGroup()">＋ 新增分组</button>
+                        <button onclick="importCards()">📥 导入</button>
+                        <button onclick="exportCards()">📤 导出</button>
                     </div>
-                </div>
-            `;
-
-            // 填充分组下拉
-            const groupSelect = document.createElement('select');
-            groupSelect.id = 'batchGroupSelect';
-            for (const g of groups) {
-                const opt = document.createElement('option');
-                opt.value = g.id;
-                opt.textContent = g.name;
-                groupSelect.appendChild(opt);
-            }
-            // 用JS填充
+                    <div class="batch-import-area">
+                        <div style="font-size:12px;font-weight:500;margin-bottom:4px;">📥 批量导入字卡</div>
+                        <textarea id="batchCardInput" placeholder="每行一条字卡&#10;例如：&#10;今天天气真好&#10;你在干嘛呢～"></textarea>
+                        <div class="batch-actions">
+                            <select id="batchGroupSelect"></select>
+                            <button onclick="batchImportCards()">批量导入</button>
+                            <span class="hint">每行一条，导入到所选分组</span>
+                        </div>
+                    </div>
+                `;
 
             if (groups.length === 0) {
                 html += `<div class="empty-state"><span class="icon-big">📚</span>还没有分组，点击「新增分组」创建</div>`;
                 container.innerHTML = html;
-                // 填充select
-                const sel = document.getElementById('batchGroupSelect');
-                if (sel) { sel.innerHTML = ''; }
                 return;
             }
 
@@ -2121,44 +2132,43 @@
                 const groupCards = cards.filter(c => c.groupId === g.id);
                 const count = groupCards.length;
                 html += `
-                    <div class="group-card">
-                        <div class="group-header">
-                            <div class="name">${g.name} <span class="count">(${count})</span></div>
-                            <div class="actions">
-                                <button onclick="deleteGroup('${g.id}')" title="删除分组">🗑️</button>
+                        <div class="group-card">
+                            <div class="group-header">
+                                <div class="name">${g.name} <span class="count">(${count})</span></div>
+                                <div class="actions">
+                                    <button onclick="deleteGroup('${g.id}')" title="删除分组">🗑️</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="group-body" id="groupBody_${g.id}">
-                `;
+                            <div class="group-body" id="groupBody_${g.id}">
+                    `;
                 for (const item of groupCards) {
-                    html += `<div class="card-item">${item.content}<span class="del" onclick="deleteCard('${item.id}')">×</span></div>`;
+                    html +=
+                        `<div class="card-item">${item.content}<span class="del" onclick="deleteCard('${item.id}')">×</span></div>`;
                 }
                 html += `
-                            <div class="add-card-row">
-                                <input type="text" id="newCardInput_${g.id}" placeholder="添加字卡…" />
-                                <button onclick="addCard('${g.id}')">添加</button>
+                                <div class="add-card-row">
+                                    <input type="text" id="newCardInput_${g.id}" placeholder="添加字卡…" />
+                                    <button onclick="addCard('${g.id}')">添加</button>
+                                </div>
                             </div>
+                        </div>
+                    `;
+            }
+
+            html += `
+                    <div class="pat-manager">
+                        <div class="pat-header">
+                            <span>👋 拍一拍管理</span>
+                            <button onclick="addPat()">+ 添加</button>
+                        </div>
+                        <div class="pat-list">
+                            ${pats.map(p => `<span class="pat-item">${p} <span class="del" onclick="deletePat('${p}')">×</span></span>`).join('')}
                         </div>
                     </div>
                 `;
-            }
-
-            // 拍一拍管理
-            html += `
-                <div class="pat-manager">
-                    <div class="pat-header">
-                        <span>👋 拍一拍管理</span>
-                        <button onclick="addPat()">+ 添加</button>
-                    </div>
-                    <div class="pat-list">
-                        ${pats.map(p => `<span class="pat-item">${p} <span class="del" onclick="deletePat('${p}')">×</span></span>`).join('')}
-                    </div>
-                </div>
-            `;
 
             container.innerHTML = html;
 
-            // 填充分组下拉
             const sel = document.getElementById('batchGroupSelect');
             if (sel) {
                 sel.innerHTML = '';
@@ -2175,15 +2185,16 @@
         function renderEmojiList(container) {
             const emojis = appData.replyLibrary.emojis || [];
             let html = `
-                <div class="lib-header-actions">
-                    <button class="primary" onclick="addEmoji()">＋ 新增Emoji</button>
-                </div>
-                <div class="no-group-items">
-            `;
+                    <div class="lib-header-actions">
+                        <button class="primary" onclick="addEmoji()">＋ 新增Emoji</button>
+                    </div>
+                    <div class="no-group-items">
+                `;
             if (emojis.length === 0) html += `<div class="empty-state">还没有Emoji，点击上方添加</div>`;
             else {
                 for (const e of emojis) {
-                    html += `<span class="item emoji-big" onclick="sendEmojiToChat('${e}')">${e} <span class="del" onclick="deleteEmoji('${e}')">×</span></span>`;
+                    html +=
+                        `<span class="item emoji-big" onclick="sendEmojiToChat('${e}')">${e} <span class="del" onclick="deleteEmoji('${e}')">×</span></span>`;
                 }
                 html += `<div style="width:100%;font-size:11px;color:var(--text-secondary);margin-top:4px;">💡 点击Emoji可直接发送</div>`;
             }
@@ -2208,25 +2219,25 @@
         function renderStickerList(container) {
             const stickers = appData.replyLibrary.stickers || [];
             let html = `
-                <div class="sticker-upload-area">
-                    <div class="upload-actions">
-                        <button onclick="batchImportStickers()">📥 批量导入表情包</button>
-                        <button class="secondary" onclick="addSingleSticker()">＋ 单张添加</button>
+                    <div class="sticker-upload-area">
+                        <div class="upload-actions">
+                            <button onclick="batchImportStickers()">📥 批量导入表情包</button>
+                            <button class="secondary" onclick="addSingleSticker()">＋ 单张添加</button>
+                        </div>
+                        <div class="hint">批量导入可一次选择多张图片，全部添加到表情库</div>
                     </div>
-                    <div class="hint">批量导入可一次选择多张图片，全部添加到表情库</div>
-                </div>
-            `;
+                `;
             if (stickers.length === 0) {
                 html += `<div class="empty-state"><span class="icon-big">🖼️</span>还没有表情包，点击上方导入</div>`;
             } else {
                 html += `<div class="sticker-grid">`;
                 for (const s of stickers) {
                     html += `
-                        <div class="sticker-item" onclick="sendStickerToChat('${s.id}')">
-                            <img src="${s.dataUrl}" alt="sticker">
-                            <span class="del" onclick="event.stopPropagation();deleteSticker('${s.id}')">×</span>
-                        </div>
-                    `;
+                            <div class="sticker-item" onclick="sendStickerFromPicker('${s.id}')">
+                                <img src="${s.dataUrl}" alt="sticker">
+                                <span class="del" onclick="event.stopPropagation();deleteSticker('${s.id}')">×</span>
+                            </div>
+                        `;
                 }
                 html += `</div>`;
                 html += `<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">💡 点击表情包可直接发送</div>`;
@@ -2234,23 +2245,8 @@
             container.innerHTML = html;
         }
 
-        function sendStickerToChat(id) {
-            const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
-            if (!sticker) return;
-            const msg = {
-                sender: 'me',
-                type: 'sticker',
-                content: sticker.dataUrl,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-            };
-            appData.messages.push(msg);
-            saveData();
-            renderMessages();
-            triggerPartnerReply();
-        }
-
         // ============================================================
-        //  字卡库操作函数
+        //  📂 字卡库操作
         // ============================================================
         function addGroup() {
             const name = prompt('请输入分组名称：');
@@ -2306,7 +2302,7 @@
         }
 
         // ============================================================
-        //  Emoji操作
+        //  😊 Emoji操作
         // ============================================================
         function addEmoji() {
             const emoji = prompt('请输入Emoji：');
@@ -2325,7 +2321,7 @@
         }
 
         // ============================================================
-        //  表情包操作
+        //  🖼️ 表情包操作
         // ============================================================
         function batchImportStickers() {
             const input = document.createElement('input');
@@ -2380,7 +2376,7 @@
         }
 
         // ============================================================
-        //  拍一拍操作
+        //  👋 拍一拍操作
         // ============================================================
         function addPat() {
             const pat = prompt('请输入拍一拍内容 (如 "拍了拍你")：');
@@ -2397,7 +2393,7 @@
         }
 
         // ============================================================
-        //  导入导出字卡
+        //  📥📤 导入导出字卡
         // ============================================================
         function importCards() {
             const input = document.createElement('input');
@@ -2469,7 +2465,7 @@
         }
 
         // ============================================================
-        //  外观设置
+        //  🎨 外观设置
         // ============================================================
         const bgPresets = [
             { id: 'bg-preset-default', label: '默认', color: '#f5f2ed' },
@@ -2500,12 +2496,14 @@
         ];
 
         function renderAppearance() {
+            // 背景
             const bgContainer = document.getElementById('bgOptions');
             const currentBg = appData.appearance.background || 'bg-preset-default';
             bgContainer.innerHTML = bgPresets.map(b =>
                 `<div class="opt bg-opt ${b.id === currentBg ? 'active' : ''}" style="background:${b.color};" onclick="selectBg('${b.id}')" title="${b.label}"></div>`
             ).join('');
 
+            // 气泡
             const bubbleContainer = document.getElementById('bubbleOptions');
             const currentBubble = appData.appearance.bubbleStyle || 'bubble-macaron-pink';
             bubbleContainer.innerHTML = bubblePresets.map(b =>
@@ -2542,18 +2540,19 @@
                 document.getElementById('page-chat').querySelector('.chat-list').style.backgroundImage = '';
             }
 
+            // 应用样式
             applyBg(currentBg);
             applyBubble(currentBubble);
-            // 更新头像标签
             document.getElementById('myAvatarLabel').textContent = getMyName();
             document.getElementById('partnerAvatarLabel').textContent = getPartnerName();
         }
 
+        // ✅ 关键修复：selectBg 和 selectBubble 正确绑定
         function selectBg(id) {
             appData.appearance.background = id;
             saveData();
-            renderAppearance();
             applyBg(id);
+            renderAppearance(); // 刷新高亮
         }
 
         function applyBg(id) {
@@ -2569,8 +2568,8 @@
         function selectBubble(id) {
             appData.appearance.bubbleStyle = id;
             saveData();
-            renderAppearance();
             applyBubble(id);
+            renderAppearance(); // 刷新高亮
         }
 
         function applyBubble(id) {
@@ -2614,7 +2613,7 @@
         }
 
         // ============================================================
-        //  聊天设置 - 滑块版本
+        //  ⚙️ 聊天设置
         // ============================================================
         function loadChatSettings() {
             const s = appData.settings;
@@ -2659,7 +2658,7 @@
         }
 
         // ============================================================
-        //  修改昵称
+        //  ✏️ 修改昵称
         // ============================================================
         function editMyName() {
             const current = getMyName();
@@ -2695,7 +2694,7 @@
         }
 
         // ============================================================
-        //  信件系统
+        //  ✉️ 信件系统
         // ============================================================
         function switchLetterTab(tab) {
             letterTab = tab;
@@ -2791,7 +2790,7 @@
         setInterval(checkLetterReplies, 5 * 60 * 1000);
 
         // ============================================================
-        //  通话系统
+        //  📞 通话系统
         // ============================================================
         function initiateCall() {
             document.getElementById('plusPanel').classList.remove('show');
@@ -2835,9 +2834,9 @@
                     `<button class="btn-hangup" onclick="hangupCall()" style="background:#ff3b30;color:#fff;">📞</button>`;
             } else if (callState.status === 'incoming') {
                 actions.innerHTML = `
-                    <button class="btn-decline" onclick="declineCall('已拒绝')" style="background:#ff3b30;color:#fff;">✕</button>
-                    <button class="btn-answer" onclick="answerCall()" style="background:#34c759;color:#fff;">📞</button>
-                `;
+                        <button class="btn-decline" onclick="declineCall('已拒绝')" style="background:#ff3b30;color:#fff;">✕</button>
+                        <button class="btn-answer" onclick="answerCall()" style="background:#34c759;color:#fff;">📞</button>
+                    `;
             }
         }
 
@@ -2887,24 +2886,28 @@
             document.getElementById('callTimer').textContent = '00:00';
         }
 
+        // ✅ 修复：通话小窗横杠可点，点击小窗放大
         function toggleCallMinimize() {
             if (!callState) return;
             const panel = document.getElementById('call-panel');
             callState.isMini = !callState.isMini;
             panel.classList.toggle('mini');
+
             if (callState.isMini) {
-                // 缩小后点击放大
-                panel.onclick = function() {
+                panel.style.cursor = 'pointer';
+                panel.onclick = function(e) {
+                    if (e.target.closest('button')) return;
                     if (callState && callState.isMini) {
                         callState.isMini = false;
                         panel.classList.remove('mini');
+                        panel.style.cursor = 'grab';
                         panel.onclick = null;
-                        // 恢复大小
                         panel.style.width = '';
                         panel.style.padding = '';
                     }
                 };
             } else {
+                panel.style.cursor = 'grab';
                 panel.onclick = null;
                 panel.style.width = '';
                 panel.style.padding = '';
@@ -2979,10 +2982,9 @@
         }
 
         // ============================================================
-        //  初始化
+        //  🚀 初始化
         // ============================================================
         function init() {
-            // 应用字体
             document.documentElement.style.setProperty('--font-size', (appData.settings.fontSize || 15) + 'px');
             renderMessages();
             applyBg(appData.appearance.background || 'bg-preset-default');
@@ -3016,7 +3018,6 @@
             document.getElementById('partnerAvatarLabel').textContent = getPartnerName();
             updateLetterNames();
             document.getElementById('callName').textContent = getPartnerName();
-            // 自定义背景
             if (appData.appearance.customBg) {
                 document.getElementById('page-chat').querySelector('.chat-list').style.backgroundImage =
                     `url(${appData.appearance.customBg})`;
@@ -3032,6 +3033,9 @@
         window.insertEmoji = insertEmoji;
         window.togglePlusPanel = togglePlusPanel;
         window.toggleEmojiPicker = toggleEmojiPicker;
+        window.openStickerPicker = openStickerPicker;
+        window.sendStickerFromPicker = sendStickerFromPicker;
+        window.sendImageFromPlus = sendImageFromPlus;
         window.switchLibTab = switchLibTab;
         window.renderLibrary = renderLibrary;
         window.renderAppearance = renderAppearance;
@@ -3046,13 +3050,6 @@
         window.removeCustomBg = removeCustomBg;
         window.editMyName = editMyName;
         window.editPartnerName = editPartnerName;
-        window.sendStickerFromPlus = sendStickerFromPlus;
-        window.sendImageFromPlus = sendImageFromPlus;
-        window.sendStickerToChat = sendStickerToChat;
-        window.sendEmojiToChat = sendEmojiToChat;
-        window.batchImportStickers = batchImportStickers;
-        window.addSingleSticker = addSingleSticker;
-        window.deleteSticker = deleteSticker;
         window.addGroup = addGroup;
         window.deleteGroup = deleteGroup;
         window.addCard = addCard;
@@ -3062,6 +3059,9 @@
         window.exportCards = exportCards;
         window.addEmoji = addEmoji;
         window.deleteEmoji = deleteEmoji;
+        window.batchImportStickers = batchImportStickers;
+        window.addSingleSticker = addSingleSticker;
+        window.deleteSticker = deleteSticker;
         window.addPat = addPat;
         window.deletePat = deletePat;
         window.switchLetterTab = switchLetterTab;
