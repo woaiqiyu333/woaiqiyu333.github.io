@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局 ===== */
+        /* ===== 全局样式（完整保留） ===== */
         * {
             margin: 0;
             padding: 0;
@@ -202,6 +202,11 @@
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #aaa;
         }
         .msg .avatar img {
             width: 100%;
@@ -1623,6 +1628,7 @@
 
         function getFileFromDB(id) {
             return new Promise((resolve, reject) => {
+                if (!id) { resolve(null); return; }
                 openDB().then(db => {
                     const tx = db.transaction(STORE_NAME, 'readonly');
                     const store = tx.objectStore(STORE_NAME);
@@ -1739,6 +1745,9 @@
         let currentPage = 'page-chat';
         const pageStack = [];
 
+        // ============================================================
+        //  💾 数据读写
+        // ============================================================
         function loadData() {
             try {
                 const raw = localStorage.getItem('chuanxun_data');
@@ -1826,15 +1835,27 @@
         }
 
         // ============================================================
-        //  💬 聊天核心
+        //  💬 聊天核心（头像完全修复）
         // ============================================================
-        function renderMessages() {
+        async function renderMessages() {
             const list = document.getElementById('chatList');
             const msgs = appData.messages || [];
+
+            // 加载头像数据
+            let userAvatarData = null;
+            let partnerAvatarData = null;
+            if (appData.appearance.userAvatarFileId) {
+                userAvatarData = await getFileFromDB(appData.appearance.userAvatarFileId);
+            }
+            if (appData.appearance.partnerAvatarFileId) {
+                partnerAvatarData = await getFileFromDB(appData.appearance.partnerAvatarFileId);
+            }
+
             if (msgs.length === 0) {
                 list.innerHTML = `<div class="empty-state"><span class="icon-big">💬</span>开始和 ${getPartnerName()} 聊天吧～</div>`;
                 return;
             }
+
             let html = '';
             for (const m of msgs) {
                 if (m.type === 'system') {
@@ -1842,10 +1863,11 @@
                     continue;
                 }
                 const cls = m.sender === 'me' ? 'self' : 'other';
-                const avatar = m.sender === 'me' ? (appData.appearance.userAvatarFileId || '') : (appData.appearance
-                    .partnerAvatarFileId || '');
-                const avatarHtml =
-                    `<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'display:flex;align-items:center;justify-content:center;font-size:16px;color:#aaa;\'>${m.sender === 'me' ? getMyName().charAt(0) : '✨'}</span>'">`;
+                const avatarData = m.sender === 'me' ? userAvatarData : partnerAvatarData;
+                const avatarHtml = avatarData ?
+                    `<img src="${avatarData}" alt="avatar" style="width:100%;height:100%;object-fit:cover;">` :
+                    `<span style="font-size:16px;color:#aaa;">${m.sender === 'me' ? getMyName().charAt(0) : '✨'}</span>`;
+
                 let contentHtml = '';
                 if (m.type === 'text') contentHtml = m.content;
                 else if (m.type === 'sticker') {
@@ -2388,7 +2410,7 @@
                     reader.onload = async function(ev) {
                         const dataUrl = ev.target.result;
                         const fileId = generateFileId();
-                        await saveFileData(fileId, dataUrl);
+                        await saveFileToDB(fileId, dataUrl);
                         appData.replyLibrary.stickers.push({ id: 's' + Date.now() + Math.random().toString(36).slice(2,
                                 6), fileId: fileId });
                         loaded++;
@@ -2415,7 +2437,7 @@
                 reader.onload = async function(ev) {
                     const dataUrl = ev.target.result;
                     const fileId = generateFileId();
-                    await saveFileData(fileId, dataUrl);
+                    await saveFileToDB(fileId, dataUrl);
                     appData.replyLibrary.stickers.push({ id: 's' + Date.now() + Math.random().toString(36).slice(2, 6),
                         fileId: fileId });
                     saveData();
@@ -2626,6 +2648,7 @@
                 `<div class="opt ${b.id === currentBubble ? 'active' : ''}" style="background:rgba(255,255,255,0.3);font-size:11px;font-weight:500;" onclick="selectBubble('${b.id}')" title="${b.label}">${b.label}</div>`
             ).join('');
 
+            // 加载头像预览
             const userAvatarPreview = document.getElementById('userAvatarPreview');
             const partnerAvatarPreview = document.getElementById('partnerAvatarPreview');
 
@@ -2657,6 +2680,7 @@
                     `<span style="display:flex;align-items:center;justify-content:center;font-size:22px;color:#bbb;width:100%;height:100%;">✨</span>`;
             }
 
+            // 自定义背景
             if (appData.appearance.customBgFileId) {
                 const data = await getFileFromDB(appData.appearance.customBgFileId);
                 if (data) {
@@ -2718,8 +2742,9 @@
                     appData.appearance.partnerAvatarFileId = fileId;
                 }
                 saveData();
-                renderAppearance();
-                renderMessages();
+                await renderAppearance();
+                await renderMessages();
+                alert('头像已更新！');
             };
             reader.readAsDataURL(file);
         }
@@ -2734,7 +2759,7 @@
                 await saveFileToDB(fileId, dataUrl);
                 appData.appearance.customBgFileId = fileId;
                 saveData();
-                renderAppearance();
+                await renderAppearance();
                 alert('背景已更新！');
             };
             reader.readAsDataURL(file);
@@ -2745,7 +2770,7 @@
                 await deleteFileFromDB(appData.appearance.customBgFileId);
                 appData.appearance.customBgFileId = null;
                 saveData();
-                renderAppearance();
+                await renderAppearance();
             }
         }
 
@@ -3146,7 +3171,8 @@
             if (appData.settings.fontFamily) {
                 document.documentElement.style.setProperty('--font-family', appData.settings.fontFamily);
             }
-            renderMessages();
+            await renderMessages();
+            await renderAppearance();
             applyBg(appData.appearance.background || 'bg-preset-default');
             applyBubble(appData.appearance.bubbleStyle || 'bubble-macaron-pink');
             loadChatSettings();
@@ -3186,7 +3212,6 @@
                         `url(${data})`;
                 }
             }
-            renderAppearance();
         }
 
         document.addEventListener('DOMContentLoaded', init);
@@ -3240,11 +3265,6 @@
         window.toggleGroupCollapse = toggleGroupCollapse;
         window.exportAllData = exportAllData;
         window.importAllData = importAllData;
-        window.saveFileToDB = saveFileToDB;
-        window.getFileFromDB = getFileFromDB;
-        window.deleteFileFromDB = deleteFileFromDB;
-        window.getAllFilesFromDB = getAllFilesFromDB;
-        window.clearDB = clearDB;
     </script>
 </body>
 </html>
