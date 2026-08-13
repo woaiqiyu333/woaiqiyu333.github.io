@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局样式（与之前一致，此处省略，完整代码中保留） ===== */
+        /* ===== 全局 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -1342,9 +1342,9 @@
             <div class="header">
                 <div class="title">传讯 <small>· 字卡</small></div>
                 <div class="actions">
-                    <button onclick="openPage('page-settings')" title="设置">⚙️</button>
-                    <button onclick="initiateCall()" title="通话">📞</button>
-                    <button onclick="openPage('page-letters')" title="信件">✉️</button>
+                    <button onclick="openPage('page-settings')">⚙️</button>
+                    <button onclick="initiateCall()">📞</button>
+                    <button onclick="openPage('page-letters')">✉️</button>
                 </div>
             </div>
             <div class="chat-list" id="chatList"></div>
@@ -1400,9 +1400,8 @@
                     <div class="left"><span class="icon">✏️</span><div class="info"><div class="label">修改梦角昵称</div><div class="desc">当前：<span id="partnerNameDisplay">梦角</span></div></div></div>
                     <span class="arrow">›</span>
                 </div>
-                <!-- ✅ 新增：数据备份 -->
                 <div class="settings-item" onclick="exportAllData()">
-                    <div class="left"><span class="icon">💾</span><div class="info"><div class="label">数据备份</div><div class="desc">导出所有数据（含头像、背景、字卡、聊天记录）</div></div></div>
+                    <div class="left"><span class="icon">💾</span><div class="info"><div class="label">数据备份</div><div class="desc">导出所有数据（含头像、背景、字卡）</div></div></div>
                     <span class="arrow">›</span>
                 </div>
                 <div class="settings-item" onclick="importAllData()">
@@ -1584,7 +1583,7 @@
 
     <script>
         // ============================================================
-        //  💾 使用 IndexedDB 存储大文件数据（头像、背景、表情包）
+        //  💾 IndexedDB 存储大文件
         // ============================================================
         const DB_NAME = 'ChuanxunDB';
         const STORE_NAME = 'files';
@@ -1671,7 +1670,7 @@
         }
 
         // ============================================================
-        //  📦 数据层（小数据用 localStorage，大文件用 IndexedDB）
+        //  📦 数据层
         // ============================================================
         const DEFAULT_DATA = {
             myName: '我',
@@ -1706,7 +1705,7 @@
                 emojis: ['😊', '❤️', '😂', '🥰', '😭', '🤗', '😘', '💕', '✨', '🌟', '🌈', '🎉', '💪', '🙈', '🐱', '🌸', '🍀', '🌺', '💫',
                     '⭐'
                 ],
-                stickers: [], // 存储 { id, fileId } 实际图片存在 IndexedDB
+                stickers: [],
                 pats: ['拍了拍你', '轻轻拍了拍你', '摸了摸头', '捏了捏脸', '抱了抱你', '戳了戳你', '给你比了个心']
             },
             letters: { sent: [], received: [] },
@@ -1723,7 +1722,7 @@
             appearance: {
                 background: 'bg-preset-default',
                 bubbleStyle: 'bubble-macaron-pink',
-                userAvatarFileId: null, // 存储在 IndexedDB 中的 fileId
+                userAvatarFileId: null,
                 partnerAvatarFileId: null,
                 customBgFileId: null
             }
@@ -1740,9 +1739,6 @@
         let currentPage = 'page-chat';
         const pageStack = [];
 
-        // ============================================================
-        //  💾 数据持久化（小数据 localStorage，大文件 IndexedDB）
-        // ============================================================
         function loadData() {
             try {
                 const raw = localStorage.getItem('chuanxun_data');
@@ -1773,29 +1769,9 @@
             } catch (e) { console.warn('Save error', e); }
         }
 
-        // ============================================================
-        //  🖼️ 头像/背景/表情包 的存储与加载（IndexedDB）
-        // ============================================================
-        async function loadFileData(fileId) {
-            if (!fileId) return null;
-            try {
-                return await getFileFromDB(fileId);
-            } catch (e) { console.warn('Load file error', e); return null; }
-        }
+        function getMyName() { return appData.myName || '我'; }
 
-        async function saveFileData(fileId, dataUrl) {
-            try {
-                await saveFileToDB(fileId, dataUrl);
-                return true;
-            } catch (e) { console.warn('Save file error', e); return false; }
-        }
-
-        async function deleteFileData(fileId) {
-            if (!fileId) return;
-            try {
-                await deleteFileFromDB(fileId);
-            } catch (e) { console.warn('Delete file error', e); }
-        }
+        function getPartnerName() { return appData.partnerName || '梦角'; }
 
         function generateFileId() {
             return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
@@ -1868,13 +1844,11 @@
                 const cls = m.sender === 'me' ? 'self' : 'other';
                 const avatar = m.sender === 'me' ? (appData.appearance.userAvatarFileId || '') : (appData.appearance
                     .partnerAvatarFileId || '');
-                // 头像通过 IndexedDB 加载，但这里用占位，实际在 renderAppearance 中加载
                 const avatarHtml =
                     `<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'display:flex;align-items:center;justify-content:center;font-size:16px;color:#aaa;\'>${m.sender === 'me' ? getMyName().charAt(0) : '✨'}</span>'">`;
                 let contentHtml = '';
                 if (m.type === 'text') contentHtml = m.content;
                 else if (m.type === 'sticker') {
-                    // 表情包从 IndexedDB 加载
                     contentHtml =
                         `<img src="${m.content}" class="sticker" alt="sticker" onerror="this.style.display='none'">`;
                 } else if (m.type === 'emoji') contentHtml = `<span class="emoji-big">${m.content}</span>`;
@@ -1886,9 +1860,9 @@
             list.scrollTop = list.scrollHeight;
         }
 
-        function sendMessage(text) {
+        function sendMessage() {
             const input = document.getElementById('chatInput');
-            const content = text || input.value.trim();
+            const content = input.value.trim();
             if (!content) return;
             const msg = {
                 sender: 'me',
@@ -1923,7 +1897,7 @@
         }
 
         // ============================================================
-        //  🖼️ 加号里的「表情包」— 弹出字卡库表情列表
+        //  🖼️ 加号里的「表情包」
         // ============================================================
         async function openStickerPicker() {
             document.getElementById('plusPanel').classList.remove('show');
@@ -1932,7 +1906,6 @@
                 alert('表情库为空，请先在「设置 → 自定义回复 → 表情库」中导入表情包');
                 return;
             }
-            // 加载所有表情包图片
             const stickerData = [];
             for (const s of stickers) {
                 const data = await getFileFromDB(s.fileId);
@@ -2054,7 +2027,6 @@
             const allItems = [];
             for (const c of cards) allItems.push({ type: 'text', content: c.content });
             for (const e of emojis) allItems.push({ type: 'emoji', content: e });
-            // 加载表情包
             for (const s of stickers) {
                 const data = await getFileFromDB(s.fileId);
                 if (data) {
@@ -2109,11 +2081,9 @@
                     if (currentPage !== 'page-chat') return;
                     const cards = appData.replyLibrary.cards || [];
                     const emojis = appData.replyLibrary.emojis || [];
-                    const stickers = appData.replyLibrary.stickers || [];
                     const allItems = [];
                     for (const c of cards) allItems.push({ type: 'text', content: c.content });
                     for (const e of emojis) allItems.push({ type: 'emoji', content: e });
-                    // 表情包异步加载复杂，主动发送时先不用表情包
                     if (allItems.length === 0) return;
                     const item = allItems[Math.floor(Math.random() * allItems.length)];
                     addPartnerMessage(item.content, item.type);
@@ -2402,7 +2372,7 @@
         }
 
         // ============================================================
-        //  🖼️ 表情包操作（使用 IndexedDB）
+        //  🖼️ 表情包操作
         // ============================================================
         function batchImportStickers() {
             const input = document.createElement('input');
@@ -2459,7 +2429,7 @@
         async function deleteSticker(id) {
             const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
             if (sticker) {
-                await deleteFileData(sticker.fileId);
+                await deleteFileFromDB(sticker.fileId);
             }
             appData.replyLibrary.stickers = appData.replyLibrary.stickers.filter(s => s.id !== id);
             saveData();
@@ -2484,7 +2454,7 @@
         }
 
         // ============================================================
-        //  📥📤 导入导出字卡（小数据）
+        //  📥📤 导入导出字卡
         // ============================================================
         function importCards() {
             const input = document.createElement('input');
@@ -2550,24 +2520,21 @@
         }
 
         // ============================================================
-        //  💾 完整数据备份（含头像、背景、表情包）
+        //  💾 完整数据备份
         // ============================================================
         async function exportAllData() {
             try {
-                // 收集所有大文件
                 const files = await getAllFilesFromDB();
                 const fileMap = {};
                 for (const f of files) {
                     fileMap[f.id] = f.data;
                 }
-
                 const exportData = {
                     version: '1.0',
                     exportedAt: new Date().toISOString(),
                     appData: appData,
                     files: fileMap
                 };
-
                 const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2597,18 +2564,15 @@
                     }
                     const mode = confirm('选择导入方式：\n「确定」= 覆盖所有现有数据\n「取消」= 追加数据（可能重复）');
                     if (mode) {
-                        // 覆盖：清空现有数据
                         await clearDB();
                         appData = data.appData;
-                        // 恢复文件
                         for (const [id, content] of Object.entries(data.files)) {
-                            await saveFileData(id, content);
+                            await saveFileToDB(id, content);
                         }
                         saveData();
                         alert('数据恢复成功！页面将刷新。');
                         location.reload();
                     } else {
-                        // 追加：合并数据（简单处理，只追加不冲突的）
                         alert('追加模式暂不支持，请选择覆盖模式');
                     }
                 } catch (err) {
@@ -2662,7 +2626,6 @@
                 `<div class="opt ${b.id === currentBubble ? 'active' : ''}" style="background:rgba(255,255,255,0.3);font-size:11px;font-weight:500;" onclick="selectBubble('${b.id}')" title="${b.label}">${b.label}</div>`
             ).join('');
 
-            // 加载头像
             const userAvatarPreview = document.getElementById('userAvatarPreview');
             const partnerAvatarPreview = document.getElementById('partnerAvatarPreview');
 
@@ -2694,7 +2657,6 @@
                     `<span style="display:flex;align-items:center;justify-content:center;font-size:22px;color:#bbb;width:100%;height:100%;">✨</span>`;
             }
 
-            // 自定义背景
             if (appData.appearance.customBgFileId) {
                 const data = await getFileFromDB(appData.appearance.customBgFileId);
                 if (data) {
@@ -2749,7 +2711,7 @@
             reader.onload = async function(e) {
                 const dataUrl = e.target.result;
                 const fileId = generateFileId();
-                await saveFileData(fileId, dataUrl);
+                await saveFileToDB(fileId, dataUrl);
                 if (who === 'user') {
                     appData.appearance.userAvatarFileId = fileId;
                 } else {
@@ -2769,7 +2731,7 @@
             reader.onload = async function(e) {
                 const dataUrl = e.target.result;
                 const fileId = generateFileId();
-                await saveFileData(fileId, dataUrl);
+                await saveFileToDB(fileId, dataUrl);
                 appData.appearance.customBgFileId = fileId;
                 saveData();
                 renderAppearance();
@@ -2780,7 +2742,7 @@
 
         async function removeCustomBg() {
             if (appData.appearance.customBgFileId) {
-                await deleteFileData(appData.appearance.customBgFileId);
+                await deleteFileFromDB(appData.appearance.customBgFileId);
                 appData.appearance.customBgFileId = null;
                 saveData();
                 renderAppearance();
@@ -3002,7 +2964,6 @@
             const img = document.getElementById('callAvatarImg');
             const avatar = appData.appearance.partnerAvatarFileId || '';
             if (avatar) {
-                // 异步加载头像
                 getFileFromDB(avatar).then(data => {
                     if (data) {
                         img.src = data;
@@ -3218,7 +3179,6 @@
             updateLetterNames();
             document.getElementById('callName').textContent = getPartnerName();
 
-            // 加载背景
             if (appData.appearance.customBgFileId) {
                 const data = await getFileFromDB(appData.appearance.customBgFileId);
                 if (data) {
@@ -3226,7 +3186,6 @@
                         `url(${data})`;
                 }
             }
-            // 渲染外观
             renderAppearance();
         }
 
@@ -3281,6 +3240,11 @@
         window.toggleGroupCollapse = toggleGroupCollapse;
         window.exportAllData = exportAllData;
         window.importAllData = importAllData;
+        window.saveFileToDB = saveFileToDB;
+        window.getFileFromDB = getFileFromDB;
+        window.deleteFileFromDB = deleteFileFromDB;
+        window.getAllFilesFromDB = getAllFilesFromDB;
+        window.clearDB = clearDB;
     </script>
 </body>
 </html>
