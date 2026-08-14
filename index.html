@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局样式（完整保留） ===== */
         * {
             margin: 0;
             padding: 0;
@@ -178,6 +177,7 @@
             gap: 6px;
             max-width: 88%;
             animation: msgIn 0.3s ease;
+            position: relative;
         }
         @keyframes msgIn {
             from {
@@ -249,6 +249,46 @@
         .msg .bubble .emoji-big {
             font-size: 30px;
             line-height: 1.2;
+        }
+        .msg .bubble .quote {
+            font-size: 12px;
+            opacity: 0.7;
+            padding: 4px 8px;
+            border-left: 3px solid var(--primary);
+            margin-bottom: 4px;
+            background: rgba(0, 0, 0, 0.04);
+            border-radius: 4px;
+            font-style: italic;
+        }
+        .msg .msg-actions {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            display: none;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2px 6px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            z-index: 5;
+        }
+        .msg:hover .msg-actions,
+        .msg .msg-actions.show {
+            display: flex;
+        }
+        .msg .msg-actions button {
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            transition: background 0.15s;
+        }
+        .msg .msg-actions button:active {
+            background: rgba(0, 0, 0, 0.06);
         }
         .system-msg-wrapper {
             display: flex;
@@ -374,6 +414,69 @@
             margin-top: 1px;
             font-weight: 500;
         }
+
+        /* 图片选择弹窗 */
+        .image-picker-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-picker-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .image-picker-panel .title {
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .image-picker-panel .options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .image-picker-panel .options button {
+            padding: 10px 24px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text);
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .image-picker-panel .options button:active {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .image-picker-panel .close-btn {
+            display: block;
+            margin: 12px auto 0;
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
         .emoji-picker {
             position: absolute;
             bottom: 68px;
@@ -406,54 +509,54 @@
         .emoji-picker span:active {
             background: rgba(0, 0, 0, 0.04);
         }
+
+        /* ===== 设置 - 两排网格 ===== */
         .settings-grid {
-            padding: 16px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             flex: 1;
             overflow-y: auto;
+            align-content: start;
         }
         .settings-item {
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(12px);
             border-radius: var(--radius-sm);
-            padding: 14px 16px;
+            padding: 16px 12px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             cursor: pointer;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: transform 0.15s, background 0.2s;
+            text-align: center;
+            min-height: 80px;
         }
         .settings-item:active {
-            transform: scale(0.97);
+            transform: scale(0.95);
             background: rgba(255, 255, 255, 0.7);
         }
-        .settings-item .left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .settings-item .icon {
+            font-size: 28px;
+            margin-bottom: 4px;
         }
-        .settings-item .left .icon {
-            font-size: 22px;
-            width: 36px;
-            text-align: center;
-        }
-        .settings-item .left .info .label {
-            font-size: 15px;
+        .settings-item .label {
+            font-size: 13px;
             font-weight: 500;
+            line-height: 1.3;
         }
-        .settings-item .left .info .desc {
-            font-size: 11px;
+        .settings-item .desc {
+            font-size: 10px;
             color: var(--text-secondary);
-            margin-top: 1px;
+            margin-top: 2px;
+            line-height: 1.2;
         }
-        .settings-item .arrow {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
+
+        /* ===== 字卡库 ===== */
         .lib-tabs {
             display: flex;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -844,6 +947,8 @@
             cursor: pointer;
             margin-left: 3px;
         }
+
+        /* ===== 外观 ===== */
         .appearance-grid {
             padding: 14px;
             flex: 1;
@@ -903,6 +1008,47 @@
         .bg-upload-btn:active {
             background: rgba(255, 255, 255, 0.7);
         }
+
+        /* ===== 心情管理 ===== */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .mood-item {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-sm);
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .mood-item:active {
+            transform: scale(0.95);
+        }
+        .mood-item.active {
+            border-color: var(--primary);
+            background: rgba(124, 140, 255, 0.15);
+        }
+        .mood-item .mood-emoji {
+            font-size: 28px;
+            display: block;
+        }
+        .mood-item .mood-name {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .mood-item .del-mood {
+            font-size: 12px;
+            color: #ff3b30;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+
+        /* ===== 聊天设置 ===== */
         .chat-settings-form {
             padding: 14px;
             flex: 1;
@@ -1033,6 +1179,8 @@
             flex: 1;
             margin-left: 8px;
         }
+
+        /* ===== 信件 ===== */
         .letters-tabs {
             display: flex;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -1108,6 +1256,8 @@
         .write-letter-btn:active {
             transform: scale(0.88);
         }
+
+        /* ===== 写信 ===== */
         .letter-editor {
             flex: 1;
             padding: 14px;
@@ -1151,6 +1301,8 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
+
+        /* ===== 通话面板 ===== */
         #call-panel {
             position: fixed;
             top: 80px;
@@ -1271,6 +1423,7 @@
         #call-panel .call-minimize-btn:active {
             background: rgba(255, 255, 255, 0.05);
         }
+
         .empty-state {
             text-align: center;
             color: var(--text-secondary);
@@ -1285,6 +1438,7 @@
         .hidden {
             display: none !important;
         }
+
         .bg-preset-default {
             background: linear-gradient(160deg, #f5f2ed 0%, #e5e0da 100%);
         }
@@ -1315,6 +1469,7 @@
         .bg-preset-dark {
             background: linear-gradient(160deg, #2a2a2e 0%, #1a1a1e 100%);
         }
+
         @media (max-width:480px) {
             #app {
                 max-width: 100%;
@@ -1335,6 +1490,20 @@
             }
             .msg .bubble {
                 font-size: var(--font-size);
+            }
+            .settings-grid {
+                gap: 8px;
+                padding: 12px;
+            }
+            .settings-item {
+                min-height: 64px;
+                padding: 12px 8px;
+            }
+            .settings-item .icon {
+                font-size: 22px;
+            }
+            .settings-item .label {
+                font-size: 12px;
             }
         }
     </style>
@@ -1361,7 +1530,7 @@
             <div class="plus-panel" id="plusPanel">
                 <button onclick="toggleEmojiPicker()">😊<span>表情</span></button>
                 <button onclick="openStickerPicker()">🖼️<span>表情包</span></button>
-                <button onclick="sendImageFromPlus()">🖼️<span>图片</span></button>
+                <button onclick="showImagePicker()">🖼️<span>图片</span></button>
             </div>
             <div class="emoji-picker" id="emojiPicker">
                 <span onclick="insertEmoji('😊')">😊</span><span onclick="insertEmoji('❤️')">❤️</span>
@@ -1377,7 +1546,7 @@
             </div>
         </div>
 
-        <!-- ===== 设置 ===== -->
+        <!-- ===== 设置 - 两排网格 ===== -->
         <div id="page-settings" class="page">
             <div class="header">
                 <button class="back-btn" onclick="closePage('page-settings')">‹ 返回</button>
@@ -1386,32 +1555,44 @@
             </div>
             <div class="settings-grid">
                 <div class="settings-item" onclick="openPage('page-reply-library')">
-                    <div class="left"><span class="icon">📚</span><div class="info"><div class="label">自定义回复</div><div class="desc">字卡 · 表情包 · Emoji · 拍一拍</div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">📚</div>
+                    <div class="label">自定义回复</div>
+                    <div class="desc">字卡·表情包·拍一拍</div>
                 </div>
                 <div class="settings-item" onclick="openPage('page-appearance')">
-                    <div class="left"><span class="icon">🎨</span><div class="info"><div class="label">更改背景和气泡</div><div class="desc">主题 · 气泡 · 头像 · 背景</div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">🎨</div>
+                    <div class="label">外观设置</div>
+                    <div class="desc">背景·气泡·头像</div>
+                </div>
+                <div class="settings-item" onclick="openPage('page-mood')">
+                    <div class="icon">💭</div>
+                    <div class="label">心情管理</div>
+                    <div class="desc">查看和选择心情</div>
                 </div>
                 <div class="settings-item" onclick="openPage('page-chat-settings')">
-                    <div class="left"><span class="icon">⚡</span><div class="info"><div class="label">聊天设置</div><div class="desc">回复速度 · 条数 · 字体</div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">⚡</div>
+                    <div class="label">聊天设置</div>
+                    <div class="desc">回复速度·字体</div>
                 </div>
                 <div class="settings-item" onclick="editMyName()">
-                    <div class="left"><span class="icon">✏️</span><div class="info"><div class="label">修改我的昵称</div><div class="desc">当前：<span id="myNameDisplay">我</span></div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">✏️</div>
+                    <div class="label">我的昵称</div>
+                    <div class="desc" id="myNameDisplay">我</div>
                 </div>
                 <div class="settings-item" onclick="editPartnerName()">
-                    <div class="left"><span class="icon">✏️</span><div class="info"><div class="label">修改梦角昵称</div><div class="desc">当前：<span id="partnerNameDisplay">梦角</span></div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">✏️</div>
+                    <div class="label">梦角昵称</div>
+                    <div class="desc" id="partnerNameDisplay">梦角</div>
                 </div>
                 <div class="settings-item" onclick="exportAllData()">
-                    <div class="left"><span class="icon">💾</span><div class="info"><div class="label">数据备份</div><div class="desc">导出所有数据（含头像、背景、字卡）</div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">💾</div>
+                    <div class="label">数据备份</div>
+                    <div class="desc">导出所有数据</div>
                 </div>
                 <div class="settings-item" onclick="importAllData()">
-                    <div class="left"><span class="icon">📥</span><div class="info"><div class="label">恢复备份</div><div class="desc">从备份文件导入数据</div></div></div>
-                    <span class="arrow">›</span>
+                    <div class="icon">📥</div>
+                    <div class="label">恢复备份</div>
+                    <div class="desc">从备份文件导入</div>
                 </div>
             </div>
         </div>
@@ -1429,6 +1610,34 @@
                 <div class="tab" data-tab="sticker" onclick="switchLibTab('sticker')">表情库</div>
             </div>
             <div class="lib-content" id="libContent"></div>
+        </div>
+
+        <!-- ===== 心情管理 ===== -->
+        <div id="page-mood" class="page">
+            <div class="header">
+                <button class="back-btn" onclick="closePage('page-mood')">‹ 返回</button>
+                <div style="font-weight:600;font-size:16px;">💭 心情管理</div>
+                <div style="width:44px;"></div>
+            </div>
+            <div style="padding:16px;flex:1;overflow-y:auto;">
+                <div style="background:rgba(255,255,255,0.4);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+                    <div style="font-size:13px;color:var(--text-secondary);">😊 我的心情</div>
+                    <div style="font-size:20px;font-weight:600;margin-top:4px;" id="myMoodDisplay">😊 开心</div>
+                    <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;" id="myMoodQuickSelect"></div>
+                </div>
+                <div style="background:rgba(255,255,255,0.4);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+                    <div style="font-size:13px;color:var(--text-secondary);">💕 <span id="partnerMoodLabel">梦角</span> 的心情</div>
+                    <div style="font-size:20px;font-weight:600;margin-top:4px;" id="partnerMoodDisplay">😊 开心</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.4);border-radius:var(--radius-sm);padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <span style="font-weight:600;font-size:14px;">📋 全部心情</span>
+                        <button onclick="addMood()" style="padding:3px 14px;border-radius:18px;border:1px solid rgba(255,255,255,0.15);background:var(--primary);color:#fff;font-size:12px;cursor:pointer;">+ 添加</button>
+                    </div>
+                    <div class="mood-grid" id="moodGrid"></div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-top:8px;text-align:center;">点击心情选择，点击 × 删除</div>
+                </div>
+            </div>
         </div>
 
         <!-- ===== 外观 ===== -->
@@ -1588,10 +1797,11 @@
 
     <script>
         // ============================================================
-        //  💾 IndexedDB 存储大文件
+        //  💾 全部数据用 IndexedDB 存储（永不丢失）
         // ============================================================
-        const DB_NAME = 'ChuanxunDB';
-        const STORE_NAME = 'files';
+        const DB_NAME = 'ChuanxunDB_v2';
+        const STORE_NAME = 'data';
+
         let db = null;
 
         function openDB() {
@@ -1614,44 +1824,43 @@
             });
         }
 
-        function saveFileToDB(id, data) {
+        function saveToDB(key, data) {
             return new Promise((resolve, reject) => {
                 openDB().then(db => {
                     const tx = db.transaction(STORE_NAME, 'readwrite');
                     const store = tx.objectStore(STORE_NAME);
-                    const request = store.put({ id, data });
+                    const request = store.put({ id: key, data: data });
                     request.onsuccess = () => resolve();
                     request.onerror = () => reject(request.error);
                 }).catch(reject);
             });
         }
 
-        function getFileFromDB(id) {
+        function getFromDB(key) {
             return new Promise((resolve, reject) => {
-                if (!id) { resolve(null); return; }
                 openDB().then(db => {
                     const tx = db.transaction(STORE_NAME, 'readonly');
                     const store = tx.objectStore(STORE_NAME);
-                    const request = store.get(id);
+                    const request = store.get(key);
                     request.onsuccess = () => resolve(request.result ? request.result.data : null);
                     request.onerror = () => reject(request.error);
                 }).catch(reject);
             });
         }
 
-        function deleteFileFromDB(id) {
+        function deleteFromDB(key) {
             return new Promise((resolve, reject) => {
                 openDB().then(db => {
                     const tx = db.transaction(STORE_NAME, 'readwrite');
                     const store = tx.objectStore(STORE_NAME);
-                    const request = store.delete(id);
+                    const request = store.delete(key);
                     request.onsuccess = () => resolve();
                     request.onerror = () => reject(request.error);
                 }).catch(reject);
             });
         }
 
-        function getAllFilesFromDB() {
+        function getAllFromDB() {
             return new Promise((resolve, reject) => {
                 openDB().then(db => {
                     const tx = db.transaction(STORE_NAME, 'readonly');
@@ -1676,7 +1885,7 @@
         }
 
         // ============================================================
-        //  📦 数据层
+        //  📦 默认数据
         // ============================================================
         const DEFAULT_DATA = {
             myName: '我',
@@ -1731,56 +1940,80 @@
                 userAvatarFileId: null,
                 partnerAvatarFileId: null,
                 customBgFileId: null
+            },
+            moods: {
+                list: [
+                    { emoji: '😊', name: '开心' },
+                    { emoji: '🥰', name: '想你了' },
+                    { emoji: '😭', name: '难过' },
+                    { emoji: '😤', name: '生气' },
+                    { emoji: '😌', name: '平静' },
+                    { emoji: '😴', name: '疲惫' },
+                    { emoji: '🤩', name: '兴奋' },
+                    { emoji: '😔', name: '委屈' },
+                    { emoji: '🥱', name: '无聊' },
+                    { emoji: '🤔', name: '期待' }
+                ],
+                myMood: '😊 开心',
+                partnerMood: '😊 开心'
             }
         };
 
-        let appData = loadData();
-        let callState = null,
-            callTimerInterval = null,
-            replyTimeout = null;
-        let currentLibTab = 'main',
-            letterTab = 'sent';
-        let autoSendTimer = null,
-            autoPatTimer = null;
-        let currentPage = 'page-chat';
-        const pageStack = [];
+        // ============================================================
+        //  💾 数据读写（全部走 IndexedDB）
+        // ============================================================
+        let appData = null;
+        let dataLoaded = false;
 
-        // ============================================================
-        //  💾 数据读写
-        // ============================================================
-        function loadData() {
+        async function loadAllData() {
             try {
-                const raw = localStorage.getItem('chuanxun_data');
-                if (raw) {
-                    const d = JSON.parse(raw);
+                const data = await getFromDB('appData');
+                if (data) {
+                    appData = data;
+                    // 补全可能缺失的字段
                     for (const key in DEFAULT_DATA) {
-                        if (!(key in d)) d[key] = DEFAULT_DATA[key];
+                        if (!(key in appData)) appData[key] = DEFAULT_DATA[key];
                     }
-                    if (!d.replyLibrary.groups) d.replyLibrary.groups = DEFAULT_DATA.replyLibrary.groups;
-                    if (!d.replyLibrary.cards) d.replyLibrary.cards = DEFAULT_DATA.replyLibrary.cards;
-                    if (!d.replyLibrary.stickers) d.replyLibrary.stickers = [];
-                    if (!d.replyLibrary.emojis) d.replyLibrary.emojis = DEFAULT_DATA.replyLibrary.emojis;
-                    if (!d.replyLibrary.pats) d.replyLibrary.pats = DEFAULT_DATA.replyLibrary.pats;
-                    if (!d.letters) d.letters = { sent: [], received: [] };
-                    if (!d.settings) d.settings = DEFAULT_DATA.settings;
-                    if (!d.appearance) d.appearance = DEFAULT_DATA.appearance;
-                    if (!d.myName) d.myName = DEFAULT_DATA.myName;
-                    if (!d.partnerName) d.partnerName = DEFAULT_DATA.partnerName;
-                    return d;
+                    if (!appData.replyLibrary) appData.replyLibrary = DEFAULT_DATA.replyLibrary;
+                    if (!appData.replyLibrary.groups) appData.replyLibrary.groups = DEFAULT_DATA.replyLibrary.groups;
+                    if (!appData.replyLibrary.cards) appData.replyLibrary.cards = DEFAULT_DATA.replyLibrary.cards;
+                    if (!appData.replyLibrary.stickers) appData.replyLibrary.stickers = [];
+                    if (!appData.replyLibrary.emojis) appData.replyLibrary.emojis = DEFAULT_DATA.replyLibrary.emojis;
+                    if (!appData.replyLibrary.pats) appData.replyLibrary.pats = DEFAULT_DATA.replyLibrary.pats;
+                    if (!appData.letters) appData.letters = { sent: [], received: [] };
+                    if (!appData.settings) appData.settings = DEFAULT_DATA.settings;
+                    if (!appData.appearance) appData.appearance = DEFAULT_DATA.appearance;
+                    if (!appData.moods) appData.moods = DEFAULT_DATA.moods;
+                    if (!appData.myName) appData.myName = DEFAULT_DATA.myName;
+                    if (!appData.partnerName) appData.partnerName = DEFAULT_DATA.partnerName;
+                } else {
+                    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 }
-            } catch (e) { console.warn('Load error', e); }
-            return JSON.parse(JSON.stringify(DEFAULT_DATA));
+                dataLoaded = true;
+                return appData;
+            } catch (e) {
+                console.warn('Load data error', e);
+                appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                dataLoaded = true;
+                return appData;
+            }
         }
 
-        function saveData() {
+        async function saveAllData() {
+            if (!appData) return;
             try {
-                localStorage.setItem('chuanxun_data', JSON.stringify(appData));
-            } catch (e) { console.warn('Save error', e); }
+                await saveToDB('appData', appData);
+            } catch (e) {
+                console.warn('Save data error', e);
+            }
         }
 
-        function getMyName() { return appData.myName || '我'; }
+        // 别名保持兼容
+        function saveData() { saveAllData(); }
 
-        function getPartnerName() { return appData.partnerName || '梦角'; }
+        function getMyName() { return appData ? appData.myName || '我' : '我'; }
+
+        function getPartnerName() { return appData ? appData.partnerName || '梦角' : '梦角'; }
 
         function generateFileId() {
             return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
@@ -1789,6 +2022,9 @@
         // ============================================================
         //  🧭 页面导航
         // ============================================================
+        let currentPage = 'page-chat';
+        const pageStack = [];
+
         function openPage(pageId) {
             const el = document.getElementById(pageId);
             if (!el || el.classList.contains('active')) return;
@@ -1806,6 +2042,7 @@
             if (pageId === 'page-appearance') renderAppearance();
             if (pageId === 'page-letters') renderLetters();
             if (pageId === 'page-chat-settings') loadChatSettings();
+            if (pageId === 'page-mood') renderMoodPage();
             if (pageId === 'page-write-letter') {
                 document.getElementById('letterContent').value = '';
                 document.getElementById('letterCharCount').textContent = '0';
@@ -1835,20 +2072,21 @@
         }
 
         // ============================================================
-        //  💬 聊天核心（头像完全修复）
+        //  💬 聊天核心
         // ============================================================
+        let quoteTarget = null;
+
         async function renderMessages() {
             const list = document.getElementById('chatList');
             const msgs = appData.messages || [];
 
-            // 加载头像数据
             let userAvatarData = null;
             let partnerAvatarData = null;
             if (appData.appearance.userAvatarFileId) {
-                userAvatarData = await getFileFromDB(appData.appearance.userAvatarFileId);
+                userAvatarData = await getFromDB(appData.appearance.userAvatarFileId);
             }
             if (appData.appearance.partnerAvatarFileId) {
-                partnerAvatarData = await getFileFromDB(appData.appearance.partnerAvatarFileId);
+                partnerAvatarData = await getFromDB(appData.appearance.partnerAvatarFileId);
             }
 
             if (msgs.length === 0) {
@@ -1857,7 +2095,8 @@
             }
 
             let html = '';
-            for (const m of msgs) {
+            for (let i = 0; i < msgs.length; i++) {
+                const m = msgs[i];
                 if (m.type === 'system') {
                     html += `<div class="system-msg-wrapper"><span class="system-msg">${m.content}</span></div>`;
                     continue;
@@ -1869,31 +2108,88 @@
                     `<span style="font-size:16px;color:#aaa;">${m.sender === 'me' ? getMyName().charAt(0) : '✨'}</span>`;
 
                 let contentHtml = '';
-                if (m.type === 'text') contentHtml = m.content;
-                else if (m.type === 'sticker') {
+                if (m.type === 'text') {
+                    let text = m.content;
+                    if (m.quote) {
+                        const quoteSender = m.quoteSender === 'me' ? getMyName() : getPartnerName();
+                        contentHtml += `<div class="quote">${quoteSender}：${m.quote}</div>`;
+                    }
+                    contentHtml += text;
+                } else if (m.type === 'sticker') {
                     contentHtml =
-                        `<img src="${m.content}" class="sticker" alt="sticker" onerror="this.style.display='none'">`;
-                } else if (m.type === 'emoji') contentHtml = `<span class="emoji-big">${m.content}</span>`;
-                else contentHtml = m.content;
+                    `<img src="${m.content}" class="sticker" alt="sticker" onerror="this.style.display='none'">`;
+                } else if (m.type === 'emoji') {
+                    contentHtml = `<span class="emoji-big">${m.content}</span>`;
+                } else {
+                    contentHtml = m.content;
+                }
                 const time = m.time || '';
-                html += `<div class="msg ${cls}"><div class="avatar">${avatarHtml}</div><div class="bubble">${contentHtml}<span class="time">${time}</span></div></div>`;
+
+                // 引用按钮（只有文字消息才显示引用）
+                let quoteBtn = '';
+                if (m.type === 'text' && m.content) {
+                    quoteBtn = `<button onclick="quoteMessage(${i})" title="引用">💬</button>`;
+                }
+
+                html += `<div class="msg ${cls}" id="msg-${i}">
+                        <div class="avatar">${avatarHtml}</div>
+                        <div class="bubble">${contentHtml}<span class="time">${time}</span></div>
+                        <div class="msg-actions">${quoteBtn}</div>
+                    </div>`;
             }
             list.innerHTML = html;
             list.scrollTop = list.scrollHeight;
         }
 
+        function quoteMessage(index) {
+            const msgs = appData.messages || [];
+            if (!msgs[index] || msgs[index].type !== 'text') return;
+            quoteTarget = {
+                content: msgs[index].content,
+                sender: msgs[index].sender
+            };
+            const input = document.getElementById('chatInput');
+            input.focus();
+            input.placeholder = `引用：${quoteTarget.content.slice(0, 20)}${quoteTarget.content.length > 20 ? '…' : ''}`;
+            // 高亮被引用的消息
+            document.querySelectorAll('.msg').forEach(el => el.style.outline = 'none');
+            const el = document.getElementById(`msg-${index}`);
+            if (el) {
+                el.style.outline = '2px solid var(--primary)';
+                el.style.borderRadius = '8px';
+                setTimeout(() => {
+                    el.style.outline = 'none';
+                }, 3000);
+            }
+            setTimeout(() => {
+                input.placeholder = '输入消息…';
+            }, 5000);
+        }
+
         function sendMessage() {
             const input = document.getElementById('chatInput');
-            const content = input.value.trim();
+            let content = input.value.trim();
             if (!content) return;
+
+            let quoteContent = null;
+            let quoteSender = null;
+            if (quoteTarget) {
+                quoteContent = quoteTarget.content;
+                quoteSender = quoteTarget.sender;
+                quoteTarget = null;
+                input.placeholder = '输入消息…';
+            }
+
             const msg = {
                 sender: 'me',
                 type: 'text',
-                content,
+                content: content,
+                quote: quoteContent,
+                quoteSender: quoteSender,
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
             appData.messages.push(msg);
-            saveData();
+            saveAllData();
             renderMessages();
             input.value = '';
             document.getElementById('plusPanel').classList.remove('show');
@@ -1919,6 +2215,85 @@
         }
 
         // ============================================================
+        //  🖼️ 图片选择（相册 / 拍照）
+        // ============================================================
+        function showImagePicker() {
+            document.getElementById('plusPanel').classList.remove('show');
+            const overlay = document.createElement('div');
+            overlay.className = 'image-picker-overlay';
+            overlay.innerHTML = `
+                    <div class="image-picker-panel">
+                        <div class="title">📷 选择图片来源</div>
+                        <div class="options">
+                            <button onclick="sendImageFromGallery(this)">🖼️ 相册</button>
+                            <button onclick="sendImageFromCamera(this)">📸 拍照</button>
+                        </div>
+                        <button class="close-btn" onclick="this.closest('.image-picker-overlay').remove()">取消</button>
+                    </div>
+                `;
+            document.body.appendChild(overlay);
+        }
+
+        function sendImageFromGallery(btn) {
+            const overlay = btn.closest('.image-picker-overlay');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = true;
+            input.onchange = function(e) {
+                overlay.remove();
+                const files = e.target.files;
+                for (const file of files) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const dataUrl = ev.target.result;
+                        const msg = {
+                            sender: 'me',
+                            type: 'sticker',
+                            content: dataUrl,
+                            time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                        };
+                        appData.messages.push(msg);
+                        saveAllData();
+                        renderMessages();
+                        triggerPartnerReply();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        function sendImageFromCamera(btn) {
+            const overlay = btn.closest('.image-picker-overlay');
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            input.onchange = function(e) {
+                overlay.remove();
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const dataUrl = ev.target.result;
+                    const msg = {
+                        sender: 'me',
+                        type: 'sticker',
+                        content: dataUrl,
+                        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                    };
+                    appData.messages.push(msg);
+                    saveAllData();
+                    renderMessages();
+                    triggerPartnerReply();
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+
+        // ============================================================
         //  🖼️ 加号里的「表情包」
         // ============================================================
         async function openStickerPicker() {
@@ -1930,7 +2305,7 @@
             }
             const stickerData = [];
             for (const s of stickers) {
-                const data = await getFileFromDB(s.fileId);
+                const data = await getFromDB(s.fileId);
                 if (data) {
                     stickerData.push({ id: s.id, dataUrl: data });
                 }
@@ -1981,7 +2356,7 @@
         async function sendStickerFromPicker(id) {
             const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
             if (!sticker) return;
-            const data = await getFileFromDB(sticker.fileId);
+            const data = await getFromDB(sticker.fileId);
             if (!data) { alert('表情包加载失败'); return; }
             document.querySelectorAll('div[style*="position:fixed"]').forEach(el => {
                 if (el.style.zIndex === '200') el.remove();
@@ -1993,46 +2368,16 @@
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
             appData.messages.push(msg);
-            saveData();
+            saveAllData();
             renderMessages();
             triggerPartnerReply();
         }
 
         // ============================================================
-        //  🖼️ 加号里的「图片」
-        // ============================================================
-        function sendImageFromPlus() {
-            document.getElementById('plusPanel').classList.remove('show');
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.onchange = function(e) {
-                const files = e.target.files;
-                for (const file of files) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        const dataUrl = ev.target.result;
-                        const msg = {
-                            sender: 'me',
-                            type: 'sticker',
-                            content: dataUrl,
-                            time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-                        };
-                        appData.messages.push(msg);
-                        saveData();
-                        renderMessages();
-                        triggerPartnerReply();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }
-
-        // ============================================================
         //  🤖 梦角回复
         // ============================================================
+        let replyTimeout = null;
+
         function triggerPartnerReply() {
             if (replyTimeout) clearTimeout(replyTimeout);
             const settings = appData.settings;
@@ -2050,7 +2395,7 @@
             for (const c of cards) allItems.push({ type: 'text', content: c.content });
             for (const e of emojis) allItems.push({ type: 'emoji', content: e });
             for (const s of stickers) {
-                const data = await getFileFromDB(s.fileId);
+                const data = await getFromDB(s.fileId);
                 if (data) {
                     allItems.push({ type: 'sticker', content: data });
                 }
@@ -2063,19 +2408,32 @@
             const shuffled = [...allItems].sort(() => Math.random() - 0.5);
             const selected = shuffled.slice(0, Math.min(count, shuffled.length));
             for (const item of selected) {
-                addPartnerMessage(item.content, item.type);
+                // 15% 概率引用上一条消息
+                let quote = null,
+                    quoteSender = null;
+                const msgs = appData.messages || [];
+                if (msgs.length > 0 && Math.random() < 0.15) {
+                    const lastMsg = msgs[msgs.length - 1];
+                    if (lastMsg && lastMsg.type === 'text' && lastMsg.sender === 'me') {
+                        quote = lastMsg.content;
+                        quoteSender = 'me';
+                    }
+                }
+                addPartnerMessage(item.content, item.type, quote, quoteSender);
             }
         }
 
-        function addPartnerMessage(content, type = 'text') {
+        function addPartnerMessage(content, type = 'text', quote = null, quoteSender = null) {
             const msg = {
                 sender: 'partner',
                 type: type,
                 content: content,
+                quote: quote,
+                quoteSender: quoteSender,
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
             appData.messages.push(msg);
-            saveData();
+            saveAllData();
             renderMessages();
         }
 
@@ -2087,13 +2445,16 @@
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
             appData.messages.push(msg);
-            saveData();
+            saveAllData();
             renderMessages();
         }
 
         // ============================================================
         //  ⏰ 主动发送 & 主动拍一拍
         // ============================================================
+        let autoSendTimer = null,
+            autoPatTimer = null;
+
         function startAutoBehaviors() {
             if (autoSendTimer) clearInterval(autoSendTimer);
             if (autoPatTimer) clearInterval(autoPatTimer);
@@ -2149,6 +2510,7 @@
             document.querySelectorAll('#libTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
             renderLibrary();
         }
+        let currentLibTab = 'main';
 
         function renderLibrary() {
             const container = document.getElementById('libContent');
@@ -2157,7 +2519,6 @@
             else if (currentLibTab === 'sticker') renderStickerList(container);
         }
 
-        // ---------- 主字卡 ----------
         function renderMainCards(container) {
             const groups = appData.replyLibrary.groups || [];
             const cards = appData.replyLibrary.cards || [];
@@ -2251,7 +2612,6 @@
             renderLibrary();
         }
 
-        // ---------- Emoji ----------
         function renderEmojiList(container) {
             const emojis = appData.replyLibrary.emojis || [];
             let html = `
@@ -2280,12 +2640,11 @@
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
             };
             appData.messages.push(msg);
-            saveData();
+            saveAllData();
             renderMessages();
             triggerPartnerReply();
         }
 
-        // ---------- 表情库 ----------
         async function renderStickerList(container) {
             const stickers = appData.replyLibrary.stickers || [];
             let html = `
@@ -2302,7 +2661,7 @@
             } else {
                 html += `<div class="sticker-grid">`;
                 for (const s of stickers) {
-                    const data = await getFileFromDB(s.fileId);
+                    const data = await getFromDB(s.fileId);
                     if (data) {
                         html += `
                                 <div class="sticker-item" onclick="sendStickerFromPicker('${s.id}')">
@@ -2326,7 +2685,7 @@
             if (!name || name.trim() === '') return;
             const id = 'g' + Date.now();
             appData.replyLibrary.groups.push({ id, name: name.trim() });
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2334,7 +2693,7 @@
             if (!confirm('确定删除此分组及其所有字卡吗？')) return;
             appData.replyLibrary.groups = appData.replyLibrary.groups.filter(g => g.id !== id);
             appData.replyLibrary.cards = appData.replyLibrary.cards.filter(c => c.groupId !== id);
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2344,14 +2703,14 @@
             if (!content) return;
             const id = 'c' + Date.now();
             appData.replyLibrary.cards.push({ id, groupId, content, type: 'text' });
-            saveData();
+            saveAllData();
             input.value = '';
             renderLibrary();
         }
 
         function deleteCard(id) {
             appData.replyLibrary.cards = appData.replyLibrary.cards.filter(c => c.id !== id);
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2368,7 +2727,7 @@
                 const id = 'c' + Date.now() + Math.random().toString(36).slice(2, 6);
                 appData.replyLibrary.cards.push({ id, groupId, content: line.trim(), type: 'text' });
             }
-            saveData();
+            saveAllData();
             textarea.value = '';
             renderLibrary();
             alert(`成功导入 ${lines.length} 条字卡！`);
@@ -2382,14 +2741,14 @@
             if (!emoji || emoji.trim() === '') return;
             if (!appData.replyLibrary.emojis.includes(emoji.trim())) {
                 appData.replyLibrary.emojis.push(emoji.trim());
-                saveData();
+                saveAllData();
                 renderLibrary();
             } else alert('该Emoji已存在');
         }
 
         function deleteEmoji(emoji) {
             appData.replyLibrary.emojis = appData.replyLibrary.emojis.filter(e => e !== emoji);
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2410,12 +2769,12 @@
                     reader.onload = async function(ev) {
                         const dataUrl = ev.target.result;
                         const fileId = generateFileId();
-                        await saveFileToDB(fileId, dataUrl);
+                        await saveToDB(fileId, dataUrl);
                         appData.replyLibrary.stickers.push({ id: 's' + Date.now() + Math.random().toString(36).slice(2,
                                 6), fileId: fileId });
                         loaded++;
                         if (loaded === files.length) {
-                            saveData();
+                            saveAllData();
                             renderLibrary();
                             alert(`成功导入 ${loaded} 张表情包！`);
                         }
@@ -2437,10 +2796,10 @@
                 reader.onload = async function(ev) {
                     const dataUrl = ev.target.result;
                     const fileId = generateFileId();
-                    await saveFileToDB(fileId, dataUrl);
+                    await saveToDB(fileId, dataUrl);
                     appData.replyLibrary.stickers.push({ id: 's' + Date.now() + Math.random().toString(36).slice(2, 6),
                         fileId: fileId });
-                    saveData();
+                    saveAllData();
                     renderLibrary();
                 };
                 reader.readAsDataURL(file);
@@ -2451,10 +2810,10 @@
         async function deleteSticker(id) {
             const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
             if (sticker) {
-                await deleteFileFromDB(sticker.fileId);
+                await deleteFromDB(sticker.fileId);
             }
             appData.replyLibrary.stickers = appData.replyLibrary.stickers.filter(s => s.id !== id);
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2465,13 +2824,13 @@
             const pat = prompt('请输入拍一拍内容 (如 "拍了拍你")：');
             if (!pat || pat.trim() === '') return;
             appData.replyLibrary.pats.push(pat.trim());
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
         function deletePat(pat) {
             appData.replyLibrary.pats = appData.replyLibrary.pats.filter(p => p !== pat);
-            saveData();
+            saveAllData();
             renderLibrary();
         }
 
@@ -2514,7 +2873,7 @@
                                 if (!appData.replyLibrary.pats.includes(p)) appData.replyLibrary.pats.push(p);
                             }
                         }
-                        saveData();
+                        saveAllData();
                         renderLibrary();
                         alert('导入成功！');
                     } catch (err) { alert('导入失败：' + err.message); }
@@ -2546,13 +2905,15 @@
         // ============================================================
         async function exportAllData() {
             try {
-                const files = await getAllFilesFromDB();
+                const allData = await getAllFromDB();
                 const fileMap = {};
-                for (const f of files) {
-                    fileMap[f.id] = f.data;
+                for (const item of allData) {
+                    if (item.id !== 'appData') {
+                        fileMap[item.id] = item.data;
+                    }
                 }
                 const exportData = {
-                    version: '1.0',
+                    version: '2.0',
                     exportedAt: new Date().toISOString(),
                     appData: appData,
                     files: fileMap
@@ -2589,9 +2950,9 @@
                         await clearDB();
                         appData = data.appData;
                         for (const [id, content] of Object.entries(data.files)) {
-                            await saveFileToDB(id, content);
+                            await saveToDB(id, content);
                         }
-                        saveData();
+                        await saveToDB('appData', appData);
                         alert('数据恢复成功！页面将刷新。');
                         location.reload();
                     } else {
@@ -2648,12 +3009,11 @@
                 `<div class="opt ${b.id === currentBubble ? 'active' : ''}" style="background:rgba(255,255,255,0.3);font-size:11px;font-weight:500;" onclick="selectBubble('${b.id}')" title="${b.label}">${b.label}</div>`
             ).join('');
 
-            // 加载头像预览
             const userAvatarPreview = document.getElementById('userAvatarPreview');
             const partnerAvatarPreview = document.getElementById('partnerAvatarPreview');
 
             if (appData.appearance.userAvatarFileId) {
-                const data = await getFileFromDB(appData.appearance.userAvatarFileId);
+                const data = await getFromDB(appData.appearance.userAvatarFileId);
                 if (data) {
                     userAvatarPreview.innerHTML =
                         `<img src="${data}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
@@ -2667,7 +3027,7 @@
             }
 
             if (appData.appearance.partnerAvatarFileId) {
-                const data = await getFileFromDB(appData.appearance.partnerAvatarFileId);
+                const data = await getFromDB(appData.appearance.partnerAvatarFileId);
                 if (data) {
                     partnerAvatarPreview.innerHTML =
                         `<img src="${data}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
@@ -2680,9 +3040,8 @@
                     `<span style="display:flex;align-items:center;justify-content:center;font-size:22px;color:#bbb;width:100%;height:100%;">✨</span>`;
             }
 
-            // 自定义背景
             if (appData.appearance.customBgFileId) {
-                const data = await getFileFromDB(appData.appearance.customBgFileId);
+                const data = await getFromDB(appData.appearance.customBgFileId);
                 if (data) {
                     document.getElementById('page-chat').querySelector('.chat-list').style.backgroundImage =
                         `url(${data})`;
@@ -2699,7 +3058,7 @@
 
         function selectBg(id) {
             appData.appearance.background = id;
-            saveData();
+            saveAllData();
             applyBg(id);
             renderAppearance();
         }
@@ -2716,7 +3075,7 @@
 
         function selectBubble(id) {
             appData.appearance.bubbleStyle = id;
-            saveData();
+            saveAllData();
             applyBubble(id);
             renderAppearance();
         }
@@ -2735,13 +3094,13 @@
             reader.onload = async function(e) {
                 const dataUrl = e.target.result;
                 const fileId = generateFileId();
-                await saveFileToDB(fileId, dataUrl);
+                await saveToDB(fileId, dataUrl);
                 if (who === 'user') {
                     appData.appearance.userAvatarFileId = fileId;
                 } else {
                     appData.appearance.partnerAvatarFileId = fileId;
                 }
-                saveData();
+                saveAllData();
                 await renderAppearance();
                 await renderMessages();
                 alert('头像已更新！');
@@ -2756,9 +3115,9 @@
             reader.onload = async function(e) {
                 const dataUrl = e.target.result;
                 const fileId = generateFileId();
-                await saveFileToDB(fileId, dataUrl);
+                await saveToDB(fileId, dataUrl);
                 appData.appearance.customBgFileId = fileId;
-                saveData();
+                saveAllData();
                 await renderAppearance();
                 alert('背景已更新！');
             };
@@ -2767,11 +3126,65 @@
 
         async function removeCustomBg() {
             if (appData.appearance.customBgFileId) {
-                await deleteFileFromDB(appData.appearance.customBgFileId);
+                await deleteFromDB(appData.appearance.customBgFileId);
                 appData.appearance.customBgFileId = null;
-                saveData();
+                saveAllData();
                 await renderAppearance();
             }
+        }
+
+        // ============================================================
+        //  💭 心情管理
+        // ============================================================
+        function renderMoodPage() {
+            const moods = appData.moods || { list: DEFAULT_DATA.moods.list, myMood: '😊 开心', partnerMood: '😊 开心' };
+            document.getElementById('myMoodDisplay').textContent = moods.myMood || '😊 开心';
+            document.getElementById('partnerMoodDisplay').textContent = moods.partnerMood || '😊 开心';
+            document.getElementById('partnerMoodLabel').textContent = getPartnerName();
+
+            // 快捷选择
+            const quickDiv = document.getElementById('myMoodQuickSelect');
+            const allMoods = moods.list || [];
+            quickDiv.innerHTML = allMoods.slice(0, 6).map(m =>
+                `<span onclick="selectMyMood('${m.emoji} ${m.name}')" style="padding:4px 10px;border-radius:14px;background:rgba(255,255,255,0.3);cursor:pointer;font-size:14px;border:1px solid rgba(255,255,255,0.1);">${m.emoji} ${m.name}</span>`
+            ).join('');
+
+            // 全部心情网格
+            const grid = document.getElementById('moodGrid');
+            grid.innerHTML = allMoods.map(m =>
+                `<div class="mood-item ${moods.myMood === `${m.emoji} ${m.name}` ? 'active' : ''}" onclick="selectMyMood('${m.emoji} ${m.name}')">
+                        <span class="mood-emoji">${m.emoji}</span>
+                        <span class="mood-name">${m.name} <span class="del-mood" onclick="event.stopPropagation();deleteMood('${m.emoji} ${m.name}')">×</span></span>
+                    </div>`
+            ).join('');
+        }
+
+        function selectMyMood(moodStr) {
+            appData.moods.myMood = moodStr;
+            saveAllData();
+            renderMoodPage();
+            // 系统消息显示心情变化
+            addSystemMessage(`${getMyName()} 当前心情：${moodStr}`);
+        }
+
+        function addMood() {
+            const emoji = prompt('请输入心情表情（如 😊）：');
+            if (!emoji || emoji.trim() === '') return;
+            const name = prompt('请输入心情名称（如 开心）：');
+            if (!name || name.trim() === '') return;
+            appData.moods.list.push({ emoji: emoji.trim(), name: name.trim() });
+            saveAllData();
+            renderMoodPage();
+        }
+
+        function deleteMood(moodStr) {
+            if (!confirm(`确定删除「${moodStr}」吗？`)) return;
+            appData.moods.list = appData.moods.list.filter(m => `${m.emoji} ${m.name}` !== moodStr);
+            if (appData.moods.myMood === moodStr) {
+                appData.moods.myMood = '😊 开心';
+            }
+            saveAllData();
+            renderMoodPage();
         }
 
         // ============================================================
@@ -2814,7 +3227,7 @@
             s.fontFamily = document.getElementById('fontFamilySelect').value;
             document.documentElement.style.setProperty('--font-size', s.fontSize + 'px');
             document.documentElement.style.setProperty('--font-family', s.fontFamily);
-            saveData();
+            saveAllData();
             if (autoSendTimer) clearInterval(autoSendTimer);
             if (autoPatTimer) clearInterval(autoPatTimer);
             if (s.autoSend) startAutoBehaviors();
@@ -2825,7 +3238,7 @@
         function changeFontFamily(value) {
             document.documentElement.style.setProperty('--font-family', value);
             appData.settings.fontFamily = value;
-            saveData();
+            saveAllData();
         }
 
         function toggleSwitch(el) {
@@ -2840,10 +3253,11 @@
             const newName = prompt('请输入我的昵称：', current);
             if (newName && newName.trim() !== '') {
                 appData.myName = newName.trim();
-                saveData();
+                saveAllData();
                 document.getElementById('myNameDisplay').textContent = newName.trim();
                 document.getElementById('myAvatarLabel').textContent = newName.trim();
                 renderMessages();
+                renderMoodPage();
                 alert('昵称已修改！');
             }
         }
@@ -2853,12 +3267,14 @@
             const newName = prompt('请输入梦角昵称：', current);
             if (newName && newName.trim() !== '') {
                 appData.partnerName = newName.trim();
-                saveData();
+                saveAllData();
                 document.getElementById('partnerNameDisplay').textContent = newName.trim();
                 document.getElementById('partnerAvatarLabel').textContent = newName.trim();
+                document.getElementById('partnerMoodLabel').textContent = newName.trim();
                 updateLetterNames();
                 document.getElementById('callName').textContent = newName.trim();
                 renderMessages();
+                renderMoodPage();
                 alert('昵称已修改！');
             }
         }
@@ -2876,6 +3292,7 @@
             document.querySelectorAll('.letters-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
             renderLetters();
         }
+        let letterTab = 'sent';
 
         function renderLetters() {
             const list = document.getElementById('lettersList');
@@ -2908,7 +3325,7 @@
                 sendTime: Date.now()
             };
             appData.letters.sent.push(letter);
-            saveData();
+            saveAllData();
             textarea.value = '';
             document.getElementById('letterCharCount').textContent = '0';
             alert('信件已寄出！梦角会在6-12小时内回复～');
@@ -2956,7 +3373,7 @@
                 fromLetterId: letterId
             };
             appData.letters.received.push(reply);
-            saveData();
+            saveAllData();
             renderLetters();
             addPartnerMessage(`📨 回信：${content}`, 'text');
         }
@@ -2965,6 +3382,9 @@
         // ============================================================
         //  📞 通话系统
         // ============================================================
+        let callState = null,
+            callTimerInterval = null;
+
         function initiateCall() {
             document.getElementById('plusPanel').classList.remove('show');
             document.getElementById('emojiPicker').classList.remove('show');
@@ -2989,7 +3409,7 @@
             const img = document.getElementById('callAvatarImg');
             const avatar = appData.appearance.partnerAvatarFileId || '';
             if (avatar) {
-                getFileFromDB(avatar).then(data => {
+                getFromDB(avatar).then(data => {
                     if (data) {
                         img.src = data;
                         img.style.display = 'block';
@@ -3167,6 +3587,7 @@
         //  🚀 初始化
         // ============================================================
         async function init() {
+            await loadAllData();
             document.documentElement.style.setProperty('--font-size', (appData.settings.fontSize || 15) + 'px');
             if (appData.settings.fontFamily) {
                 document.documentElement.style.setProperty('--font-family', appData.settings.fontFamily);
@@ -3202,21 +3623,25 @@
             document.getElementById('partnerNameDisplay').textContent = getPartnerName();
             document.getElementById('myAvatarLabel').textContent = getMyName();
             document.getElementById('partnerAvatarLabel').textContent = getPartnerName();
+            document.getElementById('partnerMoodLabel').textContent = getPartnerName();
             updateLetterNames();
             document.getElementById('callName').textContent = getPartnerName();
 
             if (appData.appearance.customBgFileId) {
-                const data = await getFileFromDB(appData.appearance.customBgFileId);
+                const data = await getFromDB(appData.appearance.customBgFileId);
                 if (data) {
                     document.getElementById('page-chat').querySelector('.chat-list').style.backgroundImage =
                         `url(${data})`;
                 }
             }
+            renderMoodPage();
         }
 
         document.addEventListener('DOMContentLoaded', init);
 
-        // 暴露全局
+        // ============================================================
+        //  🌐 暴露全局
+        // ============================================================
         window.openPage = openPage;
         window.closePage = closePage;
         window.sendMessage = sendMessage;
@@ -3225,7 +3650,9 @@
         window.toggleEmojiPicker = toggleEmojiPicker;
         window.openStickerPicker = openStickerPicker;
         window.sendStickerFromPicker = sendStickerFromPicker;
-        window.sendImageFromPlus = sendImageFromPlus;
+        window.showImagePicker = showImagePicker;
+        window.sendImageFromGallery = sendImageFromGallery;
+        window.sendImageFromCamera = sendImageFromCamera;
         window.switchLibTab = switchLibTab;
         window.renderLibrary = renderLibrary;
         window.renderAppearance = renderAppearance;
@@ -3265,6 +3692,11 @@
         window.toggleGroupCollapse = toggleGroupCollapse;
         window.exportAllData = exportAllData;
         window.importAllData = importAllData;
+        window.renderMoodPage = renderMoodPage;
+        window.selectMyMood = selectMyMood;
+        window.addMood = addMood;
+        window.deleteMood = deleteMood;
+        window.quoteMessage = quoteMessage;
     </script>
 </body>
 </html>
