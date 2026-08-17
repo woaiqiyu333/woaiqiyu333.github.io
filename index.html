@@ -670,16 +670,18 @@
         .group-card .group-header .actions button:active {
             background: rgba(0, 0, 0, 0.04);
         }
+        /* ===== 核心修复：字卡全部展开，不滚动 ===== */
         .group-card .group-body {
             padding: 6px 10px 10px;
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
-            overflow: hidden;
+            overflow: visible;
             transition: max-height 0.3s ease, padding 0.3s ease;
-            max-height: 500px;
+            max-height: none;
             padding-top: 6px;
         }
+        /* 折叠时隐藏 */
         .group-card .group-body.hidden {
             max-height: 0 !important;
             padding-top: 0 !important;
@@ -1784,7 +1786,7 @@
         // ============================================================
         //  💾 全部数据用 IndexedDB 存储（永不丢失）
         // ============================================================
-        const DB_NAME = 'ChuanxunDB_v3';
+        const DB_NAME = 'ChuanxunDB_v4';
         const STORE_NAME = 'data';
         let db = null;
 
@@ -2102,7 +2104,6 @@
                 }
                 const time = m.time || '';
 
-                // 只有文字消息才显示引用和删除按钮
                 let actionBtns = '';
                 if (m.type === 'text') {
                     actionBtns = `
@@ -3373,10 +3374,8 @@
             callTimerInterval = null;
         let callStartTimestamp = null;
 
-        // 后台保活：使用 document.visibilityState 检测，页面恢复时刷新计时
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && callState && callState.status === 'connected' && callStartTimestamp) {
-                // 页面重新可见，更新计时器显示
                 updateCallTimerDisplay();
             }
         });
@@ -3458,13 +3457,11 @@
             updateCallUI('通话中');
             document.getElementById('callTimer').textContent = '00:00';
             if (callTimerInterval) clearInterval(callTimerInterval);
-            // 每秒更新一次计时
             callTimerInterval = setInterval(() => {
                 if (callState && callState.status === 'connected' && callStartTimestamp) {
                     updateCallTimerDisplay();
                 }
             }, 1000);
-            // 5% 概率对方挂断（30秒到90秒之间）
             setTimeout(() => {
                 if (callState && callState.status === 'connected' && Math.random() < 0.05) {
                     hangupCall('梦角挂断了通话');
@@ -3646,7 +3643,6 @@
             }
             renderMoodPage();
 
-            // 监听页面可见性变化，通话计时保活
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden && callState && callState.status === 'connected' && callStartTimestamp) {
                     updateCallTimerDisplay();
