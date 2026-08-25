@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
+        /* ===== 全局样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -159,6 +160,8 @@
             transform: scale(0.92);
             background: rgba(255, 255, 255, 0.7);
         }
+
+        /* ===== 主聊天 ===== */
         #page-chat .chat-list {
             flex: 1;
             overflow-y: auto;
@@ -166,7 +169,7 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            padding-bottom: 10px;
+            padding-bottom: 38px;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
@@ -730,7 +733,7 @@
             color: var(--text-secondary);
         }
 
-        /* ===== 音乐浮窗 ===== */
+        /* ===== 音乐浮窗（播放控制） ===== */
         #music-float {
             position: fixed;
             top: 80px;
@@ -890,6 +893,7 @@
             object-fit: cover;
             display: none;
             margin-bottom: 6px;
+            transform: scaleX(-1);
         }
         #call-panel .call-video.show {
             display: block;
@@ -943,7 +947,6 @@
             background: #ff3b30;
             color: #fff;
         }
-        /* 摄像头开关按钮 */
         #call-panel .call-actions .btn-camera {
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
@@ -968,6 +971,160 @@
         }
         #call-panel .call-minimize-btn:active {
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== 一起听邀请弹窗（对方发起邀请） ===== */
+        .invite-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            z-index: 110;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .invite-overlay.show {
+            display: flex;
+        }
+        .invite-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            padding: 32px 28px 28px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        .invite-panel .icon-big {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .invite-panel .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .invite-panel .sub {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .invite-panel .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .invite-panel .actions button {
+            padding: 10px 32px;
+            border-radius: 30px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .invite-panel .actions button:active {
+            opacity: 0.7;
+        }
+        .invite-panel .actions .btn-agree {
+            background: #34c759;
+            color: #fff;
+        }
+        .invite-panel .actions .btn-refuse {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-secondary);
+        }
+
+        /* ===== 我主动邀请面板（点击右上角音乐图标弹出） ===== */
+        .invite-send-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.08);
+            z-index: 55;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.94, 0.6, 1);
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .invite-send-overlay.open {
+            transform: translateY(0);
+        }
+        .invite-send-overlay .handle {
+            width: 36px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            margin: 0 auto 14px;
+        }
+        .invite-send-overlay .title {
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .invite-send-overlay .song-list {
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        .invite-send-overlay .song-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 4px;
+        }
+        .invite-send-overlay .song-item:active {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .invite-send-overlay .song-item .name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .invite-send-overlay .song-item .icon {
+            font-size: 20px;
+        }
+        .invite-send-overlay .close-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            border-radius: 30px;
+            border: none;
+            background: rgba(255, 255, 255, 0.3);
+            font-size: 15px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: background 0.15s;
+        }
+        .invite-send-overlay .close-btn:active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        .invite-send-overlay .empty-msg {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px 0;
+            font-size: 14px;
         }
 
         /* ===== 设置 ===== */
@@ -2041,12 +2198,6 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .music-settings .music-list .item .invite-btn {
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 8px;
-        }
         .music-settings .music-list .empty {
             text-align: center;
             color: var(--text-secondary);
@@ -2084,77 +2235,6 @@
             cursor: pointer;
             color: var(--text-secondary);
             padding: 2px 6px;
-        }
-
-        /* ===== 一起听邀请弹窗 ===== */
-        .invite-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            max-width: 480px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-            z-index: 110;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .invite-overlay.show {
-            display: flex;
-        }
-        .invite-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(30px);
-            border-radius: 28px;
-            padding: 32px 28px 28px;
-            max-width: 340px;
-            width: 100%;
-            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
-        }
-        .invite-panel .icon-big {
-            font-size: 48px;
-            margin-bottom: 8px;
-        }
-        .invite-panel .title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-        .invite-panel .sub {
-            font-size: 15px;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        .invite-panel .actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .invite-panel .actions button {
-            padding: 10px 32px;
-            border-radius: 30px;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.15s;
-        }
-        .invite-panel .actions button:active {
-            opacity: 0.7;
-        }
-        .invite-panel .actions .btn-agree {
-            background: #34c759;
-            color: #fff;
-        }
-        .invite-panel .actions .btn-refuse {
-            background: rgba(0, 0, 0, 0.04);
-            color: var(--text-secondary);
         }
 
         /* ===== 通用 ===== */
@@ -2271,7 +2351,7 @@
                 <div class="title">传讯 <small>· 字卡</small></div>
                 <div class="actions">
                     <button onclick="openPage('page-settings')" title="设置">⚙️</button>
-                    <button onclick="toggleMusicFloat()" title="音乐" id="musicToggleBtn">🎵</button>
+                    <button onclick="openInviteSend()" title="邀请一起听" id="musicToggleBtn">🎵</button>
                     <button onclick="openPage('page-letters')" title="信件">✉️</button>
                 </div>
             </div>
@@ -2343,7 +2423,7 @@
             </div>
         </div>
 
-        <!-- ===== 一起听邀请弹窗 ===== -->
+        <!-- ===== 一起听邀请弹窗（对方发起邀请） ===== -->
         <div class="invite-overlay" id="inviteOverlay">
             <div class="invite-panel">
                 <div class="icon-big">🎵</div>
@@ -2354,6 +2434,14 @@
                     <button class="btn-refuse" onclick="refuseInvite()">拒绝</button>
                 </div>
             </div>
+        </div>
+
+        <!-- ===== 我主动邀请面板（点击右上角音乐图标弹出） ===== -->
+        <div class="invite-send-overlay" id="inviteSendOverlay">
+            <div class="handle"></div>
+            <div class="title">🎵 选择歌曲邀请一起听</div>
+            <div class="song-list" id="inviteSongList"></div>
+            <button class="close-btn" onclick="closeInviteSend()">取消</button>
         </div>
 
         <!-- ===== 设置 ===== -->
@@ -2392,7 +2480,7 @@
                 <div class="settings-item" onclick="openPage('page-music')">
                     <div class="icon">🎵</div>
                     <div class="label">音乐播放器</div>
-                    <div class="desc">导入音乐·一起听</div>
+                    <div class="desc">导入音乐</div>
                 </div>
                 <div class="settings-item" onclick="editMyName()">
                     <div class="icon">✏️</div>
@@ -2727,7 +2815,7 @@
         // ============================================================
         //  💾 IndexedDB 存储
         // ============================================================
-        const DB_NAME = 'ChuanxunDB_v7';
+        const DB_NAME = 'ChuanxunDB_v9';
         const STORE_NAME = 'data';
         let db = null;
 
@@ -2906,7 +2994,8 @@
                 invitedSong: null,
                 inviteFrom: null
             },
-            isReplying: false
+            isReplying: false,
+            localCameraOn: false
         };
 
         let appData = null;
@@ -2941,6 +3030,7 @@
                     if (!appData.myName) appData.myName = DEFAULT_DATA.myName;
                     if (!appData.partnerName) appData.partnerName = DEFAULT_DATA.partnerName;
                     if (appData.isReplying === undefined) appData.isReplying = false;
+                    if (appData.localCameraOn === undefined) appData.localCameraOn = false;
                 } else {
                     appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 }
@@ -3002,6 +3092,7 @@
             }
             closePlusPanel();
             closeStickerPopup();
+            closeInviteSend();
         }
 
         function closePage(pageId) {
@@ -3623,7 +3714,7 @@
         }
 
         // ============================================================
-        //  🎵 音乐播放器 + 一起听
+        //  🎵 音乐播放器 + 一起听（完整）
         // ============================================================
         let musicAudio = null;
         let musicFloatVisible = false;
@@ -3666,7 +3757,6 @@
                     <div class="item" style="${isActive ? 'border:1px solid var(--primary);' : ''}">
                         <span class="name" onclick="renameMusic(${i})" title="点击修改名称">${item.name || '未命名'}</span>
                         <div>
-                            <span class="invite-btn" onclick="inviteTogether(${i})" title="邀请一起听">👥</span>
                             <span style="font-size:12px;color:var(--text-secondary);cursor:pointer;margin-right:8px;" onclick="playMusic(${i})">▶</span>
                             <span class="del" onclick="removeMusic(${i})">✕</span>
                         </div>
@@ -3917,36 +4007,99 @@
             }
         }
 
-        // ===== 一起听功能 =====
-        function inviteTogether(index) {
+        // ===== 一起听功能（完整） =====
+        // 我主动邀请
+        function openInviteSend() {
+            const playlist = appData.music.playlist || [];
+            const list = document.getElementById('inviteSongList');
+            const overlay = document.getElementById('inviteSendOverlay');
+
+            if (playlist.length === 0) {
+                list.innerHTML = `<div class="empty-msg">还没有音乐，先去设置里导入吧</div>`;
+            } else {
+                let html = '';
+                for (let i = 0; i < playlist.length; i++) {
+                    const item = playlist[i];
+                    html += `
+                        <div class="song-item" onclick="sendInvite(${i})">
+                            <span class="name">${item.name || '未命名'}</span>
+                            <span class="icon">🎵</span>
+                        </div>
+                    `;
+                }
+                list.innerHTML = html;
+            }
+            overlay.classList.add('open');
+        }
+
+        function closeInviteSend() {
+            document.getElementById('inviteSendOverlay').classList.remove('open');
+        }
+
+        function sendInvite(index) {
             const playlist = appData.music.playlist || [];
             if (playlist.length === 0 || index >= playlist.length) return;
             const item = playlist[index];
+            const songName = item.name || '未命名歌曲';
             appData.music.invitedSong = index;
             appData.music.inviteFrom = 'me';
-            const inviteMsg = `🎵 ${getPartnerName()}，邀请你一起听《${item.name}》`;
-            showInvitePanel(inviteMsg, function(agree) {
-                if (agree) {
-                    playMusic(index);
-                    addSystemMessage(`🎵 ${getPartnerName()} 接受了邀请，一起听《${item.name}》`);
-                    appData.music.together = true;
-                } else {
-                    addSystemMessage(`🎵 ${getPartnerName()} 拒绝了邀请`);
-                    appData.music.together = false;
-                }
-                saveAllData();
-            });
-            addSystemMessage(`🎵 你邀请了 ${getPartnerName()} 一起听《${item.name}》，等待对方回应...`);
-            // 模拟对方自动同意（5~10秒后）
+            closeInviteSend();
+
+            const inviteMsg = `🎵 你邀请了 ${getPartnerName()} 一起听《${songName}》，等待对方回应...`;
+            addSystemMessage(inviteMsg);
+
+            // 弹出邀请面板（模拟对方收到邀请）
             setTimeout(() => {
-                if (appData.music.inviteFrom === 'me' && appData.music.invitedSong === index) {
-                    if (document.getElementById('inviteOverlay').classList.contains('show')) {
-                        acceptInvite();
+                const panelMsg = `🎵 ${getPartnerName()} 邀请你一起听《${songName}》`;
+                showInvitePanel(panelMsg, function(agree) {
+                    if (agree) {
+                        playMusic(index);
+                        appData.music.together = true;
+                        addSystemMessage(`🎵 ${getPartnerName()} 接受了邀请，一起听《${songName}》`);
+                    } else {
+                        appData.music.together = false;
+                        addSystemMessage(`🎵 ${getPartnerName()} 拒绝了邀请`);
                     }
-                }
-            }, 5000 + Math.random() * 5000);
+                    saveAllData();
+                });
+            }, 1000);
         }
 
+        // 对方主动邀请（完全随机）
+        function partnerSendMusicInvite() {
+            const playlist = appData.music.playlist || [];
+            if (playlist.length === 0) {
+                addPartnerMessage('好想和你一起听歌呀～', 'text');
+                return;
+            }
+            const randomIndex = Math.floor(Math.random() * playlist.length);
+            const song = playlist[randomIndex];
+            const songName = song.name || '未命名歌曲';
+
+            appData.music.invitedSong = randomIndex;
+            appData.music.inviteFrom = 'partner';
+            appData.music.isInviting = true;
+
+            addSystemMessage(`🎵 ${getPartnerName()} 邀请你一起听《${songName}》`);
+
+            setTimeout(() => {
+                const inviteMsg = `🎵 ${getPartnerName()} 邀请你一起听《${songName}》`;
+                showInvitePanel(inviteMsg, function(agree) {
+                    appData.music.isInviting = false;
+                    if (agree) {
+                        playMusic(randomIndex);
+                        appData.music.together = true;
+                        addSystemMessage(`🎵 你接受了 ${getPartnerName()} 的邀请，一起听《${songName}》`);
+                    } else {
+                        appData.music.together = false;
+                        addSystemMessage(`🎵 你拒绝了 ${getPartnerName()} 的邀请`);
+                    }
+                    saveAllData();
+                });
+            }, 1000 + Math.random() * 1500);
+        }
+
+        // 通用邀请面板
         function showInvitePanel(message, callback) {
             const overlay = document.getElementById('inviteOverlay');
             document.getElementById('inviteMessage').textContent = message;
@@ -3996,7 +4149,7 @@
         }
 
         // ============================================================
-        //  🤖 梦角回复（支持拼接 + 回复条数）
+        //  🤖 梦角回复（支持拼接 + 回复条数 + 音乐邀请）
         // ============================================================
         let replyTimeout = null;
 
@@ -4013,6 +4166,14 @@
         }
 
         async function doPartnerReply() {
+            // 30% 概率梦角主动发一起听邀请
+            if (Math.random() < 0.30) {
+                hideTyping();
+                partnerSendMusicInvite();
+                return;
+            }
+
+            // 10% 概率发红包
             if (Math.random() < 0.10) {
                 hideTyping();
                 partnerSendRedPacket();
@@ -4041,7 +4202,6 @@
             const minCnt = settings.minReplyCount || 1;
             const maxCnt = settings.maxReplyCount || 3;
             const replyCount = Math.floor(Math.random() * (maxCnt - minCnt + 1)) + minCnt;
-
             const concatEnabled = settings.concatCards !== undefined ? settings.concatCards : true;
 
             let sentCount = 0;
@@ -4140,10 +4300,16 @@
         function startAutoBehaviors() {
             if (autoSendTimer) clearInterval(autoSendTimer);
             if (autoPatTimer) clearInterval(autoPatTimer);
+
             if (appData.settings.autoSend) {
                 const interval = (appData.settings.autoSendInterval || 31) * 60 * 1000;
                 autoSendTimer = setInterval(() => {
                     if (currentPage !== 'page-chat') return;
+                    // 30% 概率发起音乐邀请
+                    if (Math.random() < 0.30) {
+                        partnerSendMusicInvite();
+                        return;
+                    }
                     const cards = appData.replyLibrary.cards || [];
                     const emojis = appData.replyLibrary.emojis || [];
                     const allItems = [];
@@ -4158,6 +4324,7 @@
                     }, 2000 + Math.random() * 3000);
                 }, interval);
             }
+
             autoPatTimer = setInterval(() => {
                 if (currentPage !== 'page-chat') return;
                 if (Math.random() < 0.15) {
@@ -5367,31 +5534,41 @@
         setInterval(checkLetterReplies, 5 * 60 * 1000);
 
         // ============================================================
-        //  📹 视频通话（含摄像头开关）
+        //  📹 视频通话（摄像头镜像 + 隐藏头像/名字 + 持久化）
         // ============================================================
         let callState = null,
             callTimerInterval = null;
         let callStartTimestamp = null;
         let localStream = null;
-        let isCameraOn = false;
 
         function updateCallVideo() {
             const video = document.getElementById('localVideo');
             const cameraEnabled = appData.appearance.cameraEnabled || false;
+            const isCameraOn = appData.localCameraOn || false;
+
             if (cameraEnabled && isCameraOn) {
                 video.classList.add('show');
+                video.style.transform = 'scaleX(-1)';
                 if (!localStream) {
                     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                         .then(stream => {
                             localStream = stream;
                             video.srcObject = stream;
+                            document.getElementById('callAvatar').style.display = 'none';
+                            document.getElementById('callName').style.display = 'none';
                         })
                         .catch(e => {
                             console.warn('摄像头获取失败:', e);
                             video.classList.remove('show');
-                            isCameraOn = false;
+                            appData.localCameraOn = false;
+                            saveAllData();
                             updateCallCameraBtn();
+                            document.getElementById('callAvatar').style.display = 'flex';
+                            document.getElementById('callName').style.display = 'block';
                         });
+                } else {
+                    document.getElementById('callAvatar').style.display = 'none';
+                    document.getElementById('callName').style.display = 'none';
                 }
             } else {
                 video.classList.remove('show');
@@ -5400,33 +5577,47 @@
                     localStream = null;
                     video.srcObject = null;
                 }
+                document.getElementById('callAvatar').style.display = 'flex';
+                document.getElementById('callName').style.display = 'block';
             }
         }
 
         function toggleCamera() {
-            isCameraOn = !isCameraOn;
-            if (!isCameraOn) {
-                // 关闭摄像头
-                if (localStream) {
-                    localStream.getTracks().forEach(t => t.stop());
-                    localStream = null;
-                    const video = document.getElementById('localVideo');
-                    video.srcObject = null;
-                    video.classList.remove('show');
-                }
-            } else {
-                // 打开摄像头
-                const video = document.getElementById('localVideo');
+            const video = document.getElementById('localVideo');
+            const cameraEnabled = appData.appearance.cameraEnabled || false;
+            if (!cameraEnabled) {
+                alert('请先在“外观设置”中启用摄像头开关');
+                return;
+            }
+            appData.localCameraOn = !appData.localCameraOn;
+            saveAllData();
+
+            if (appData.localCameraOn) {
                 navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                     .then(stream => {
                         localStream = stream;
                         video.srcObject = stream;
                         video.classList.add('show');
+                        video.style.transform = 'scaleX(-1)';
+                        document.getElementById('callAvatar').style.display = 'none';
+                        document.getElementById('callName').style.display = 'none';
                     })
                     .catch(e => {
                         alert('无法访问摄像头：' + e.message);
-                        isCameraOn = false;
+                        appData.localCameraOn = false;
+                        saveAllData();
+                        document.getElementById('callAvatar').style.display = 'flex';
+                        document.getElementById('callName').style.display = 'block';
                     });
+            } else {
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                    localStream = null;
+                    video.srcObject = null;
+                }
+                video.classList.remove('show');
+                document.getElementById('callAvatar').style.display = 'flex';
+                document.getElementById('callName').style.display = 'block';
             }
             updateCallCameraBtn();
         }
@@ -5434,7 +5625,7 @@
         function updateCallCameraBtn() {
             const btn = document.getElementById('callCameraBtn');
             if (!btn) return;
-            if (isCameraOn) {
+            if (appData.localCameraOn) {
                 btn.textContent = '📹';
                 btn.classList.remove('off');
                 btn.title = '关闭摄像头';
@@ -5453,7 +5644,10 @@
                 video.srcObject = null;
                 video.classList.remove('show');
             }
-            isCameraOn = false;
+            appData.localCameraOn = false;
+            saveAllData();
+            document.getElementById('callAvatar').style.display = 'flex';
+            document.getElementById('callName').style.display = 'block';
             updateCallCameraBtn();
         }
 
@@ -5498,6 +5692,15 @@
             }
             document.getElementById('callName').textContent = getPartnerName();
             makeDraggable(panel);
+            // 恢复摄像头状态
+            if (appData.localCameraOn && appData.appearance.cameraEnabled) {
+                setTimeout(() => {
+                    toggleCamera();
+                }, 300);
+            } else {
+                document.getElementById('callAvatar').style.display = 'flex';
+                document.getElementById('callName').style.display = 'block';
+            }
             updateCallVideo();
         }
 
@@ -5540,6 +5743,12 @@
                 }
             }, 30000 + Math.random() * 60000);
             addSystemMessage('📹 视频通话已接通');
+            // 如果摄像头已开启，确保显示
+            if (appData.localCameraOn && appData.appearance.cameraEnabled) {
+                setTimeout(() => {
+                    toggleCamera();
+                }, 200);
+            }
             updateCallVideo();
         }
 
@@ -5758,6 +5967,11 @@
             if (appData.isReplying) {
                 showTyping();
             }
+
+            // 恢复摄像头状态（如之前开启过）
+            if (appData.localCameraOn && appData.appearance.cameraEnabled) {
+                // 不主动打开，等待通话接通后自动打开
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);
@@ -5842,7 +6056,10 @@
         window.closeMusicFloat = closeMusicFloat;
         window.toggleMusicSize = toggleMusicSize;
         window.renderMusicPage = renderMusicPage;
-        window.inviteTogether = inviteTogether;
+        window.openInviteSend = openInviteSend;
+        window.closeInviteSend = closeInviteSend;
+        window.sendInvite = sendInvite;
+        window.partnerSendMusicInvite = partnerSendMusicInvite;
         window.acceptInvite = acceptInvite;
         window.refuseInvite = refuseInvite;
         window.leaveTogether = leaveTogether;
