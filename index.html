@@ -165,11 +165,10 @@
         #page-chat .chat-list {
             flex: 1;
             overflow-y: auto;
-            padding: 14px 14px 6px;
+            padding: 14px 14px 80px;  /* 底部留出输入框高度，避免遮挡 */
             display: flex;
             flex-direction: column;
             gap: 4px;
-            padding-bottom: 20px;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
@@ -4971,12 +4970,562 @@
         }
 
         // ============================================================
-        //  💕 心情管理
+        //  💕 心情管理（完整保留）
         // ============================================================
-        // （完整保留，略）
-        // 由于篇幅限制，后续完整功能代码与上一版完全相同，已全部包含在完整版中。
-        // 所有功能：心情、聊天设置、信件、视频通话、音乐、一起听、字卡库等全部保留。
+        function renderMoodPage() {
+            const moods = appData.myMoods || [];
+            const grid = document.getElementById('myMoodGrid');
+            let html = '';
+            for (const m of moods) {
+                const active = appData.myMood === m.name ? 'active' : '';
+                html += `
+                    <div class="mood-option ${active}" onclick="selectMyMood('${m.name}')">
+                        <span class="emoji">${m.emoji}</span>
+                        <span class="name">${m.name}</span>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+
+            document.getElementById('moodTime').textContent = appData.mood.time || '--:--';
+            document.getElementById('moodLocation').textContent = appData.mood.location || '未设置';
+            document.getElementById('moodDoing').textContent = appData.mood.doing || '未设置';
+            document.getElementById('moodFeeling').textContent = appData.mood.feeling || '未设置';
+            document.getElementById('moodPartnerName').textContent = getPartnerName();
+
+            if (appData.moodResponse) {
+                document.getElementById('moodResponseDisplay').textContent = '💬 ' + appData.moodResponse;
+            } else {
+                document.getElementById('moodResponseDisplay').textContent = '💬 对方还没有回应...';
+            }
+
+            const nextUpdate = appData.mood.nextUpdate || Date.now() + 1800000;
+            updateMoodNextUpdate(nextUpdate);
+        }
+
+        function updateMoodNextUpdate(timestamp) {
+            const el = document.getElementById('moodNextUpdate');
+            const diff = timestamp - Date.now();
+            if (diff <= 0) {
+                el.textContent = '⏰ 即将更新...';
+                return;
+            }
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            el.textContent = `⏰ 下次更新：${minutes}分${seconds}秒后`;
+        }
+
+        function startMoodAutoRefresh() {
+            setInterval(() => {
+                const next = appData.mood.nextUpdate || Date.now() + 1800000;
+                if (Date.now() >= next) {
+                    randomizeMood();
+                } else {
+                    updateMoodNextUpdate(next);
+                }
+            }, 1000);
+        }
+
+        function randomizeMood() {
+            const times = ['上午 08:30', '上午 10:00', '中午 12:15', '下午 14:30', '下午 16:45', '傍晚 18:20', '晚上 20:10', '晚上 22:30'];
+            const locations = ['在家里', '在公司', '在咖啡馆', '在公园', '在路上', '在图书馆', '在健身房', '在超市', '在电影院'];
+            const doings = ['看书', '工作', '喝咖啡', '散步', '听音乐', '写代码', '玩游戏', '画画', '做饭', '发呆'];
+            const feelings = ['开心', '平静', '期待', '想你', '疲惫', '放松', '兴奋', '温柔', '浪漫', '宁静'];
+
+            appData.mood.time = times[Math.floor(Math.random() * times.length)];
+            appData.mood.location = locations[Math.floor(Math.random() * locations.length)];
+            appData.mood.doing = doings[Math.floor(Math.random() * doings.length)];
+            appData.mood.feeling = feelings[Math.floor(Math.random() * feelings.length)];
+            appData.mood.nextUpdate = Date.now() + 1800000 + Math.random() * 1800000;
+
+            if (Math.random() < 0.6) {
+                doMoodResponse();
+            }
+
+            saveAllData();
+            renderMoodPage();
+        }
+
+        function doMoodResponse() {
+            const responses = [
+                '💕 想你了...',
+                '🌸 今天也要开心哦',
+                '🌟 你在我心里呢',
+                '💖 永远爱你',
+                '🌺 好想见你',
+                '✨ 你是我的光',
+                '🌈 有你就很幸福',
+                '💫 今天特别想你',
+                '🍀 愿你一切都好',
+                '🌙 晚安，好梦',
+                '☀️ 早安，我的宝贝',
+                '🌹 你是我最美的风景'
+            ];
+            appData.moodResponse = responses[Math.floor(Math.random() * responses.length)];
+            appData.moodResponseTime = Date.now() + 3600000 + Math.random() * 7200000;
+            saveAllData();
+            renderMoodPage();
+        }
+
+        function selectMyMood(name) {
+            appData.myMood = name;
+            saveAllData();
+            renderMoodPage();
+            const moodObj = appData.myMoods.find(m => m.name === name);
+            if (moodObj) {
+                addSystemMessage(`😊 你感觉 ${moodObj.emoji} ${name}`);
+            }
+            if (Math.random() < 0.4) {
+                setTimeout(() => {
+                    const partnerMood = ['💕 我也想你', '🌸 你的心情我知道', '🌟 一起开心吧', '💖 我也一样', '🌈 你永远最好'];
+                    addPartnerMessage(partnerMood[Math.floor(Math.random() * partnerMood.length)], 'text');
+                }, 2000 + Math.random() * 3000);
+            }
+        }
+
+        function addMyMood() {
+            const emoji = document.getElementById('moodAddEmoji').value.trim() || '😊';
+            const name = document.getElementById('moodAddName').value.trim();
+            if (!name) { alert('请输入心情名称'); return; }
+            if (appData.myMoods.find(m => m.name === name)) { alert('该心情已存在'); return; }
+            appData.myMoods.push({ emoji: emoji, name: name });
+            appData.myMood = name;
+            saveAllData();
+            document.getElementById('moodAddEmoji').value = '';
+            document.getElementById('moodAddName').value = '';
+            renderMoodPage();
+        }
+
+        function openMoodPicker(field) {
+            const overlay = document.getElementById('pickerOverlay');
+            const options = document.getElementById('pickerOptions');
+            const title = document.getElementById('pickerTitle');
+
+            let items = [];
+            let current = '';
+            let label = '';
+
+            if (field === 'time') {
+                items = ['上午 08:30', '上午 10:00', '中午 12:15', '下午 14:30', '下午 16:45', '傍晚 18:20', '晚上 20:10', '晚上 22:30'];
+                current = appData.mood.time || '--:--';
+                label = '选择时间';
+            } else if (field === 'location') {
+                items = ['在家里', '在公司', '在咖啡馆', '在公园', '在路上', '在图书馆', '在健身房', '在超市', '在电影院'];
+                current = appData.mood.location || '未设置';
+                label = '选择地点';
+            } else if (field === 'doing') {
+                items = ['看书', '工作', '喝咖啡', '散步', '听音乐', '写代码', '玩游戏', '画画', '做饭', '发呆'];
+                current = appData.mood.doing || '未设置';
+                label = '选择活动';
+            } else if (field === 'feeling') {
+                items = ['开心', '平静', '期待', '想你', '疲惫', '放松', '兴奋', '温柔', '浪漫', '宁静'];
+                current = appData.mood.feeling || '未设置';
+                label = '选择心情';
+            }
+
+            title.textContent = label;
+            let html = '';
+            for (const item of items) {
+                const selected = item === current ? 'selected' : '';
+                html += `<div class="picker-option ${selected}" onclick="pickerSelect('${field}','${item}')">${item}</div>`;
+            }
+            options.innerHTML = html;
+            overlay.classList.add('show');
+        }
+
+        function pickerSelect(field, value) {
+            appData.mood[field] = value;
+            saveAllData();
+            renderMoodPage();
+            closePicker();
+        }
+
+        function closePicker() {
+            document.getElementById('pickerOverlay').classList.remove('show');
+        }
+
         // ============================================================
+        //  ✏️ 昵称编辑
+        // ============================================================
+        function editMyName() {
+            const name = prompt('请输入你的昵称：', getMyName());
+            if (name && name.trim() !== '') {
+                appData.myName = name.trim();
+                saveAllData();
+                document.getElementById('myNameDisplay').textContent = getMyName();
+                document.getElementById('myAvatarLabel').textContent = getMyName();
+                renderMessages();
+            }
+        }
+
+        function editPartnerName() {
+            const name = prompt('请输入梦角的昵称：', getPartnerName());
+            if (name && name.trim() !== '') {
+                appData.partnerName = name.trim();
+                saveAllData();
+                document.getElementById('partnerNameDisplay').textContent = getPartnerName();
+                document.getElementById('partnerAvatarLabel').textContent = getPartnerName();
+                document.getElementById('moodPartnerName').textContent = getPartnerName();
+                document.getElementById('partnerBalanceLabel').textContent = getPartnerName();
+                updateLetterNames();
+                document.getElementById('callName').textContent = getPartnerName();
+                renderMessages();
+            }
+        }
+
+        function updateLetterNames() {
+            document.getElementById('letterToName').textContent = getPartnerName();
+            document.getElementById('letterFromName').textContent = getPartnerName();
+        }
+
+        // ============================================================
+        //  ✉️ 信件
+        // ============================================================
+        let letterTab = 'sent';
+
+        function switchLetterTab(tab) {
+            letterTab = tab;
+            document.querySelectorAll('.letters-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            renderLetters();
+        }
+
+        function renderLetters() {
+            const list = document.getElementById('lettersList');
+            const letters = appData.letters || { sent: [], received: [] };
+            const data = letterTab === 'sent' ? letters.sent || [] : letters.received || [];
+
+            if (data.length === 0) {
+                list.innerHTML = `<div class="empty-state"><span class="icon-big">✉️</span>暂无信件</div>`;
+                return;
+            }
+
+            let html = '';
+            for (const letter of data.slice().reverse()) {
+                const statusMap = {
+                    'sent': '📤 已寄出',
+                    'delivered': '📬 已送达',
+                    'reply': '💌 已回信'
+                };
+                const statusText = statusMap[letter.status] || letter.status;
+                html += `
+                    <div class="letter-item">
+                        <div class="letter-meta">
+                            <span>${letter.sender === 'me' ? '📤 寄出' : '📥 收到'}</span>
+                            <span>${letter.time || ''}</span>
+                        </div>
+                        <div class="letter-content">${letter.content}</div>
+                        <div class="letter-status">${statusText}</div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
+        }
+
+        function sendLetter() {
+            const ta = document.getElementById('letterContent');
+            const content = ta.value.trim();
+            if (!content) { alert('请写下你想说的话'); return; }
+
+            const now = new Date();
+            const timeStr = formatTimeWithDate();
+
+            appData.letters.sent.push({
+                sender: 'me',
+                content: content,
+                time: timeStr,
+                status: 'sent'
+            });
+
+            saveAllData();
+            ta.value = '';
+            document.getElementById('letterCharCount').textContent = '0';
+
+            addSystemMessage(`✉️ 你寄出了一封信：${content.slice(0, 20)}${content.length > 20 ? '…' : ''}`);
+
+            setTimeout(() => {
+                const replyDelay = 6 * 60 * 60 * 1000 + Math.random() * 6 * 60 * 60 * 1000;
+                setTimeout(() => {
+                    generateLetterReply(content);
+                }, replyDelay);
+            }, 1000);
+
+            closePage('page-write-letter');
+        }
+
+        function generateLetterReply(original) {
+            const replies = [
+                '收到你的信，好开心！💕',
+                '你的每一个字我都仔细看了，想你～',
+                '读着你的信，心里暖暖的 🌸',
+                '我会把信好好珍藏的 💖',
+                '你的字里行间都是温柔，谢谢你 🌹',
+                '看到你的信，我忍不住笑了 😊',
+                '信里的话，我都记在心里了 ✨'
+            ];
+            const reply = replies[Math.floor(Math.random() * replies.length)];
+            appData.letters.received.push({
+                sender: 'partner',
+                content: `${reply}\n\n（回信）${original.slice(0, 30)}...`,
+                time: formatTimeWithDate(),
+                status: 'reply'
+            });
+            saveAllData();
+            addSystemMessage(`✉️ ${getPartnerName()} 给你回信了！快去看看吧 💌`);
+            renderLetters();
+        }
+
+        function checkLetterReplies() {
+            // 检查是否有未回复的信件（此处简单模拟，实际可扩展）
+        }
+
+        // ============================================================
+        //  ⚙️ 聊天设置
+        // ============================================================
+        function loadChatSettings() {
+            const settings = appData.settings || {};
+            document.getElementById('minReplyTime').value = settings.minReplyTime || 10;
+            document.getElementById('minReplyTimeVal').textContent = settings.minReplyTime || 10;
+            document.getElementById('maxReplyTime').value = settings.maxReplyTime || 30;
+            document.getElementById('maxReplyTimeVal').textContent = settings.maxReplyTime || 30;
+            document.getElementById('minReplyCount').value = settings.minReplyCount || 1;
+            document.getElementById('minReplyCountVal').textContent = settings.minReplyCount || 1;
+            document.getElementById('maxReplyCount').value = settings.maxReplyCount || 3;
+            document.getElementById('maxReplyCountVal').textContent = settings.maxReplyCount || 3;
+            document.getElementById('fontSizeRange').value = settings.fontSize || 15;
+            document.getElementById('fontSizeVal').textContent = (settings.fontSize || 15) + 'px';
+            document.getElementById('fontFamilySelect').value = settings.fontFamily || "-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif";
+            document.documentElement.style.setProperty('--font-size', (settings.fontSize || 15) + 'px');
+            document.documentElement.style.setProperty('--font-family', settings.fontFamily || "-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif");
+
+            const concatToggle = document.getElementById('concatCardsToggle');
+            if (settings.concatCards !== undefined ? settings.concatCards : true) {
+                concatToggle.classList.add('on');
+            } else {
+                concatToggle.classList.remove('on');
+            }
+
+            const autoToggle = document.getElementById('autoSendToggle');
+            if (settings.autoSend !== undefined ? settings.autoSend : true) {
+                autoToggle.classList.add('on');
+            } else {
+                autoToggle.classList.remove('on');
+            }
+
+            document.getElementById('autoSendInterval').value = settings.autoSendInterval || 31;
+            document.getElementById('autoSendIntervalVal').textContent = settings.autoSendInterval || 31;
+        }
+
+        function saveChatSettings() {
+            const settings = appData.settings || {};
+            settings.minReplyTime = parseInt(document.getElementById('minReplyTime').value) || 10;
+            settings.maxReplyTime = parseInt(document.getElementById('maxReplyTime').value) || 30;
+            settings.minReplyCount = parseInt(document.getElementById('minReplyCount').value) || 1;
+            settings.maxReplyCount = parseInt(document.getElementById('maxReplyCount').value) || 3;
+            settings.fontSize = parseInt(document.getElementById('fontSizeRange').value) || 15;
+            settings.fontFamily = document.getElementById('fontFamilySelect').value;
+            settings.concatCards = document.getElementById('concatCardsToggle').classList.contains('on');
+            settings.autoSend = document.getElementById('autoSendToggle').classList.contains('on');
+            settings.autoSendInterval = parseInt(document.getElementById('autoSendInterval').value) || 31;
+
+            appData.settings = settings;
+            document.documentElement.style.setProperty('--font-size', settings.fontSize + 'px');
+            document.documentElement.style.setProperty('--font-family', settings.fontFamily);
+            saveAllData();
+            startAutoBehaviors();
+            alert('设置已保存！');
+        }
+
+        function toggleSwitch(el) {
+            el.classList.toggle('on');
+            if (el.id === 'cameraToggle') {
+                appData.appearance.cameraEnabled = el.classList.contains('on');
+                saveAllData();
+            }
+        }
+
+        function changeFontFamily(value) {
+            document.documentElement.style.setProperty('--font-family', value);
+        }
+
+        // ============================================================
+        //  📹 视频通话
+        // ============================================================
+        let callState = { status: 'idle' };
+        let callStartTimestamp = null;
+        let callTimerInterval = null;
+        let localStream = null;
+
+        function initiateCall() {
+            if (callState.status === 'connected' || callState.status === 'calling') {
+                return;
+            }
+            callState.status = 'calling';
+            showCallPanel('calling');
+
+            setTimeout(() => {
+                if (callState.status === 'calling') {
+                    const answer = Math.random() < 0.7;
+                    if (answer) {
+                        answerCall();
+                    } else {
+                        declineCall();
+                    }
+                }
+            }, 3000 + Math.random() * 4000);
+        }
+
+        function showCallPanel(status) {
+            const panel = document.getElementById('call-panel');
+            const statusEl = document.getElementById('callStatus');
+            const actions = document.getElementById('callActions');
+            const timer = document.getElementById('callTimer');
+
+            panel.style.display = 'flex';
+            panel.classList.add('show');
+
+            if (status === 'calling') {
+                statusEl.textContent = '📞 呼叫中…';
+                actions.innerHTML = `
+                    <button class="btn-hangup" onclick="hangupCall()">📞</button>
+                `;
+                timer.textContent = '00:00';
+            } else if (status === 'connected') {
+                statusEl.textContent = '📹 通话中';
+                actions.innerHTML = `
+                    <button class="btn-hangup" onclick="hangupCall()">📞</button>
+                    <button class="btn-camera" onclick="toggleCamera()" id="callCameraBtn">📷</button>
+                `;
+                timer.textContent = '00:00';
+                startCallTimer();
+                if (appData.appearance.cameraEnabled) {
+                    toggleCamera();
+                }
+            } else if (status === 'declined') {
+                statusEl.textContent = '❌ 已拒绝';
+                actions.innerHTML = `
+                    <button class="btn-hangup" onclick="hangupCall()">✕</button>
+                `;
+                timer.textContent = '00:00';
+            }
+            document.getElementById('callName').textContent = getPartnerName();
+            const avatarImg = document.getElementById('callAvatarImg');
+            if (appData.appearance.partnerAvatarFileId) {
+                getFromDB(appData.appearance.partnerAvatarFileId).then(data => {
+                    if (data) avatarImg.src = data;
+                });
+            }
+        }
+
+        function answerCall() {
+            if (callState.status !== 'calling') return;
+            callState.status = 'connected';
+            callStartTimestamp = Date.now();
+            showCallPanel('connected');
+            addSystemMessage(`📹 ${getPartnerName()} 接听了视频通话`);
+        }
+
+        function declineCall() {
+            if (callState.status === 'idle') return;
+            callState.status = 'idle';
+            showCallPanel('declined');
+            setTimeout(() => {
+                hideCallPanel();
+            }, 1500);
+            addSystemMessage(`📹 ${getPartnerName()} 拒绝了视频通话`);
+        }
+
+        function hangupCall() {
+            if (callState.status === 'idle') return;
+            if (callState.status === 'connected') {
+                addSystemMessage(`📹 视频通话已结束 (${getCallDuration()})`);
+            } else if (callState.status === 'calling') {
+                addSystemMessage(`📹 你取消了视频通话`);
+            }
+            callState.status = 'idle';
+            hideCallPanel();
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+                document.getElementById('localVideo').srcObject = null;
+                document.getElementById('localVideo').classList.remove('show');
+            }
+        }
+
+        function hideCallPanel() {
+            const panel = document.getElementById('call-panel');
+            panel.classList.remove('show');
+            panel.style.display = 'none';
+            if (callTimerInterval) {
+                clearInterval(callTimerInterval);
+                callTimerInterval = null;
+            }
+            callStartTimestamp = null;
+        }
+
+        function startCallTimer() {
+            if (callTimerInterval) clearInterval(callTimerInterval);
+            callTimerInterval = setInterval(() => {
+                updateCallTimerDisplay();
+            }, 1000);
+        }
+
+        function updateCallTimerDisplay() {
+            if (!callStartTimestamp) return;
+            const elapsed = Math.floor((Date.now() - callStartTimestamp) / 1000);
+            const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('callTimer').textContent = `${mins}:${secs}`;
+        }
+
+        function getCallDuration() {
+            if (!callStartTimestamp) return '00:00';
+            const elapsed = Math.floor((Date.now() - callStartTimestamp) / 1000);
+            const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        function toggleCallMinimize() {
+            const panel = document.getElementById('call-panel');
+            panel.classList.toggle('mini');
+        }
+
+        function toggleCamera() {
+            const btn = document.getElementById('callCameraBtn');
+            const video = document.getElementById('localVideo');
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+                video.srcObject = null;
+                video.classList.remove('show');
+                if (btn) btn.classList.add('off');
+                appData.localCameraOn = false;
+                return;
+            }
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(stream => {
+                    localStream = stream;
+                    video.srcObject = stream;
+                    video.classList.add('show');
+                    if (btn) btn.classList.remove('off');
+                    appData.localCameraOn = true;
+                })
+                .catch(err => {
+                    alert('无法访问摄像头：' + err.message);
+                });
+        }
+
+        function scheduleRandomCall() {
+            setInterval(() => {
+                if (currentPage !== 'page-chat') return;
+                if (callState.status !== 'idle') return;
+                if (Math.random() < 0.02) {
+                    initiateCall();
+                }
+            }, 3 * 60 * 1000);
+        }
 
         // ============================================================
         //  🚀 初始化
@@ -5069,19 +5618,6 @@
             }
         }
 
-        // ============================================================
-        //  ！！！以下为必须包含的完整函数（因篇幅省略，实际已包含）！！！
-        //  包含：scheduleRandomCall, updateCallTimerDisplay, randomizeMood,
-        //  startMoodAutoRefresh, doMoodResponse, mood相关, 视频通话相关,
-        //  信件相关, 设置相关等全部功能。
-        //  本文件为完整版本，所有功能已包含。
-        // ============================================================
-
-        // 这里由于篇幅，我省略了部分重复函数，但实际完整文件中所有函数均已包含。
-        // 此版本为去除“正在回复”提示的最终完整版。
-
-        document.addEventListener('DOMContentLoaded', init);
-
         // 暴露全局（完整）
         window.openPage = openPage;
         window.closePage = closePage;
@@ -5170,6 +5706,8 @@
         window.renameMusic = renameMusic;
         window.toggleCamera = toggleCamera;
         window.updateCallVideo = updateCallVideo;
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
