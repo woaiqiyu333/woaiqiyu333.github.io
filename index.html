@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -167,25 +166,31 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
-            padding-bottom: 74px;
+            padding-bottom: 10px;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
+            position: relative;
         }
-        /* ===== 正在回复提示 ===== */
         .typing-indicator {
+            position: sticky;
+            bottom: 0;
+            left: 0;
             display: none;
             font-size: 12px;
             color: var(--text-secondary);
-            padding: 4px 16px;
+            padding: 6px 16px 4px 12px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             backdrop-filter: blur(4px);
             align-self: flex-start;
-            margin: 2px 0 4px 12px;
+            margin: 0 0 2px 0;
             opacity: 0.7;
             font-style: italic;
             animation: typingDot 1.2s infinite;
+            z-index: 3;
+            width: auto;
+            max-width: 80%;
         }
         .typing-indicator.show {
             display: inline-block;
@@ -463,6 +468,7 @@
         .chat-input-bar .send-btn:active {
             transform: scale(0.88);
         }
+
         /* ===== +号面板 ===== */
         .plus-overlay {
             position: fixed;
@@ -502,24 +508,38 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            padding: 8px 4px;
-            border-radius: 12px;
-            transition: background 0.15s;
+            padding: 4px 0;
             border: none;
             background: none;
             color: var(--text);
             font-family: inherit;
+            transition: transform 0.15s;
         }
         .plus-overlay .grid .item:active {
-            background: rgba(0, 0, 0, 0.04);
+            transform: scale(0.92);
         }
-        .plus-overlay .grid .item .icon {
-            font-size: 32px;
+        .plus-overlay .grid .item .icon-wrap {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
             margin-bottom: 4px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            transition: background 0.15s, transform 0.15s;
+        }
+        .plus-overlay .grid .item:active .icon-wrap {
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0.9);
         }
         .plus-overlay .grid .item .label {
             font-size: 11px;
             color: var(--text-secondary);
+            margin-top: 2px;
         }
         .plus-backdrop {
             position: fixed;
@@ -922,6 +942,16 @@
         #call-panel .call-actions .btn-decline {
             background: #ff3b30;
             color: #fff;
+        }
+        /* 摄像头开关按钮 */
+        #call-panel .call-actions .btn-camera {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 18px;
+        }
+        #call-panel .call-actions .btn-camera.off {
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
         }
         #call-panel .call-minimize-btn {
             position: absolute;
@@ -2001,6 +2031,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: 8px;
+            cursor: pointer;
+        }
+        .music-settings .music-list .item .name:active {
+            opacity: 0.7;
         }
         .music-settings .music-list .item .del {
             color: #ff3b30;
@@ -2062,7 +2096,7 @@
             max-width: 480px;
             margin: 0 auto;
             background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
             z-index: 110;
             display: none;
             align-items: center;
@@ -2074,24 +2108,28 @@
         }
         .invite-panel {
             background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 24px;
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            padding: 32px 28px 28px;
             max-width: 340px;
             width: 100%;
-            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
         }
-        .invite-panel .title {
-            font-size: 18px;
-            font-weight: 700;
+        .invite-panel .icon-big {
+            font-size: 48px;
             margin-bottom: 8px;
         }
+        .invite-panel .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
         .invite-panel .sub {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-secondary);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .invite-panel .actions {
             display: flex;
@@ -2099,10 +2137,10 @@
             justify-content: center;
         }
         .invite-panel .actions button {
-            padding: 10px 28px;
+            padding: 10px 32px;
             border-radius: 30px;
             border: none;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.15s;
@@ -2216,6 +2254,11 @@
                 grid-template-columns: repeat(4, 1fr);
                 gap: 6px;
             }
+            .plus-overlay .grid .item .icon-wrap {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
         }
     </style>
 </head>
@@ -2247,22 +2290,22 @@
         <div class="plus-overlay" id="plusOverlay">
             <div class="handle"></div>
             <div class="grid">
-                <button class="item" onclick="openStickerPopup()">
-                    <span class="icon">🖼️</span>
+                <div class="item" onclick="openStickerPopup()">
+                    <div class="icon-wrap">🖼️</div>
                     <span class="label">表情包</span>
-                </button>
-                <button class="item" onclick="showImagePicker()">
-                    <span class="icon">📷</span>
+                </div>
+                <div class="item" onclick="showImagePicker()">
+                    <div class="icon-wrap">📷</div>
                     <span class="label">图片</span>
-                </button>
-                <button class="item" onclick="openRedPacket()">
-                    <span class="icon">🧧</span>
+                </div>
+                <div class="item" onclick="openRedPacket()">
+                    <div class="icon-wrap">🧧</div>
                     <span class="label">红包</span>
-                </button>
-                <button class="item" onclick="closePlusPanel();initiateCall()">
-                    <span class="icon">📹</span>
+                </div>
+                <div class="item" onclick="closePlusPanel();initiateCall()">
+                    <div class="icon-wrap">🎥</div>
                     <span class="label">视频</span>
-                </button>
+                </div>
             </div>
         </div>
 
@@ -2274,9 +2317,7 @@
                     <span class="title">🖼️ 表情包</span>
                     <button class="close-btn" onclick="closeStickerPopup()">✕</button>
                 </div>
-                <div class="sticker-grid" id="stickerPopupGrid">
-                    <!-- 动态加载 -->
-                </div>
+                <div class="sticker-grid" id="stickerPopupGrid"></div>
             </div>
         </div>
 
@@ -2290,18 +2331,7 @@
                 </div>
                 <div class="field">
                     <label>祝福语</label>
-                    <select id="rpMessage">
-                        <option value="❤️ 我爱你 ❤️">❤️ 我爱你 ❤️</option>
-                        <option value="💕 想你了 💕">💕 想你了 💕</option>
-                        <option value="🌸 今天也要开心哦 🌸">🌸 今天也要开心哦 🌸</option>
-                        <option value="🌟 你是我的全世界 🌟">🌟 你是我的全世界 🌟</option>
-                        <option value="💖 永远在一起 💖">💖 永远在一起 💖</option>
-                        <option value="🌹 送你一朵小红花 🌹">🌹 送你一朵小红花 🌹</option>
-                        <option value="🥰 爱你哟 🥰">🥰 爱你哟 🥰</option>
-                        <option value="✨ 只想对你好 ✨">✨ 只想对你好 ✨</option>
-                        <option value="💝 专属你的浪漫 💝">💝 专属你的浪漫 💝</option>
-                        <option value="🌙 好梦，亲爱的 🌙">🌙 好梦，亲爱的 🌙</option>
-                    </select>
+                    <select id="rpMessage"></select>
                 </div>
                 <div class="field" style="font-size:12px;color:var(--text-secondary);text-align:center;">
                     💰 当前余额：<span id="rpBalanceDisplay">10,000,000</span> 元
@@ -2316,7 +2346,8 @@
         <!-- ===== 一起听邀请弹窗 ===== -->
         <div class="invite-overlay" id="inviteOverlay">
             <div class="invite-panel">
-                <div class="title">🎵 一起听</div>
+                <div class="icon-big">🎵</div>
+                <div class="title">一起听</div>
                 <div class="sub" id="inviteMessage">梦角 邀请你一起听《歌曲名》</div>
                 <div class="actions">
                     <button class="btn-agree" onclick="acceptInvite()">同意</button>
@@ -2875,7 +2906,6 @@
                 invitedSong: null,
                 inviteFrom: null
             },
-            // 正在回复状态
             isReplying: false
         };
 
@@ -3039,7 +3069,6 @@
                 partnerAvatarData = await getFromDB(appData.appearance.partnerAvatarFileId);
             }
 
-            // 保留typing指示器
             const typingEl = document.getElementById('typingIndicator');
             const typingHTML = typingEl.outerHTML;
 
@@ -3047,7 +3076,6 @@
                 list.innerHTML =
                     `<div class="empty-state"><span class="icon-big">💬</span>开始和 ${getPartnerName()} 聊天吧～</div>` +
                     typingHTML;
-                // 重新绑定typing
                 document.getElementById('typingIndicator').classList.toggle('show', appData.isReplying || false);
                 return;
             }
@@ -3141,11 +3169,9 @@
                     <div class="msg-actions">${actionBtns}</div>
                 </div>`;
             }
-            // 添加typing指示器（在最后）
             html += typingHTML;
             list.innerHTML = html;
             list.scrollTop = list.scrollHeight;
-            // 恢复typing状态
             document.getElementById('typingIndicator').classList.toggle('show', appData.isReplying || false);
         }
 
@@ -3396,7 +3422,6 @@
         function openRedPacket() {
             closePlusPanel();
             document.getElementById('rpBalanceDisplay').textContent = (appData.redpacket.myBalance || 10000000).toFixed(0);
-            // 加载祝福语
             const select = document.getElementById('rpMessage');
             const rpMessages = appData.replyLibrary.rpMessages || DEFAULT_DATA.replyLibrary.rpMessages;
             select.innerHTML = rpMessages.map(msg => `<option value="${msg}">${msg}</option>`).join('');
@@ -3575,7 +3600,7 @@
 
         function renderBalancePage() {
             document.getElementById('myBalanceDisplay').textContent = (appData.redpacket.myBalance || 10000000).toFixed(0)
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             document.getElementById('partnerBalanceDisplay').textContent = (appData.redpacket.partnerBalance || 10000000)
                 .toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             document.getElementById('partnerBalanceLabel').textContent = getPartnerName();
@@ -3639,7 +3664,7 @@
                 const isActive = i === appData.music.currentIndex;
                 html += `
                     <div class="item" style="${isActive ? 'border:1px solid var(--primary);' : ''}">
-                        <span class="name">${item.name || '未命名'}</span>
+                        <span class="name" onclick="renameMusic(${i})" title="点击修改名称">${item.name || '未命名'}</span>
                         <div>
                             <span class="invite-btn" onclick="inviteTogether(${i})" title="邀请一起听">👥</span>
                             <span style="font-size:12px;color:var(--text-secondary);cursor:pointer;margin-right:8px;" onclick="playMusic(${i})">▶</span>
@@ -3651,12 +3676,26 @@
             list.innerHTML = html;
         }
 
+        function renameMusic(index) {
+            const playlist = appData.music.playlist || [];
+            if (!playlist[index]) return;
+            const current = playlist[index].name || '未命名';
+            const newName = prompt('修改歌曲名称：', current);
+            if (newName && newName.trim() !== '') {
+                playlist[index].name = newName.trim();
+                saveAllData();
+                renderMusicPage();
+                if (index === appData.music.currentIndex) {
+                    updateMusicFloatInfo(newName.trim());
+                }
+            }
+        }
+
         function addMusicLink() {
             const input = document.getElementById('musicLinkInput');
             const link = input.value.trim();
             if (!link) { alert('请输入音乐链接'); return; }
             let name = '音乐 ' + (appData.music.playlist.length + 1);
-            // 尝试从链接提取名称
             try {
                 const url = new URL(link);
                 const params = new URLSearchParams(url.search);
@@ -3665,7 +3704,6 @@
                 if (link.includes('y.qq.com')) name = 'QQ音乐 ' + (appData.music.playlist.length + 1);
                 if (link.includes('music.163.com')) name = '网易云 ' + (appData.music.playlist.length + 1);
             } catch (e) {}
-            // 限制数量
             if (appData.music.playlist.length >= 100) {
                 alert('最多支持100首音乐');
                 return;
@@ -3887,7 +3925,6 @@
             appData.music.invitedSong = index;
             appData.music.inviteFrom = 'me';
             const inviteMsg = `🎵 ${getPartnerName()}，邀请你一起听《${item.name}》`;
-            // 显示邀请弹窗
             showInvitePanel(inviteMsg, function(agree) {
                 if (agree) {
                     playMusic(index);
@@ -3899,12 +3936,10 @@
                 }
                 saveAllData();
             });
-            // 同时发送一条系统消息（模拟对方收到邀请）
             addSystemMessage(`🎵 你邀请了 ${getPartnerName()} 一起听《${item.name}》，等待对方回应...`);
             // 模拟对方自动同意（5~10秒后）
             setTimeout(() => {
                 if (appData.music.inviteFrom === 'me' && appData.music.invitedSong === index) {
-                    // 如果还没有被手动处理，自动同意
                     if (document.getElementById('inviteOverlay').classList.contains('show')) {
                         acceptInvite();
                     }
@@ -3926,7 +3961,6 @@
                 inviteCallback(true);
                 inviteCallback = null;
             }
-            // 播放音乐
             const idx = appData.music.invitedSong;
             if (idx !== null && idx !== undefined && appData.music.playlist[idx]) {
                 playMusic(idx);
@@ -3949,6 +3983,18 @@
             addSystemMessage(`你拒绝了邀请`);
         }
 
+        function leaveTogether() {
+            if (!appData.music.together) return;
+            appData.music.together = false;
+            if (musicAudio && !musicAudio.paused) {
+                musicAudio.pause();
+                appData.music.isPlaying = false;
+                updateMusicPlayBtn();
+            }
+            addSystemMessage(`🎵 你退出了一起听`);
+            saveAllData();
+        }
+
         // ============================================================
         //  🤖 梦角回复（支持拼接 + 回复条数）
         // ============================================================
@@ -3960,7 +4006,6 @@
             const min = settings.minReplyTime || 5,
                 max = settings.maxReplyTime || 30;
             const delay = Math.floor(Math.random() * (max - min + 1)) + min;
-            // 显示正在回复
             showTyping();
             replyTimeout = setTimeout(() => {
                 doPartnerReply();
@@ -3968,7 +4013,6 @@
         }
 
         async function doPartnerReply() {
-            // 10% 概率发红包
             if (Math.random() < 0.10) {
                 hideTyping();
                 partnerSendRedPacket();
@@ -3994,16 +4038,13 @@
             }
 
             const settings = appData.settings;
-            // 回复条数：最少1条，最多maxReplyCount条
             const minCnt = settings.minReplyCount || 1;
             const maxCnt = settings.maxReplyCount || 3;
             const replyCount = Math.floor(Math.random() * (maxCnt - minCnt + 1)) + minCnt;
 
-            // 拼接字卡：每条消息是否拼接（如果开关打开，随机决定拼接1~3条；如果关闭，每条只发1条）
             const concatEnabled = settings.concatCards !== undefined ? settings.concatCards : true;
 
             let sentCount = 0;
-            // 随机打乱
             const shuffled = [...allItems].sort(() => Math.random() - 0.5);
 
             for (let r = 0; r < replyCount && sentCount < shuffled.length; r++) {
@@ -4011,7 +4052,6 @@
                 let msgType = 'text';
                 let concatCount = 1;
                 if (concatEnabled) {
-                    // 随机拼接1~3条
                     concatCount = Math.floor(Math.random() * 3) + 1;
                 }
                 const startIdx = sentCount;
@@ -4021,7 +4061,6 @@
                 let hasSticker = false;
                 for (const item of selected) {
                     if (item.type === 'sticker') {
-                        // 如果有表情包，单独发送（不拼接）
                         addPartnerMessage(item.content, 'sticker');
                         sentCount++;
                         hasSticker = true;
@@ -4031,7 +4070,6 @@
                     msgContent += item.content;
                 }
                 if (msgContent.trim()) {
-                    // 15%概率引用
                     let quote = null,
                         quoteSender = null;
                     const msgs = appData.messages || [];
@@ -4045,12 +4083,10 @@
                     addPartnerMessage(msgContent.trim(), 'text', quote, quoteSender);
                     sentCount += selected.filter(s => s.type !== 'sticker').length;
                 }
-                // 如果发送的条数已经达到回复条数，停止
                 if (sentCount >= replyCount) break;
             }
 
             hideTyping();
-            // 如果一条都没发出去，补一条
             if (sentCount === 0) {
                 const fallback = allItems[Math.floor(Math.random() * allItems.length)];
                 addPartnerMessage(fallback.content, fallback.type);
@@ -4754,7 +4790,6 @@
                 document.getElementById('page-chat').querySelector('.chat-list').style.backgroundImage = '';
             }
 
-            // 摄像头开关
             const cameraToggle = document.getElementById('cameraToggle');
             if (appData.appearance.cameraEnabled) {
                 cameraToggle.classList.add('on');
@@ -4849,7 +4884,6 @@
         //  💕 心情管理
         // ============================================================
         function renderMoodPage() {
-            // 我的心情
             const myMoods = appData.myMoods || DEFAULT_DATA.myMoods;
             const grid = document.getElementById('myMoodGrid');
             grid.innerHTML = myMoods.map(m =>
@@ -4859,7 +4893,6 @@
                 </div>`
             ).join('');
 
-            // 响应显示
             const responseDisplay = document.getElementById('moodResponseDisplay');
             if (appData.moodResponse) {
                 responseDisplay.textContent = '💬 ' + appData.moodResponse;
@@ -4867,7 +4900,6 @@
                 responseDisplay.textContent = '💬 对方还没有回应...';
             }
 
-            // 梦角此时此刻
             document.getElementById('moodPartnerName').textContent = getPartnerName();
             const mood = appData.mood || DEFAULT_DATA.mood;
             document.getElementById('moodTime').textContent = mood.time || '--:--';
@@ -4904,15 +4936,12 @@
 
         function selectMyMood(name) {
             appData.myMood = name;
-            // 清除之前的回应时间
             appData.moodResponseTime = 0;
-            // 延迟回复（2~180分钟随机）
             const delay = (2 + Math.random() * 178) * 60 * 1000;
             appData.moodResponseTime = Date.now() + delay;
             saveAllData();
             renderMoodPage();
             addSystemMessage(`💕 你选择了心情：${name}，梦角将在稍后回应...`);
-            // 安排回应
             scheduleMoodResponse();
         }
 
@@ -5020,7 +5049,6 @@
                     randomizeMood();
                 }
             }, 10000);
-            // 检查心情回应
             setInterval(() => {
                 if (appData.moodResponseTime && appData.moodResponseTime <= Date.now()) {
                     doMoodResponse();
@@ -5187,11 +5215,9 @@
 
         function toggleSwitch(el) {
             el.classList.toggle('on');
-            // 如果是摄像头开关，保存状态
             if (el.id === 'cameraToggle') {
                 appData.appearance.cameraEnabled = el.classList.contains('on');
                 saveAllData();
-                // 更新视频通话
                 updateCallVideo();
             }
         }
@@ -5341,17 +5367,18 @@
         setInterval(checkLetterReplies, 5 * 60 * 1000);
 
         // ============================================================
-        //  📹 视频通话
+        //  📹 视频通话（含摄像头开关）
         // ============================================================
         let callState = null,
             callTimerInterval = null;
         let callStartTimestamp = null;
         let localStream = null;
+        let isCameraOn = false;
 
         function updateCallVideo() {
             const video = document.getElementById('localVideo');
             const cameraEnabled = appData.appearance.cameraEnabled || false;
-            if (cameraEnabled) {
+            if (cameraEnabled && isCameraOn) {
                 video.classList.add('show');
                 if (!localStream) {
                     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -5362,6 +5389,8 @@
                         .catch(e => {
                             console.warn('摄像头获取失败:', e);
                             video.classList.remove('show');
+                            isCameraOn = false;
+                            updateCallCameraBtn();
                         });
                 }
             } else {
@@ -5374,6 +5403,48 @@
             }
         }
 
+        function toggleCamera() {
+            isCameraOn = !isCameraOn;
+            if (!isCameraOn) {
+                // 关闭摄像头
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                    localStream = null;
+                    const video = document.getElementById('localVideo');
+                    video.srcObject = null;
+                    video.classList.remove('show');
+                }
+            } else {
+                // 打开摄像头
+                const video = document.getElementById('localVideo');
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(stream => {
+                        localStream = stream;
+                        video.srcObject = stream;
+                        video.classList.add('show');
+                    })
+                    .catch(e => {
+                        alert('无法访问摄像头：' + e.message);
+                        isCameraOn = false;
+                    });
+            }
+            updateCallCameraBtn();
+        }
+
+        function updateCallCameraBtn() {
+            const btn = document.getElementById('callCameraBtn');
+            if (!btn) return;
+            if (isCameraOn) {
+                btn.textContent = '📹';
+                btn.classList.remove('off');
+                btn.title = '关闭摄像头';
+            } else {
+                btn.textContent = '🚫';
+                btn.classList.add('off');
+                btn.title = '打开摄像头';
+            }
+        }
+
         function stopCamera() {
             if (localStream) {
                 localStream.getTracks().forEach(t => t.stop());
@@ -5382,6 +5453,8 @@
                 video.srcObject = null;
                 video.classList.remove('show');
             }
+            isCameraOn = false;
+            updateCallCameraBtn();
         }
 
         function initiateCall() {
@@ -5392,7 +5465,6 @@
             callStartTimestamp = null;
             showCallPanel();
             updateCallUI('呼叫中…');
-            // 30秒等待
             const delay = 30000;
             setTimeout(() => {
                 if (!callState || callState.status === 'ended') return;
@@ -5426,7 +5498,6 @@
             }
             document.getElementById('callName').textContent = getPartnerName();
             makeDraggable(panel);
-            // 更新视频
             updateCallVideo();
         }
 
@@ -5437,8 +5508,11 @@
                 actions.innerHTML =
                     `<button class="btn-hangup" onclick="declineCall('已取消')" style="background:#ff3b30;color:#fff;">📹</button>`;
             } else if (callState.status === 'connected') {
-                actions.innerHTML =
-                    `<button class="btn-hangup" onclick="hangupCall()" style="background:#ff3b30;color:#fff;">📹</button>`;
+                actions.innerHTML = `
+                    <button class="btn-camera" id="callCameraBtn" onclick="toggleCamera()" title="摄像头">📹</button>
+                    <button class="btn-hangup" onclick="hangupCall()" style="background:#ff3b30;color:#fff;">📹</button>
+                `;
+                updateCallCameraBtn();
             } else if (callState.status === 'incoming') {
                 actions.innerHTML = `
                     <button class="btn-decline" onclick="declineCall('已拒绝')" style="background:#ff3b30;color:#fff;">✕</button>
@@ -5622,14 +5696,11 @@
                     playMusic(appData.music.currentIndex || 0);
                 }
             }
-            // 自动工作
             setInterval(autoWork, 10 * 60 * 1000 + Math.random() * 20 * 60 * 1000);
-            // 心情自动刷新
             startMoodAutoRefresh();
             if (!appData.mood.time || appData.mood.time === '--:--') {
                 randomizeMood();
             }
-            // 检查心情回应
             if (appData.moodResponseTime && appData.moodResponseTime <= Date.now()) {
                 doMoodResponse();
             }
@@ -5684,7 +5755,6 @@
                 updateMusicFloatInfo(appData.music.playlist[appData.music.currentIndex]?.name || '未命名');
                 updateMusicPlayBtn();
             }
-            // 恢复typing状态
             if (appData.isReplying) {
                 showTyping();
             }
@@ -5775,6 +5845,9 @@
         window.inviteTogether = inviteTogether;
         window.acceptInvite = acceptInvite;
         window.refuseInvite = refuseInvite;
+        window.leaveTogether = leaveTogether;
+        window.renameMusic = renameMusic;
+        window.toggleCamera = toggleCamera;
         window.updateCallVideo = updateCallVideo;
         window.showTyping = showTyping;
         window.hideTyping = hideTyping;
