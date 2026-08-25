@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>传讯 · 字卡</title>
     <style>
-        /* ===== 全局样式 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -166,11 +165,31 @@
             padding: 14px 14px 6px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             padding-bottom: 74px;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
+        }
+        .date-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 6px 0 8px;
+            width: 100%;
+        }
+        .date-divider .line {
+            flex: 1;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .date-divider .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            white-space: nowrap;
+            padding: 0 8px;
         }
         .msg {
             display: flex;
@@ -234,18 +253,26 @@
             border-bottom-left-radius: 4px;
         }
         .msg .bubble .time {
-            font-size: 9px;
+            font-size: 10px;
             opacity: 0.45;
-            margin-top: 3px;
+            margin-top: 4px;
             display: block;
             text-align: right;
             letter-spacing: 0.2px;
         }
         .msg .bubble .sticker {
-            max-width: 72px;
-            max-height: 72px;
+            max-width: 100px;
+            max-height: 100px;
             border-radius: 10px;
             display: block;
+        }
+        .msg .bubble .image-msg {
+            max-width: 200px;
+            max-height: 300px;
+            border-radius: 10px;
+            display: block;
+            width: auto;
+            height: auto;
         }
         .msg .bubble .emoji-big {
             font-size: 30px;
@@ -260,6 +287,33 @@
             background: rgba(0, 0, 0, 0.05);
             border-radius: 4px;
             font-style: italic;
+        }
+        .msg .bubble .redpacket-msg {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            min-width: 120px;
+            text-align: center;
+        }
+        .msg .bubble .redpacket-msg .rp-amount {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .msg .bubble .redpacket-msg .rp-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .msg .bubble .redpacket-msg .rp-sender {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        .msg .bubble .redpacket-msg .rp-message {
+            font-size: 13px;
+            margin-top: 4px;
+            font-style: italic;
+            opacity: 0.9;
         }
         .msg .msg-actions {
             position: absolute;
@@ -380,138 +434,319 @@
         .chat-input-bar .send-btn:active {
             transform: scale(0.88);
         }
-        .plus-panel {
-            position: absolute;
-            bottom: 68px;
-            left: 12px;
+        .plus-overlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
             background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border-radius: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            padding: 10px 18px;
-            display: none;
-            gap: 18px;
-            align-items: center;
-            z-index: 25;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.08);
+            z-index: 50;
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.94, 0.6, 1);
+            padding: 16px 20px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .plus-panel.show {
-            display: flex;
+        .plus-overlay.open {
+            transform: translateY(0);
         }
-        .plus-panel button {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 2px 2px;
-            transition: transform 0.15s;
-            line-height: 1;
+        .plus-overlay .handle {
+            width: 36px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            margin: 0 auto 14px;
+        }
+        .plus-overlay .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .plus-overlay .grid .item {
             display: flex;
             flex-direction: column;
             align-items: center;
+            cursor: pointer;
+            padding: 8px 4px;
+            border-radius: 12px;
+            transition: background 0.15s;
+            border: none;
+            background: none;
             color: var(--text);
+            font-family: inherit;
         }
-        .plus-panel button:active {
-            transform: scale(0.8);
+        .plus-overlay .grid .item:active {
+            background: rgba(0, 0, 0, 0.04);
         }
-        .plus-panel button span {
-            font-size: 9px;
+        .plus-overlay .grid .item .icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+        .plus-overlay .grid .item .label {
+            font-size: 11px;
             color: var(--text-secondary);
-            margin-top: 1px;
-            font-weight: 500;
         }
-        .image-picker-overlay {
+        .plus-backdrop {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(6px);
-            z-index: 200;
+            right: 0;
+            bottom: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 49;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        .plus-backdrop.show {
+            display: block;
+            opacity: 1;
+        }
+        .sticker-panel {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .sticker-panel.show {
+            display: block;
+        }
+        .sticker-panel .sticker-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 2px 8px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+        .sticker-panel .sticker-scroll::-webkit-scrollbar {
+            height: 3px;
+        }
+        .sticker-panel .sticker-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 4px;
+        }
+        .sticker-panel .sticker-scroll .sticker-item {
+            flex-shrink: 0;
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            cursor: pointer;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .image-picker-panel {
-            background: rgba(255, 255, 255, 0.85);
+        .sticker-panel .sticker-scroll .sticker-item:active {
+            transform: scale(0.9);
+        }
+        .sticker-panel .sticker-scroll .sticker-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .sticker-panel .sticker-empty {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 12px 0;
+        }
+        .redpacket-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .redpacket-overlay.show {
+            display: flex;
+        }
+        .redpacket-panel {
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 24px;
-            max-width: 320px;
-            width: 90%;
+            max-width: 340px;
+            width: 100%;
             box-shadow: 0 8px 48px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .image-picker-panel .title {
-            font-weight: 600;
-            font-size: 16px;
+        .redpacket-panel .title {
+            font-size: 18px;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 16px;
+            color: #ff4757;
         }
-        .image-picker-panel .options {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .redpacket-panel .field {
+            margin-bottom: 12px;
         }
-        .image-picker-panel .options button {
-            padding: 10px 24px;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-            cursor: pointer;
+        .redpacket-panel .field label {
+            font-size: 13px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        .redpacket-panel .field input,
+        .redpacket-panel .field select {
+            width: 100%;
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 15px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.6);
             color: var(--text);
-            transition: background 0.15s;
+        }
+        .redpacket-panel .field input:focus,
+        .redpacket-panel .field select:focus {
+            border-color: var(--primary);
+        }
+        .redpacket-panel .field select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .redpacket-panel .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .redpacket-panel .actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 30px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+        .redpacket-panel .actions button:active {
+            opacity: 0.7;
+        }
+        .redpacket-panel .actions .btn-send {
+            background: #ff4757;
+            color: #fff;
+        }
+        .redpacket-panel .actions .btn-cancel {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-secondary);
+        }
+        #music-float {
+            position: fixed;
+            top: 80px;
+            right: 12px;
+            background: rgba(20, 20, 26, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 80;
+            padding: 10px 14px;
+            min-width: 140px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #fff;
+            cursor: grab;
+            touch-action: none;
+            display: none;
+            user-select: none;
+        }
+        #music-float.show {
+            display: block;
+        }
+        #music-float.mini {
+            min-width: auto;
+            padding: 8px 10px;
+        }
+        #music-float.mini .music-info {
+            display: none;
+        }
+        #music-float.mini .music-controls {
+            gap: 4px;
+        }
+        #music-float.mini .music-controls button {
+            font-size: 14px;
+            padding: 2px 4px;
+        }
+        #music-float .music-info {
+            font-size: 12px;
+            margin-bottom: 6px;
+            text-align: center;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 120px;
+        }
+        #music-float .music-controls {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            gap: 8px;
         }
-        .image-picker-panel .options button:active {
-            background: rgba(255, 255, 255, 0.7);
-        }
-        .image-picker-panel .close-btn {
-            display: block;
-            margin: 12px auto 0;
+        #music-float .music-controls button {
             background: none;
             border: none;
-            font-size: 14px;
-            color: var(--text-secondary);
+            color: #fff;
+            font-size: 18px;
             cursor: pointer;
-        }
-        .emoji-picker {
-            position: absolute;
-            bottom: 68px;
-            left: 12px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border-radius: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            padding: 10px 14px;
-            display: none;
-            z-index: 25;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            max-width: 260px;
-            max-height: 220px;
-            overflow-y: auto;
-            flex-wrap: wrap;
-            gap: 3px;
-        }
-        .emoji-picker.show {
-            display: flex;
-        }
-        .emoji-picker span {
-            font-size: 24px;
-            padding: 3px 5px;
-            cursor: pointer;
+            padding: 2px 6px;
             border-radius: 6px;
             transition: background 0.15s;
         }
-        .emoji-picker span:active {
-            background: rgba(0, 0, 0, 0.04);
+        #music-float .music-controls button:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        #music-float .music-controls .play-btn {
+            font-size: 22px;
+        }
+        #music-float .music-close {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        #music-float .music-close:active {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        #music-float .music-toggle-size {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        #music-float .music-toggle-size:active {
+            color: rgba(255, 255, 255, 0.6);
         }
         .settings-grid {
             padding: 16px;
@@ -1006,52 +1241,35 @@
         .bg-upload-btn:active {
             background: rgba(255, 255, 255, 0.7);
         }
-
-        /* ===== 心情管理 - 梦角此时此刻 ===== */
         .mood-container {
             padding: 16px;
             flex: 1;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
         }
         .mood-card {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(12px);
             border-radius: var(--radius-sm);
-            padding: 18px 16px 16px;
+            padding: 20px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 12px;
         }
-        .mood-card .card-title {
+        .mood-card .title {
             font-size: 16px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             margin-bottom: 14px;
-        }
-        .mood-card .card-title .refresh-btn {
-            margin-left: auto;
-            background: rgba(255, 255, 255, 0.4);
-            border: none;
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 13px;
-            cursor: pointer;
-            color: var(--text);
-            transition: background 0.2s;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
-        .mood-card .card-title .refresh-btn:active {
-            background: rgba(255, 255, 255, 0.7);
+        .mood-card .title .partner-name {
+            color: var(--primary);
         }
         .mood-row {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid rgba(0, 0, 0, 0.04);
         }
@@ -1061,55 +1279,128 @@
         .mood-row .label {
             font-size: 14px;
             color: var(--text-secondary);
-            min-width: 48px;
+            min-width: 50px;
         }
         .mood-row .value {
-            flex: 1;
             font-size: 15px;
             font-weight: 500;
-            padding: 0 8px;
+            flex: 1;
+            margin-left: 10px;
         }
         .mood-row .edit-btn {
             background: none;
             border: none;
             font-size: 16px;
             cursor: pointer;
-            color: var(--text-secondary);
             padding: 2px 6px;
             border-radius: 6px;
+            color: var(--text-secondary);
             transition: background 0.15s;
         }
         .mood-row .edit-btn:active {
             background: rgba(0, 0, 0, 0.06);
         }
+        .mood-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .mood-actions button {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text);
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mood-actions button:active {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .mood-actions button.primary {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .mood-actions button.primary:active {
+            opacity: 0.8;
+        }
         .mood-next-update {
             font-size: 12px;
             color: var(--text-secondary);
+            margin-top: 12px;
             text-align: center;
-            padding: 8px 0 2px;
+            opacity: 0.7;
+        }
+        .my-mood-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .my-mood-grid .mood-option {
+            padding: 6px 4px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .my-mood-grid .mood-option:active {
+            transform: scale(0.92);
+        }
+        .my-mood-grid .mood-option.active {
+            border-color: var(--primary);
+            background: rgba(124, 140, 255, 0.15);
+        }
+        .my-mood-grid .mood-option .emoji {
+            font-size: 24px;
+            display: block;
+        }
+        .my-mood-grid .mood-option .name {
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+        .mood-response {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
             font-style: italic;
         }
-
-        /* 选择器弹窗 */
         .picker-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
+            max-width: 480px;
+            margin: 0 auto;
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(6px);
             z-index: 200;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
+        }
+        .picker-overlay.show {
+            display: flex;
         }
         .picker-panel {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 20px;
-            max-width: 320px;
+            max-width: 340px;
             width: 90%;
             max-height: 60vh;
             overflow-y: auto;
@@ -1122,26 +1413,7 @@
             text-align: center;
             margin-bottom: 14px;
         }
-        .picker-panel .picker-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-        }
-        .picker-panel .picker-options button {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.4);
-            font-size: 13px;
-            cursor: pointer;
-            color: var(--text);
-            transition: background 0.15s;
-        }
-        .picker-panel .picker-options button:active {
-            background: rgba(255, 255, 255, 0.7);
-        }
-        .picker-panel .close-btn {
+        .picker-panel .picker-close {
             display: block;
             margin: 12px auto 0;
             background: none;
@@ -1150,8 +1422,22 @@
             color: var(--text-secondary);
             cursor: pointer;
         }
-
-        /* ===== 其他原有样式 ===== */
+        .picker-option {
+            padding: 10px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            text-align: center;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        .picker-option:active {
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .picker-option.selected {
+            background: rgba(124, 140, 255, 0.15);
+            border: 1px solid var(--primary);
+        }
         .chat-settings-form {
             padding: 14px;
             flex: 1;
@@ -1400,6 +1686,69 @@
             font-size: 11px;
             color: var(--text-secondary);
         }
+        .music-settings {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .music-settings .field {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 12px;
+        }
+        .music-settings .field label {
+            font-size: 13px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+        .music-settings .field input {
+            width: 100%;
+            padding: 8px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 14px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            color: var(--text);
+        }
+        .music-settings .field input:focus {
+            border-color: var(--primary);
+        }
+        .music-settings .music-list {
+            margin-top: 12px;
+        }
+        .music-settings .music-list .item {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .music-settings .music-list .item .name {
+            font-size: 13px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 8px;
+        }
+        .music-settings .music-list .item .del {
+            color: #ff3b30;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .music-settings .music-list .empty {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 20px 0;
+        }
         #call-panel {
             position: fixed;
             top: 80px;
@@ -1599,12 +1948,21 @@
             .settings-item .label {
                 font-size: 12px;
             }
-            .mood-row .label {
-                min-width: 36px;
-                font-size: 13px;
+            .mood-card {
+                padding: 14px;
             }
-            .mood-row .value {
-                font-size: 14px;
+            .my-mood-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 4px;
+            }
+            .my-mood-grid .mood-option .emoji {
+                font-size: 20px;
+            }
+            .my-mood-grid .mood-option .name {
+                font-size: 9px;
+            }
+            .plus-overlay .grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
@@ -1618,7 +1976,7 @@
                 <div class="title">传讯 <small>· 字卡</small></div>
                 <div class="actions">
                     <button onclick="openPage('page-settings')">⚙️</button>
-                    <button onclick="initiateCall()">📞</button>
+                    <button onclick="toggleMusicFloat()" id="musicToggleBtn">🎵</button>
                     <button onclick="openPage('page-letters')">✉️</button>
                 </div>
             </div>
@@ -1628,22 +1986,65 @@
                 <input type="text" id="chatInput" placeholder="输入消息…" autocomplete="off" />
                 <button class="send-btn" onclick="sendMessage()">➤</button>
             </div>
-            <div class="plus-panel" id="plusPanel">
-                <button onclick="toggleEmojiPicker()">😊<span>表情</span></button>
-                <button onclick="openStickerPicker()">🖼️<span>表情包</span></button>
-                <button onclick="showImagePicker()">🖼️<span>图片</span></button>
+        </div>
+
+        <!-- ===== +号底部半屏面板 ===== -->
+        <div class="plus-backdrop" id="plusBackdrop" onclick="closePlusPanel()"></div>
+        <div class="plus-overlay" id="plusOverlay">
+            <div class="handle"></div>
+            <div class="grid">
+                <button class="item" onclick="openStickerPicker()">
+                    <span class="icon">🖼️</span>
+                    <span class="label">表情包</span>
+                </button>
+                <button class="item" onclick="showImagePicker()">
+                    <span class="icon">📷</span>
+                    <span class="label">图片</span>
+                </button>
+                <button class="item" onclick="openRedPacket()">
+                    <span class="icon">🧧</span>
+                    <span class="label">红包</span>
+                </button>
+                <button class="item" onclick="closePlusPanel();initiateCall()">
+                    <span class="icon">📞</span>
+                    <span class="label">通话</span>
+                </button>
             </div>
-            <div class="emoji-picker" id="emojiPicker">
-                <span onclick="insertEmoji('😊')">😊</span><span onclick="insertEmoji('❤️')">❤️</span>
-                <span onclick="insertEmoji('😂')">😂</span><span onclick="insertEmoji('🥰')">🥰</span>
-                <span onclick="insertEmoji('😭')">😭</span><span onclick="insertEmoji('🤗')">🤗</span>
-                <span onclick="insertEmoji('😘')">😘</span><span onclick="insertEmoji('💕')">💕</span>
-                <span onclick="insertEmoji('✨')">✨</span><span onclick="insertEmoji('🌟')">🌟</span>
-                <span onclick="insertEmoji('🌈')">🌈</span><span onclick="insertEmoji('🎉')">🎉</span>
-                <span onclick="insertEmoji('💪')">💪</span><span onclick="insertEmoji('🙈')">🙈</span>
-                <span onclick="insertEmoji('🐱')">🐱</span><span onclick="insertEmoji('🌸')">🌸</span>
-                <span onclick="insertEmoji('🍀')">🍀</span><span onclick="insertEmoji('🌺')">🌺</span>
-                <span onclick="insertEmoji('💫')">💫</span><span onclick="insertEmoji('⭐')">⭐</span>
+            <div class="sticker-panel" id="stickerPanel">
+                <div class="sticker-scroll" id="stickerScroll"></div>
+            </div>
+        </div>
+
+        <!-- ===== 红包弹窗 ===== -->
+        <div class="redpacket-overlay" id="redpacketOverlay">
+            <div class="redpacket-panel">
+                <div class="title">🧧 发红包</div>
+                <div class="field">
+                    <label>金额（元）</label>
+                    <input type="number" id="rpAmount" value="100" min="0.01" step="0.01" />
+                </div>
+                <div class="field">
+                    <label>祝福语</label>
+                    <select id="rpMessage">
+                        <option value="❤️ 我爱你 ❤️">❤️ 我爱你 ❤️</option>
+                        <option value="💕 想你了 💕">💕 想你了 💕</option>
+                        <option value="🌸 今天也要开心哦 🌸">🌸 今天也要开心哦 🌸</option>
+                        <option value="🌟 你是我的全世界 🌟">🌟 你是我的全世界 🌟</option>
+                        <option value="💖 永远在一起 💖">💖 永远在一起 💖</option>
+                        <option value="🌹 送你一朵小红花 🌹">🌹 送你一朵小红花 🌹</option>
+                        <option value="🥰 爱你哟 🥰">🥰 爱你哟 🥰</option>
+                        <option value="✨ 只想对你好 ✨">✨ 只想对你好 ✨</option>
+                        <option value="💝 专属你的浪漫 💝">💝 专属你的浪漫 💝</option>
+                        <option value="🌙 好梦，亲爱的 🌙">🌙 好梦，亲爱的 🌙</option>
+                    </select>
+                </div>
+                <div class="field" style="font-size:12px;color:var(--text-secondary);text-align:center;">
+                    💰 当前余额：<span id="rpBalanceDisplay">10,000,000.00</span> 元
+                </div>
+                <div class="actions">
+                    <button class="btn-cancel" onclick="closeRedPacket()">取消</button>
+                    <button class="btn-send" onclick="sendRedPacket()">发红包</button>
+                </div>
             </div>
         </div>
 
@@ -1666,14 +2067,19 @@
                     <div class="desc">背景·气泡·头像</div>
                 </div>
                 <div class="settings-item" onclick="openPage('page-mood')">
-                    <div class="icon">💭</div>
-                    <div class="label">梦角此时此刻</div>
-                    <div class="desc">时间·地点·在做·心情</div>
+                    <div class="icon">💕</div>
+                    <div class="label">心情管理</div>
+                    <div class="desc">我的心情 · 梦角此时此刻</div>
                 </div>
                 <div class="settings-item" onclick="openPage('page-chat-settings')">
                     <div class="icon">⚡</div>
                     <div class="label">聊天设置</div>
-                    <div class="desc">回复速度·字体</div>
+                    <div class="desc">回复速度·字体·拼接</div>
+                </div>
+                <div class="settings-item" onclick="openPage('page-music')">
+                    <div class="icon">🎵</div>
+                    <div class="label">音乐播放器</div>
+                    <div class="desc">导入QQ音乐链接</div>
                 </div>
                 <div class="settings-item" onclick="editMyName()">
                     <div class="icon">✏️</div>
@@ -1713,43 +2119,45 @@
             <div class="lib-content" id="libContent"></div>
         </div>
 
-        <!-- ===== 梦角此时此刻 ===== -->
+        <!-- ===== 心情管理 ===== -->
         <div id="page-mood" class="page">
             <div class="header">
                 <button class="back-btn" onclick="closePage('page-mood')">‹ 返回</button>
-                <div style="font-weight:600;font-size:16px;">💕 梦角此时此刻</div>
+                <div style="font-weight:600;font-size:16px;">💕 心情管理</div>
                 <div style="width:44px;"></div>
             </div>
-            <div class="mood-container" id="moodContainer">
+            <div class="mood-container">
                 <div class="mood-card">
-                    <div class="card-title">
-                        <span>💕 <span id="moodPartnerName">梦角</span> 此时此刻</span>
-                        <button class="refresh-btn" onclick="refreshAllMood()">🎲 全部随机</button>
-                    </div>
-                    <div class="mood-row">
-                        <span class="label">🕐</span>
-                        <span class="value" id="moodTime">--:--</span>
-                        <button class="edit-btn" onclick="editMoodField('time')">✏️</button>
-                    </div>
-                    <div class="mood-row">
-                        <span class="label">📍</span>
-                        <span class="value" id="moodLocation">--</span>
-                        <button class="edit-btn" onclick="editMoodField('location')">✏️</button>
-                    </div>
-                    <div class="mood-row">
-                        <span class="label">🎯</span>
-                        <span class="value" id="moodDoing">--</span>
-                        <button class="edit-btn" onclick="editMoodField('doing')">✏️</button>
-                    </div>
-                    <div class="mood-row">
-                        <span class="label">💭</span>
-                        <span class="value" id="moodFeeling">--</span>
-                        <button class="edit-btn" onclick="editMoodField('feeling')">✏️</button>
-                    </div>
-                    <div class="mood-next-update" id="moodNextUpdate">⏰ 下次更新：约 -- 分钟后</div>
+                    <div class="title">😊 我的心情</div>
+                    <div class="my-mood-grid" id="myMoodGrid"></div>
+                    <div class="mood-response" id="moodResponseDisplay">💬 对方还没有回应...</div>
                 </div>
-                <div style="font-size:12px;color:var(--text-secondary);text-align:center;padding:4px;">
-                    💡 点击 ✏️ 单独修改某一项 · 点击 🎲 全部随机刷新
+                <div class="mood-card">
+                    <div class="title">💕 <span class="partner-name" id="moodPartnerName">梦角</span> 此时此刻</div>
+                    <div class="mood-row">
+                        <span class="label">🕐 时间</span>
+                        <span class="value" id="moodTime">--:--</span>
+                        <button class="edit-btn" onclick="openMoodPicker('time')">✏️</button>
+                    </div>
+                    <div class="mood-row">
+                        <span class="label">📍 地点</span>
+                        <span class="value" id="moodLocation">未设置</span>
+                        <button class="edit-btn" onclick="openMoodPicker('location')">✏️</button>
+                    </div>
+                    <div class="mood-row">
+                        <span class="label">🎯 在做</span>
+                        <span class="value" id="moodDoing">未设置</span>
+                        <button class="edit-btn" onclick="openMoodPicker('doing')">✏️</button>
+                    </div>
+                    <div class="mood-row">
+                        <span class="label">💭 心情</span>
+                        <span class="value" id="moodFeeling">未设置</span>
+                        <button class="edit-btn" onclick="openMoodPicker('feeling')">✏️</button>
+                    </div>
+                    <div class="mood-actions">
+                        <button class="primary" onclick="randomizeMood()">🎲 全部随机刷新</button>
+                    </div>
+                    <div class="mood-next-update" id="moodNextUpdate">⏰ 下次更新：计算中...</div>
                 </div>
             </div>
         </div>
@@ -1832,6 +2240,13 @@
                     <span class="range-value" id="maxReplyCountVal">3</span>
                     <span class="range-unit">条</span>
                 </div>
+                <div class="toggle-row">
+                    <div class="info">
+                        <div class="label">拼接字卡</div>
+                        <div class="desc">梦角回复时拼接1~3条字卡</div>
+                    </div>
+                    <div class="toggle-switch" id="concatCardsToggle" onclick="toggleSwitch(this)"><div class="thumb"></div></div>
+                </div>
                 <div class="field font-size-field">
                     <label>字体大小</label>
                     <input type="range" id="fontSizeRange" min="14" max="24" value="15" oninput="document.getElementById('fontSizeVal').textContent=this.value+'px'; document.documentElement.style.setProperty('--font-size', this.value+'px');">
@@ -1860,6 +2275,25 @@
                     <span class="range-unit">分钟</span>
                 </div>
                 <button style="padding:10px;border-radius:var(--radius-sm);border:none;background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;" onclick="saveChatSettings()">💾 保存设置</button>
+            </div>
+        </div>
+
+        <!-- ===== 音乐设置 ===== -->
+        <div id="page-music" class="page">
+            <div class="header">
+                <button class="back-btn" onclick="closePage('page-music')">‹ 返回</button>
+                <div style="font-weight:600;font-size:16px;">🎵 音乐播放器</div>
+                <div style="width:44px;"></div>
+            </div>
+            <div class="music-settings">
+                <div class="field">
+                    <label>QQ音乐链接</label>
+                    <input type="text" id="musicLinkInput" placeholder="粘贴QQ音乐分享链接..." />
+                    <button style="margin-top:8px;padding:6px 18px;border-radius:26px;border:1px solid rgba(255,255,255,0.15);background:var(--primary);color:#fff;font-size:13px;cursor:pointer;" onclick="addMusic()">➕ 导入</button>
+                </div>
+                <div class="music-list" id="musicList">
+                    <div class="empty">暂无音乐，请导入</div>
+                </div>
             </div>
         </div>
 
@@ -1897,6 +2331,18 @@
             </div>
         </div>
 
+        <!-- ===== 音乐浮窗 ===== -->
+        <div id="music-float">
+            <button class="music-close" onclick="closeMusicFloat()">✕</button>
+            <button class="music-toggle-size" onclick="toggleMusicSize()">⤡</button>
+            <div class="music-info" id="musicFloatInfo">🎵 未播放</div>
+            <div class="music-controls">
+                <button onclick="musicPrev()">⏮</button>
+                <button class="play-btn" id="musicPlayBtn" onclick="musicTogglePlay()">▶</button>
+                <button onclick="musicNext()">⏭</button>
+            </div>
+        </div>
+
         <!-- ===== 通话面板 ===== -->
         <div id="call-panel" style="display:none;">
             <button class="call-minimize-btn" onclick="toggleCallMinimize()">−</button>
@@ -1907,13 +2353,22 @@
             <div class="call-actions" id="callActions"></div>
         </div>
 
+        <!-- ===== 选择弹窗 ===== -->
+        <div class="picker-overlay" id="pickerOverlay">
+            <div class="picker-panel" id="pickerPanel">
+                <div class="picker-title" id="pickerTitle">选择</div>
+                <div id="pickerOptions"></div>
+                <button class="picker-close" onclick="closePicker()">取消</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         // ============================================================
-        //  💾 全部数据用 IndexedDB 存储（永不丢失）
+        //  💾 IndexedDB
         // ============================================================
-        const DB_NAME = 'ChuanxunDB_v5';
+        const DB_NAME = 'ChuanxunDB_v6';
         const STORE_NAME = 'data';
         let db = null;
 
@@ -1931,9 +2386,7 @@
                     db = e.target.result;
                     resolve(db);
                 };
-                request.onerror = function(e) {
-                    reject(e.target.error);
-                };
+                request.onerror = function(e) { reject(e.target.error); };
             });
         }
 
@@ -2045,7 +2498,8 @@
                 autoSend: true,
                 autoSendInterval: 31,
                 fontSize: 15,
-                fontFamily: "-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif"
+                fontFamily: "-apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif",
+                concatCards: true
             },
             appearance: {
                 background: 'bg-preset-default',
@@ -2055,21 +2509,31 @@
                 customBgFileId: null
             },
             mood: {
-                time: '14:20',
-                location: '在家园',
-                doing: '在画画',
-                feeling: '开心',
-                nextUpdate: null // 存储下次更新的时间戳
+                time: '下午 14:30',
+                location: '在家里',
+                doing: '看书',
+                feeling: '平静',
+                nextUpdate: Date.now() + 1800000
+            },
+            myMood: '开心',
+            moodResponse: '',
+            redpacket: {
+                myBalance: 10000000,
+                partnerBalance: 10000000,
+                history: []
+            },
+            music: {
+                playlist: [],
+                currentIndex: 0,
+                isPlaying: false,
+                currentTime: 0,
+                volume: 1
             }
         };
 
         let appData = null;
         let dataLoaded = false;
-        let moodTimer = null;
 
-        // ============================================================
-        //  💾 数据读写
-        // ============================================================
         async function loadAllData() {
             try {
                 const data = await getFromDB('appData');
@@ -2088,19 +2552,20 @@
                     if (!appData.settings) appData.settings = DEFAULT_DATA.settings;
                     if (!appData.appearance) appData.appearance = DEFAULT_DATA.appearance;
                     if (!appData.mood) appData.mood = DEFAULT_DATA.mood;
+                    if (!appData.myMood) appData.myMood = '开心';
+                    if (!appData.moodResponse) appData.moodResponse = '';
+                    if (!appData.redpacket) appData.redpacket = DEFAULT_DATA.redpacket;
+                    if (!appData.music) appData.music = DEFAULT_DATA.music;
                     if (!appData.myName) appData.myName = DEFAULT_DATA.myName;
                     if (!appData.partnerName) appData.partnerName = DEFAULT_DATA.partnerName;
                 } else {
                     appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                    // 初始化第一次随机
-                    appData.mood = generateRandomMood();
                 }
                 dataLoaded = true;
                 return appData;
             } catch (e) {
                 console.warn('Load data error', e);
                 appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
-                appData.mood = generateRandomMood();
                 dataLoaded = true;
                 return appData;
             }
@@ -2110,222 +2575,14 @@
             if (!appData) return;
             try {
                 await saveToDB('appData', appData);
-            } catch (e) {
-                console.warn('Save data error', e);
-            }
+            } catch (e) { console.warn('Save error', e); }
         }
 
         function getMyName() { return appData ? appData.myName || '我' : '我'; }
 
         function getPartnerName() { return appData ? appData.partnerName || '梦角' : '梦角'; }
 
-        function generateFileId() {
-            return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-        }
-
-        // ============================================================
-        //  💭 心情管理 - 梦角此时此刻
-        // ============================================================
-        const MOOD_OPTIONS = {
-            locations: ['在家里', '在咖啡馆', '在公园', '在地铁上', '在公司', '在图书馆', '在健身房', '在天台', '在超市', '在路边小店', '在家园', '在画室',
-                '在画展'
-            ],
-            doings: ['看书', '喝咖啡', '听音乐', '发呆', '散步', '工作', '打游戏', '刷手机', '写东西', '放空自己', '在画画', '在开画展'],
-            feelings: ['开心', '想你了', '有点累', '平静', '兴奋', '期待', '慵懒', '委屈', '无聊', '满足']
-        };
-
-        function randomTime() {
-            const h = String(Math.floor(Math.random() * 24)).padStart(2, '0');
-            const m = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-            return h + ':' + m;
-        }
-
-        function randomItem(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        function generateRandomMood() {
-            return {
-                time: randomTime(),
-                location: randomItem(MOOD_OPTIONS.locations),
-                doing: randomItem(MOOD_OPTIONS.doings),
-                feeling: randomItem(MOOD_OPTIONS.feelings),
-                nextUpdate: Date.now() + getRandomInterval()
-            };
-        }
-
-        function getRandomInterval() {
-            // 60~180 分钟之间随机（毫秒）
-            const min = 60 * 60 * 1000;
-            const max = 180 * 60 * 1000;
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function getTimeDisplay(timeStr) {
-            const parts = timeStr.split(':');
-            const h = parseInt(parts[0]);
-            const m = parts[1];
-            if (h >= 0 && h < 6) return '凌晨 ' + h + ':' + m;
-            if (h >= 6 && h < 9) return '清晨 ' + h + ':' + m;
-            if (h >= 9 && h < 12) return '上午 ' + h + ':' + m;
-            if (h >= 12 && h < 14) return '中午 ' + h + ':' + m;
-            if (h >= 14 && h < 18) return '下午 ' + h + ':' + m;
-            if (h >= 18 && h < 20) return '傍晚 ' + h + ':' + m;
-            if (h >= 20 && h < 23) return '晚上 ' + h + ':' + m;
-            return '深夜 ' + h + ':' + m;
-        }
-
-        function renderMood() {
-            const mood = appData.mood || generateRandomMood();
-            document.getElementById('moodPartnerName').textContent = getPartnerName();
-            document.getElementById('moodTime').textContent = getTimeDisplay(mood.time);
-            document.getElementById('moodLocation').textContent = mood.location;
-            document.getElementById('moodDoing').textContent = mood.doing;
-            document.getElementById('moodFeeling').textContent = mood.feeling;
-
-            // 计算下次更新时间
-            if (mood.nextUpdate) {
-                const remaining = mood.nextUpdate - Date.now();
-                if (remaining > 0) {
-                    const minutes = Math.ceil(remaining / 60000);
-                    document.getElementById('moodNextUpdate').textContent = '⏰ 下次更新：约 ' + minutes + ' 分钟后';
-                } else {
-                    document.getElementById('moodNextUpdate').textContent = '⏰ 即将更新…';
-                }
-            } else {
-                document.getElementById('moodNextUpdate').textContent = '⏰ 计算中…';
-            }
-        }
-
-        function refreshAllMood() {
-            appData.mood = generateRandomMood();
-            saveAllData();
-            renderMood();
-            resetMoodTimer();
-        }
-
-        function editMoodField(field) {
-            const mood = appData.mood;
-            let options = [];
-            let title = '';
-            let currentValue = '';
-
-            switch (field) {
-                case 'time':
-                    title = '🕐 选择时间';
-                    // 生成一些预设时间供选择
-                    const presetTimes = ['06:00', '07:30', '08:00', '09:00', '10:00', '10:30', '11:00', '12:00', '13:00',
-                        '14:00', '14:30', '15:00', '16:00', '17:00', '17:30', '18:00', '19:00', '20:00', '21:00', '22:00',
-                        '23:00', '23:30'
-                    ];
-                    options = presetTimes;
-                    currentValue = mood.time;
-                    break;
-                case 'location':
-                    title = '📍 选择地点';
-                    options = MOOD_OPTIONS.locations;
-                    currentValue = mood.location;
-                    break;
-                case 'doing':
-                    title = '🎯 选择在做的事';
-                    options = MOOD_OPTIONS.doings;
-                    currentValue = mood.doing;
-                    break;
-                case 'feeling':
-                    title = '💭 选择心情';
-                    options = MOOD_OPTIONS.feelings;
-                    currentValue = mood.feeling;
-                    break;
-                default:
-                    return;
-            }
-
-            // 创建选择器弹窗
-            const overlay = document.createElement('div');
-            overlay.className = 'picker-overlay';
-            let optionsHtml = options.map(opt =>
-                `<button onclick="selectMoodOption('${field}', '${opt.replace(/'/g, "\\'")}')">${opt}</button>`
-            ).join('');
-
-            // 时间特殊处理：显示"随机"按钮
-            let randomBtn = '';
-            if (field === 'time') {
-                randomBtn =
-                    `<button onclick="selectMoodOption('time', '__RANDOM__')" style="background:var(--primary);color:#fff;">🎲 随机时间</button>`;
-            }
-
-            overlay.innerHTML = `
-                    <div class="picker-panel">
-                        <div class="picker-title">${title}</div>
-                        <div class="picker-options">
-                            ${optionsHtml}
-                            ${randomBtn}
-                        </div>
-                        <button class="close-btn" onclick="this.closest('.picker-overlay').remove()">取消</button>
-                    </div>
-                `;
-            document.body.appendChild(overlay);
-            overlay.addEventListener('click', function(e) {
-                if (e.target === this) this.remove();
-            });
-        }
-
-        function selectMoodOption(field, value) {
-            // 关闭所有选择器
-            document.querySelectorAll('.picker-overlay').forEach(el => el.remove());
-
-            const mood = appData.mood;
-            if (field === 'time') {
-                if (value === '__RANDOM__') {
-                    mood.time = randomTime();
-                } else {
-                    mood.time = value;
-                }
-            } else if (field === 'location') {
-                mood.location = value;
-            } else if (field === 'doing') {
-                mood.doing = value;
-            } else if (field === 'feeling') {
-                mood.feeling = value;
-            }
-            // 重置下次更新计时（用户手动修改后延长刷新间隔）
-            mood.nextUpdate = Date.now() + getRandomInterval();
-            saveAllData();
-            renderMood();
-            resetMoodTimer();
-        }
-
-        function resetMoodTimer() {
-            if (moodTimer) {
-                clearTimeout(moodTimer);
-                moodTimer = null;
-            }
-            const mood = appData.mood;
-            if (mood && mood.nextUpdate) {
-                const remaining = mood.nextUpdate - Date.now();
-                if (remaining > 0) {
-                    moodTimer = setTimeout(() => {
-                        // 自动刷新
-                        appData.mood = generateRandomMood();
-                        saveAllData();
-                        renderMood();
-                        resetMoodTimer();
-                    }, remaining);
-                } else {
-                    // 已经过期，立即刷新
-                    appData.mood = generateRandomMood();
-                    saveAllData();
-                    renderMood();
-                    resetMoodTimer();
-                }
-            } else {
-                // 没有设置下次更新，设置一个
-                appData.mood.nextUpdate = Date.now() + getRandomInterval();
-                saveAllData();
-                renderMood();
-                resetMoodTimer();
-            }
-        }
+        function generateFileId() { return 'f_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8); }
 
         // ============================================================
         //  🧭 页面导航
@@ -2344,14 +2601,12 @@
             el.classList.add('active', 'slide-in');
             setTimeout(() => el.classList.remove('slide-in'), 400);
             currentPage = pageId;
-            document.getElementById('plusPanel').classList.remove('show');
-            document.getElementById('emojiPicker').classList.remove('show');
             if (pageId === 'page-reply-library') renderLibrary();
             if (pageId === 'page-appearance') renderAppearance();
             if (pageId === 'page-letters') renderLetters();
             if (pageId === 'page-chat-settings') loadChatSettings();
-            if (pageId === 'page-mood') { renderMood();
-                resetMoodTimer(); }
+            if (pageId === 'page-mood') renderMoodPage();
+            if (pageId === 'page-music') renderMusicPage();
             if (pageId === 'page-write-letter') {
                 document.getElementById('letterContent').value = '';
                 document.getElementById('letterCharCount').textContent = '0';
@@ -2361,6 +2616,7 @@
                 document.getElementById('myNameDisplay').textContent = getMyName();
                 document.getElementById('partnerNameDisplay').textContent = getPartnerName();
             }
+            closePlusPanel();
         }
 
         function closePage(pageId) {
@@ -2375,8 +2631,6 @@
                 setTimeout(() => prevEl.classList.remove('slide-in'), 400);
                 currentPage = prev; } else { document.getElementById('page-chat').classList.add('active');
                 currentPage = 'page-chat'; }
-            document.getElementById('plusPanel').classList.remove('show');
-            document.getElementById('emojiPicker').classList.remove('show');
             if (pageId === 'page-write-letter') renderLetters();
         }
 
@@ -2384,6 +2638,25 @@
         //  💬 聊天核心
         // ============================================================
         let quoteTarget = null;
+        let lastDateStr = '';
+
+        function getDateStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2,
+            '0');
+        }
+
+        function formatTimeWithDate() {
+            const d = new Date();
+            const dateStr = d.getFullYear() + '年' + String(d.getMonth() + 1) + '月' + String(d.getDate()) + '日';
+            const timeStr = d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            return dateStr + ' ' + timeStr;
+        }
+
+        function formatTimeShort() {
+            const d = new Date();
+            return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
 
         async function renderMessages() {
             const list = document.getElementById('chatList');
@@ -2404,12 +2677,21 @@
             }
 
             let html = '';
+            let currentDate = '';
+
             for (let i = 0; i < msgs.length; i++) {
                 const m = msgs[i];
+                const msgDate = m.date || '';
                 if (m.type === 'system') {
                     html += `<div class="system-msg-wrapper"><span class="system-msg">${m.content}</span></div>`;
                     continue;
                 }
+                if (msgDate && msgDate !== currentDate) {
+                    currentDate = msgDate;
+                    const displayDate = msgDate.replace(/-/g, '/');
+                    html += `<div class="date-divider"><span class="line"></span><span class="label">${displayDate}</span><span class="line"></span></div>`;
+                }
+
                 const cls = m.sender === 'me' ? 'self' : 'other';
                 const avatarData = m.sender === 'me' ? userAvatarData : partnerAvatarData;
                 const avatarHtml = avatarData ?
@@ -2425,22 +2707,54 @@
                     }
                     contentHtml += text;
                 } else if (m.type === 'sticker') {
-                    contentHtml =
-                    `<img src="${m.content}" class="sticker" alt="sticker" onerror="this.style.display='none'">`;
+                    contentHtml = `<img src="${m.content}" class="sticker" alt="sticker" onerror="this.style.display='none'">`;
+                } else if (m.type === 'image') {
+                    contentHtml = `<img src="${m.content}" class="image-msg" alt="image" onerror="this.style.display='none'">`;
                 } else if (m.type === 'emoji') {
                     contentHtml = `<span class="emoji-big">${m.content}</span>`;
+                } else if (m.type === 'redpacket') {
+                    let statusHtml = '';
+                    const isPending = m.status === 'pending';
+                    const isReceived = m.status === 'received';
+                    const isRefunded = m.status === 'refunded';
+
+                    if (isPending && m.sender === 'partner') {
+                        statusHtml = `
+                                <div style="display:flex; gap:8px; margin-top:8px; justify-content:center;">
+                                    <button onclick="handleRedPacketAction('${m.rpId}','receive')" style="padding:4px 16px; border-radius:16px; border:none; background:#34c759; color:#fff; font-size:12px; cursor:pointer;">接收</button>
+                                    <button onclick="handleRedPacketAction('${m.rpId}','refund')" style="padding:4px 16px; border-radius:16px; border:none; background:#ff3b30; color:#fff; font-size:12px; cursor:pointer;">退回</button>
+                                </div>
+                            `;
+                    } else if (isPending && m.sender === 'me') {
+                        statusHtml = `<div style="margin-top:6px; font-size:12px; opacity:0.7;">⏳ 等待对方领取...</div>`;
+                    } else if (isReceived) {
+                        statusHtml = `<div style="margin-top:6px; font-size:12px; color:#34c759;">✅ 已领取</div>`;
+                    } else if (isRefunded) {
+                        statusHtml = `<div style="margin-top:6px; font-size:12px; color:#ff3b30;">↩️ 已退回</div>`;
+                    }
+
+                    contentHtml = `
+                            <div class="redpacket-msg">
+                                <div class="rp-label">🧧 红包</div>
+                                <div class="rp-amount">${m.amount ? m.amount.toFixed(2) + '元' : ''}</div>
+                                ${m.rpMessage ? `<div class="rp-message">${m.rpMessage}</div>` : ''}
+                                <div class="rp-sender">来自 ${m.sender === 'me' ? getMyName() : getPartnerName()}</div>
+                                ${statusHtml}
+                            </div>
+                        `;
                 } else {
                     contentHtml = m.content;
                 }
                 const time = m.time || '';
+                const displayTime = m.displayTime || time;
 
                 let actionBtns = '';
-                if (m.type === 'text') {
+                if (m.type === 'text' || m.type === 'redpacket') {
                     actionBtns = `
                             <button class="quote-btn" onclick="quoteMessage(${i})" title="引用">💬</button>
                             <button class="delete-btn" onclick="deleteMessage(${i})" title="删除">🗑️</button>
                         `;
-                } else if (m.type === 'sticker' || m.type === 'emoji') {
+                } else if (m.type === 'sticker' || m.type === 'image' || m.type === 'emoji') {
                     actionBtns = `
                             <button class="delete-btn" onclick="deleteMessage(${i})" title="删除">🗑️</button>
                         `;
@@ -2448,7 +2762,7 @@
 
                 html += `<div class="msg ${cls}" id="msg-${i}">
                         <div class="avatar">${avatarHtml}</div>
-                        <div class="bubble">${contentHtml}<span class="time">${time}</span></div>
+                        <div class="bubble">${contentHtml}<span class="time">${displayTime}</span></div>
                         <div class="msg-actions">${actionBtns}</div>
                     </div>`;
             }
@@ -2458,25 +2772,21 @@
 
         function quoteMessage(index) {
             const msgs = appData.messages || [];
-            if (!msgs[index] || msgs[index].type !== 'text') return;
-            quoteTarget = {
-                content: msgs[index].content,
-                sender: msgs[index].sender
-            };
+            if (!msgs[index]) return;
+            const m = msgs[index];
+            if (m.type !== 'text' && m.type !== 'redpacket') return;
+            const content = m.type === 'redpacket' ? `🧧 红包：${m.rpMessage || '发了一个红包'}` : m.content;
+            quoteTarget = { content: content, sender: m.sender };
             const input = document.getElementById('chatInput');
             input.focus();
-            input.placeholder = `引用：${quoteTarget.content.slice(0, 20)}${quoteTarget.content.length > 20 ? '…' : ''}`;
+            input.placeholder = `引用：${content.slice(0, 20)}${content.length > 20 ? '…' : ''}`;
             const el = document.getElementById(`msg-${index}`);
             if (el) {
                 el.style.outline = '2px solid var(--primary)';
                 el.style.borderRadius = '8px';
-                setTimeout(() => {
-                    el.style.outline = 'none';
-                }, 3000);
+                setTimeout(() => { el.style.outline = 'none'; }, 3000);
             }
-            setTimeout(() => {
-                input.placeholder = '输入消息…';
-            }, 5000);
+            setTimeout(() => { input.placeholder = '输入消息…'; }, 5000);
         }
 
         function deleteMessage(index) {
@@ -2502,20 +2812,26 @@
                 input.placeholder = '输入消息…';
             }
 
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+
             const msg = {
                 sender: 'me',
                 type: 'text',
                 content: content,
                 quote: quoteContent,
                 quoteSender: quoteSender,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
             };
             appData.messages.push(msg);
             saveAllData();
             renderMessages();
             input.value = '';
-            document.getElementById('plusPanel').classList.remove('show');
-            document.getElementById('emojiPicker').classList.remove('show');
+            closePlusPanel();
             triggerPartnerReply();
         }
 
@@ -2526,21 +2842,87 @@
             document.getElementById('emojiPicker').classList.remove('show');
         }
 
+        // ============================================================
+        //  ➕ 加号面板
+        // ============================================================
         function togglePlusPanel() {
-            document.getElementById('plusPanel').classList.toggle('show');
-            document.getElementById('emojiPicker').classList.remove('show');
+            const overlay = document.getElementById('plusOverlay');
+            const backdrop = document.getElementById('plusBackdrop');
+            const isOpen = overlay.classList.contains('open');
+            if (isOpen) {
+                closePlusPanel();
+            } else {
+                overlay.classList.add('open');
+                backdrop.classList.add('show');
+                document.getElementById('stickerPanel').classList.remove('show');
+                loadStickersForPanel();
+            }
         }
 
-        function toggleEmojiPicker() {
-            document.getElementById('emojiPicker').classList.toggle('show');
-            document.getElementById('plusPanel').classList.remove('show');
+        function closePlusPanel() {
+            document.getElementById('plusOverlay').classList.remove('open');
+            document.getElementById('plusBackdrop').classList.remove('show');
+            document.getElementById('stickerPanel').classList.remove('show');
         }
 
         // ============================================================
-        //  🖼️ 图片选择（相册 / 拍照）
+        //  🖼️ 表情包面板
+        // ============================================================
+        async function loadStickersForPanel() {
+            const scroll = document.getElementById('stickerScroll');
+            const stickers = appData.replyLibrary.stickers || [];
+            if (stickers.length === 0) {
+                scroll.innerHTML = `<div class="sticker-empty">还没有表情包，去字卡库添加吧</div>`;
+                return;
+            }
+            let html = '';
+            for (const s of stickers) {
+                const data = await getFromDB(s.fileId);
+                if (data) {
+                    html += `
+                            <div class="sticker-item" onclick="sendStickerFromPanel('${s.id}')">
+                                <img src="${data}" alt="sticker">
+                            </div>
+                        `;
+                }
+            }
+            if (!html) {
+                scroll.innerHTML = `<div class="sticker-empty">表情包加载失败</div>`;
+            } else {
+                scroll.innerHTML = html;
+                document.getElementById('stickerPanel').classList.add('show');
+            }
+        }
+
+        async function sendStickerFromPanel(id) {
+            const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
+            if (!sticker) return;
+            const data = await getFromDB(sticker.fileId);
+            if (!data) { alert('表情包加载失败'); return; }
+            closePlusPanel();
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            const msg = {
+                sender: 'me',
+                type: 'sticker',
+                content: data,
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            };
+            appData.messages.push(msg);
+            saveAllData();
+            renderMessages();
+            triggerPartnerReply();
+        }
+
+        // ============================================================
+        //  🖼️ 图片
         // ============================================================
         function showImagePicker() {
-            document.getElementById('plusPanel').classList.remove('show');
+            closePlusPanel();
             const overlay = document.createElement('div');
             overlay.className = 'image-picker-overlay';
             overlay.innerHTML = `
@@ -2569,11 +2951,17 @@
                     const reader = new FileReader();
                     reader.onload = function(ev) {
                         const dataUrl = ev.target.result;
+                        const now = new Date();
+                        const dateStr = getDateStr();
+                        const displayTime = formatTimeWithDate();
+                        const timeShort = formatTimeShort();
                         const msg = {
                             sender: 'me',
-                            type: 'sticker',
+                            type: 'image',
                             content: dataUrl,
-                            time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                            time: timeShort,
+                            displayTime: displayTime,
+                            date: dateStr
                         };
                         appData.messages.push(msg);
                         saveAllData();
@@ -2599,11 +2987,17 @@
                 const reader = new FileReader();
                 reader.onload = function(ev) {
                     const dataUrl = ev.target.result;
+                    const now = new Date();
+                    const dateStr = getDateStr();
+                    const displayTime = formatTimeWithDate();
+                    const timeShort = formatTimeShort();
                     const msg = {
                         sender: 'me',
-                        type: 'sticker',
+                        type: 'image',
                         content: dataUrl,
-                        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                        time: timeShort,
+                        displayTime: displayTime,
+                        date: dateStr
                     };
                     appData.messages.push(msg);
                     saveAllData();
@@ -2616,83 +3010,406 @@
         }
 
         // ============================================================
-        //  🖼️ 加号里的「表情包」
+        //  🧧 红包
         // ============================================================
-        async function openStickerPicker() {
-            document.getElementById('plusPanel').classList.remove('show');
-            const stickers = appData.replyLibrary.stickers || [];
-            if (stickers.length === 0) {
-                alert('表情库为空，请先在「设置 → 自定义回复 → 表情库」中导入表情包');
+        function openRedPacket() {
+            closePlusPanel();
+            const balance = appData.redpacket.myBalance || 10000000;
+            document.getElementById('rpBalanceDisplay').textContent = balance.toFixed(2);
+            document.getElementById('redpacketOverlay').classList.add('show');
+        }
+
+        function closeRedPacket() {
+            document.getElementById('redpacketOverlay').classList.remove('show');
+        }
+
+        function sendRedPacket() {
+            const amount = parseFloat(document.getElementById('rpAmount').value) || 0;
+            const msg = document.getElementById('rpMessage').value;
+            if (amount <= 0) { alert('请输入有效金额（元）'); return; }
+            if ((appData.redpacket.myBalance || 10000000) < amount) {
+                alert('余额不足！');
                 return;
             }
-            const stickerData = [];
-            for (const s of stickers) {
-                const data = await getFromDB(s.fileId);
-                if (data) {
-                    stickerData.push({ id: s.id, dataUrl: data });
+            appData.redpacket.myBalance = (appData.redpacket.myBalance || 10000000) - amount;
+
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            const rpId = 'rp_' + Date.now();
+
+            const msgObj = {
+                sender: 'me',
+                type: 'redpacket',
+                content: '🧧 红包',
+                amount: amount,
+                rpMessage: msg,
+                rpId: rpId,
+                status: 'pending',
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            };
+            appData.messages.push(msgObj);
+            appData.redpacket.history.push({
+                id: rpId,
+                sender: 'me',
+                amount: amount,
+                message: msg,
+                time: displayTime,
+                status: 'pending'
+            });
+            saveAllData();
+            renderMessages();
+            closeRedPacket();
+            autoDecideRedPacket(rpId);
+        }
+
+        function autoDecideRedPacket(rpId) {
+            const delay = Math.random() * 10 * 60 * 1000;
+            setTimeout(() => {
+                const msgsNow = appData.messages || [];
+                const idxNow = msgsNow.findIndex(m => m.rpId === rpId && m.type === 'redpacket');
+                if (idxNow === -1) return;
+                const msgNow = msgsNow[idxNow];
+                if (msgNow.status !== 'pending') return;
+
+                const isReceive = Math.random() < 0.8;
+                if (isReceive) {
+                    msgNow.status = 'received';
+                    appData.redpacket.partnerBalance = (appData.redpacket.partnerBalance || 10000000) + msgNow.amount;
+                    addSystemMessage(`🧧 ${getPartnerName()} 领取了红包 ${msgNow.amount.toFixed(2)} 元`);
+                } else {
+                    msgNow.status = 'refunded';
+                    appData.redpacket.myBalance = (appData.redpacket.myBalance || 10000000) + msgNow.amount;
+                    addSystemMessage(`🧧 ${getPartnerName()} 退回了红包`);
                 }
+                const history = appData.redpacket.history || [];
+                const hIdx = history.findIndex(h => h.id === rpId);
+                if (hIdx !== -1) {
+                    history[hIdx].status = msgNow.status;
+                }
+                saveAllData();
+                renderMessages();
+            }, delay);
+        }
+
+        function handleRedPacketAction(rpId, action) {
+            const msgs = appData.messages || [];
+            const idx = msgs.findIndex(m => m.rpId === rpId && m.type === 'redpacket');
+            if (idx === -1) return;
+            const msg = msgs[idx];
+            if (msg.status !== 'pending') return;
+
+            if (action === 'receive') {
+                msg.status = 'received';
+                appData.redpacket.myBalance = (appData.redpacket.myBalance || 10000000) + msg.amount;
+                addSystemMessage(`🧧 你领取了 ${getPartnerName()} 的红包 ${msg.amount.toFixed(2)} 元`);
+            } else if (action === 'refund') {
+                msg.status = 'refunded';
+                appData.redpacket.partnerBalance = (appData.redpacket.partnerBalance || 10000000) + msg.amount;
+                addSystemMessage(`🧧 你退回了 ${getPartnerName()} 的红包`);
             }
-            if (stickerData.length === 0) {
-                alert('表情包加载失败，请重新导入');
+            const history = appData.redpacket.history || [];
+            const hIdx = history.findIndex(h => h.id === rpId);
+            if (hIdx !== -1) {
+                history[hIdx].status = msg.status;
+            }
+            saveAllData();
+            renderMessages();
+        }
+
+        function partnerSendRedPacket() {
+            const cards = appData.replyLibrary.cards || [];
+            let rpMessage = '❤️ 给你的红包 ❤️';
+            if (cards.length > 0) {
+                const randomCard = cards[Math.floor(Math.random() * cards.length)];
+                rpMessage = randomCard.content;
+            }
+            const amount = Math.floor(Math.random() * 9999) + 1;
+            if ((appData.redpacket.partnerBalance || 10000000) < amount) {
+                addPartnerMessage('想给你发红包，但余额不足了...', 'text');
                 return;
             }
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                    position:fixed; top:0; left:0; width:100%; height:100%;
-                    background:rgba(0,0,0,0.3); backdrop-filter:blur(6px);
-                    z-index:200; display:flex; align-items:center; justify-content:center;
-                `;
-            const panel = document.createElement('div');
-            panel.style.cssText = `
-                    background:rgba(255,255,255,0.85); backdrop-filter:blur(20px);
-                    border-radius:24px; padding:20px; max-width:320px; width:90%;
-                    max-height:60vh; overflow-y:auto; box-shadow:0 8px 48px rgba(0,0,0,0.15);
-                    border:1px solid rgba(255,255,255,0.2);
-                `;
-            panel.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <span style="font-weight:600;font-size:16px;">🖼️ 选择表情包</span>
-                        <button onclick="this.closest('div[style]').parentElement.remove()" 
-                            style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
-                    </div>
-                    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
-                `;
-            for (const s of stickerData) {
-                panel.innerHTML += `
-                        <div onclick="sendStickerFromPicker('${s.id}')" 
-                            style="cursor:pointer;border-radius:12px;padding:6px;background:rgba(255,255,255,0.4);
-                                   border:1px solid rgba(255,255,255,0.1);transition:transform 0.15s;
-                                   display:flex;align-items:center;justify-content:center;">
-                            <img src="${s.dataUrl}" style="max-width:64px;max-height:64px;border-radius:8px;display:block;">
+            appData.redpacket.partnerBalance = (appData.redpacket.partnerBalance || 10000000) - amount;
+
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            const rpId = 'rp_' + Date.now();
+
+            const msgObj = {
+                sender: 'partner',
+                type: 'redpacket',
+                content: '🧧 红包',
+                amount: amount,
+                rpMessage: rpMessage,
+                rpId: rpId,
+                status: 'pending',
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            };
+            appData.messages.push(msgObj);
+            appData.redpacket.history.push({
+                id: rpId,
+                sender: 'partner',
+                amount: amount,
+                message: rpMessage,
+                time: displayTime,
+                status: 'pending'
+            });
+            saveAllData();
+            renderMessages();
+            addSystemMessage(`🧧 ${getPartnerName()} 给你发了一个红包！`);
+        }
+
+        function autoWork() {
+            const earn = Math.floor(Math.random() * 900000) + 100000;
+            appData.redpacket.myBalance = (appData.redpacket.myBalance || 10000000) + earn;
+            appData.redpacket.partnerBalance = (appData.redpacket.partnerBalance || 10000000) + earn;
+            saveAllData();
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            appData.messages.push({
+                sender: 'system',
+                type: 'system',
+                content: `💰 自动工作赚了 ${(earn/10000).toFixed(0)} 万`,
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            });
+            saveAllData();
+            renderMessages();
+        }
+
+        // ============================================================
+        //  🎵 音乐
+        // ============================================================
+        let musicAudio = null;
+        let musicFloatVisible = false;
+        let musicFloatMini = false;
+        let isDraggingMusic = false;
+        let musicDragStartX, musicDragStartY, musicOrigX, musicOrigY;
+
+        function initMusicAudio() {
+            if (!musicAudio) {
+                musicAudio = new Audio();
+                musicAudio.addEventListener('ended', function() {
+                    musicNext();
+                });
+            }
+        }
+
+        function renderMusicPage() {
+            const list = document.getElementById('musicList');
+            const playlist = appData.music.playlist || [];
+            if (playlist.length === 0) {
+                list.innerHTML = `<div class="empty">暂无音乐，请导入</div>`;
+                return;
+            }
+            let html = '';
+            for (let i = 0; i < playlist.length; i++) {
+                const item = playlist[i];
+                const isActive = i === appData.music.currentIndex;
+                html += `
+                        <div class="item" style="${isActive ? 'border:1px solid var(--primary);' : ''}">
+                            <span class="name">${item.name || '未命名'}</span>
+                            <div>
+                                <span style="font-size:12px;color:var(--text-secondary);cursor:pointer;margin-right:8px;" onclick="playMusic(${i})">▶</span>
+                                <span class="del" onclick="removeMusic(${i})">✕</span>
+                            </div>
                         </div>
                     `;
             }
-            panel.innerHTML += `</div>`;
-            overlay.appendChild(panel);
-            document.body.appendChild(overlay);
-            overlay.addEventListener('click', function(e) {
-                if (e.target === this) this.remove();
-            });
+            list.innerHTML = html;
         }
 
-        async function sendStickerFromPicker(id) {
-            const sticker = appData.replyLibrary.stickers.find(s => s.id === id);
-            if (!sticker) return;
-            const data = await getFromDB(sticker.fileId);
-            if (!data) { alert('表情包加载失败'); return; }
-            document.querySelectorAll('div[style*="position:fixed"]').forEach(el => {
-                if (el.style.zIndex === '200') el.remove();
-            });
-            const msg = {
-                sender: 'me',
-                type: 'sticker',
-                content: data,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-            };
-            appData.messages.push(msg);
+        function addMusic() {
+            const input = document.getElementById('musicLinkInput');
+            const link = input.value.trim();
+            if (!link) { alert('请输入QQ音乐链接'); return; }
+            let name = 'QQ音乐歌曲';
+            try {
+                const url = new URL(link);
+                const params = new URLSearchParams(url.search);
+                if (params.get('songid')) name = '歌曲 ' + params.get('songid');
+                if (params.get('songmid')) name = '歌曲 ' + params.get('songmid');
+            } catch (e) { name = 'QQ音乐歌曲'; }
+            if (appData.music.playlist.length >= 50) {
+                alert('最多支持50首音乐');
+                return;
+            }
+            appData.music.playlist.push({ name: name, url: link });
+            if (appData.music.playlist.length === 1) {
+                appData.music.currentIndex = 0;
+            }
             saveAllData();
-            renderMessages();
-            triggerPartnerReply();
+            renderMusicPage();
+            input.value = '';
+            alert('导入成功！');
+        }
+
+        function removeMusic(index) {
+            if (!confirm('确定删除这首音乐吗？')) return;
+            appData.music.playlist.splice(index, 1);
+            if (appData.music.currentIndex >= appData.music.playlist.length) {
+                appData.music.currentIndex = Math.max(0, appData.music.playlist.length - 1);
+            }
+            saveAllData();
+            renderMusicPage();
+            if (appData.music.playlist.length === 0) {
+                closeMusicFloat();
+            }
+        }
+
+        function playMusic(index) {
+            const playlist = appData.music.playlist || [];
+            if (playlist.length === 0 || index >= playlist.length) return;
+            appData.music.currentIndex = index;
+            const item = playlist[index];
+            initMusicAudio();
+            musicAudio.src = item.url;
+            musicAudio.play().catch(e => { musicAudio.load(); });
+            appData.music.isPlaying = true;
+            updateMusicFloatInfo(item.name);
+            updateMusicPlayBtn();
+            saveAllData();
+            renderMusicPage();
+            showMusicFloat();
+        }
+
+        function musicTogglePlay() {
+            if (!musicAudio) { initMusicAudio(); }
+            if (appData.music.playlist.length === 0) { return; }
+            if (musicAudio.src) {
+                if (musicAudio.paused) {
+                    musicAudio.play().catch(e => {});
+                    appData.music.isPlaying = true;
+                } else {
+                    musicAudio.pause();
+                    appData.music.isPlaying = false;
+                }
+            } else {
+                playMusic(appData.music.currentIndex || 0);
+                return;
+            }
+            updateMusicPlayBtn();
+            saveAllData();
+        }
+
+        function musicNext() {
+            const playlist = appData.music.playlist || [];
+            if (playlist.length === 0) return;
+            let nextIndex = (appData.music.currentIndex + 1) % playlist.length;
+            playMusic(nextIndex);
+        }
+
+        function musicPrev() {
+            const playlist = appData.music.playlist || [];
+            if (playlist.length === 0) return;
+            let prevIndex = (appData.music.currentIndex - 1 + playlist.length) % playlist.length;
+            playMusic(prevIndex);
+        }
+
+        function updateMusicFloatInfo(name) {
+            document.getElementById('musicFloatInfo').textContent = '🎵 ' + (name || '未命名');
+        }
+
+        function updateMusicPlayBtn() {
+            const btn = document.getElementById('musicPlayBtn');
+            btn.textContent = appData.music.isPlaying ? '⏸' : '▶';
+        }
+
+        function showMusicFloat() {
+            const el = document.getElementById('music-float');
+            el.classList.add('show');
+            musicFloatVisible = true;
+        }
+
+        function toggleMusicFloat() {
+            if (musicFloatVisible) {
+                closeMusicFloat();
+            } else {
+                if (appData.music.playlist.length > 0) {
+                    showMusicFloat();
+                    if (musicAudio && musicAudio.src && !musicAudio.paused) {} else if (appData.music.playlist.length > 0) {
+                        playMusic(appData.music.currentIndex || 0);
+                    }
+                } else {
+                    alert('请先在设置 → 音乐播放器中导入音乐');
+                    openPage('page-music');
+                }
+            }
+        }
+
+        function closeMusicFloat() {
+            document.getElementById('music-float').classList.remove('show');
+            musicFloatVisible = false;
+            if (musicAudio) {
+                musicAudio.pause();
+                appData.music.isPlaying = false;
+                updateMusicPlayBtn();
+                saveAllData();
+            }
+        }
+
+        function toggleMusicSize() {
+            const el = document.getElementById('music-float');
+            musicFloatMini = !musicFloatMini;
+            el.classList.toggle('mini');
+        }
+
+        function initMusicDrag() {
+            const el = document.getElementById('music-float');
+            el.addEventListener('mousedown', startMusicDrag);
+            el.addEventListener('touchstart', startMusicDrag, { passive: true });
+
+            function startMusicDrag(e) {
+                if (e.target.closest('button')) return;
+                isDraggingMusic = true;
+                const touch = e.touches ? e.touches[0] : e;
+                musicDragStartX = touch.clientX;
+                musicDragStartY = touch.clientY;
+                const rect = el.getBoundingClientRect();
+                musicOrigX = rect.left;
+                musicOrigY = rect.top;
+                el.style.cursor = 'grabbing';
+                document.addEventListener('mousemove', onMusicDrag);
+                document.addEventListener('touchmove', onMusicDrag, { passive: true });
+                document.addEventListener('mouseup', endMusicDrag);
+                document.addEventListener('touchend', endMusicDrag, { passive: true });
+            }
+
+            function onMusicDrag(e) {
+                if (!isDraggingMusic) return;
+                const touch = e.touches ? e.touches[0] : e;
+                const dx = touch.clientX - musicDragStartX;
+                const dy = touch.clientY - musicDragStartY;
+                let x = musicOrigX + dx;
+                let y = musicOrigY + dy;
+                const maxX = window.innerWidth - el.offsetWidth - 10;
+                const maxY = window.innerHeight - el.offsetHeight - 10;
+                x = Math.max(10, Math.min(x, maxX));
+                y = Math.max(60, Math.min(y, maxY));
+                el.style.left = x + 'px';
+                el.style.right = 'auto';
+                el.style.top = y + 'px';
+                el.style.bottom = 'auto';
+            }
+
+            function endMusicDrag() {
+                isDraggingMusic = false;
+                el.style.cursor = '';
+                document.removeEventListener('mousemove', onMusicDrag);
+                document.removeEventListener('touchmove', onMusicDrag);
+                document.removeEventListener('mouseup', endMusicDrag);
+                document.removeEventListener('touchend', endMusicDrag);
+            }
         }
 
         // ============================================================
@@ -2710,6 +3427,12 @@
         }
 
         async function doPartnerReply() {
+            // 5% 概率发红包
+            if (Math.random() < 0.05) {
+                partnerSendRedPacket();
+                return;
+            }
+
             const cards = appData.replyLibrary.cards || [];
             const emojis = appData.replyLibrary.emojis || [];
             const stickers = appData.replyLibrary.stickers || [];
@@ -2723,13 +3446,29 @@
                 }
             }
             if (allItems.length === 0) { addPartnerMessage('嗯嗯', 'text'); return; }
+
             const settings = appData.settings;
             const minCnt = settings.minReplyCount || 1,
                 maxCnt = settings.maxReplyCount || 3;
-            const count = Math.floor(Math.random() * (maxCnt - minCnt + 1)) + minCnt;
+            let count = Math.floor(Math.random() * (maxCnt - minCnt + 1)) + minCnt;
+            if (!settings.concatCards) {
+                count = 1;
+            }
             const shuffled = [...allItems].sort(() => Math.random() - 0.5);
             const selected = shuffled.slice(0, Math.min(count, shuffled.length));
-            for (const item of selected) {
+
+            let combinedContent = '';
+            let combinedType = 'text';
+            for (let i = 0; i < selected.length; i++) {
+                const item = selected[i];
+                if (i > 0) combinedContent += ' ';
+                if (item.type === 'sticker') {
+                    addPartnerMessage(item.content, 'sticker');
+                    continue;
+                }
+                combinedContent += item.content;
+            }
+            if (combinedContent.trim()) {
                 let quote = null,
                     quoteSender = null;
                 const msgs = appData.messages || [];
@@ -2740,18 +3479,24 @@
                         quoteSender = 'me';
                     }
                 }
-                addPartnerMessage(item.content, item.type, quote, quoteSender);
+                addPartnerMessage(combinedContent.trim(), 'text', quote, quoteSender);
             }
         }
 
         function addPartnerMessage(content, type = 'text', quote = null, quoteSender = null) {
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
             const msg = {
                 sender: 'partner',
                 type: type,
                 content: content,
                 quote: quote,
                 quoteSender: quoteSender,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
             };
             appData.messages.push(msg);
             saveAllData();
@@ -2759,11 +3504,17 @@
         }
 
         function addSystemMessage(content) {
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
             const msg = {
                 sender: 'system',
                 type: 'system',
                 content: content,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
             };
             appData.messages.push(msg);
             saveAllData();
@@ -2771,7 +3522,7 @@
         }
 
         // ============================================================
-        //  ⏰ 主动发送 & 主动拍一拍
+        //  ⏰ 主动发送 & 拍一拍
         // ============================================================
         let autoSendTimer = null,
             autoPatTimer = null;
@@ -2804,7 +3555,7 @@
         }
 
         // ============================================================
-        //  👋 拍一拍 (双击头像)
+        //  👋 拍一拍
         // ============================================================
         document.addEventListener('dblclick', function(e) {
             const avatar = e.target.closest('.msg .avatar');
@@ -2954,11 +3705,17 @@
         }
 
         function sendEmojiToChat(emoji) {
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
             const msg = {
                 sender: 'me',
                 type: 'emoji',
                 content: emoji,
-                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
             };
             appData.messages.push(msg);
             saveAllData();
@@ -3055,7 +3812,7 @@
         }
 
         // ============================================================
-        //  😊 Emoji操作
+        //  😊 Emoji
         // ============================================================
         function addEmoji() {
             const emoji = prompt('请输入Emoji：');
@@ -3074,7 +3831,7 @@
         }
 
         // ============================================================
-        //  🖼️ 表情包操作
+        //  🖼️ 表情包
         // ============================================================
         function batchImportStickers() {
             const input = document.createElement('input');
@@ -3156,7 +3913,7 @@
         }
 
         // ============================================================
-        //  📥📤 导入导出字卡
+        //  📥📤 导入导出
         // ============================================================
         function importCards() {
             const input = document.createElement('input');
@@ -3234,7 +3991,7 @@
                     }
                 }
                 const exportData = {
-                    version: '2.0',
+                    version: '3.0',
                     exportedAt: new Date().toISOString(),
                     appData: appData,
                     files: fileMap
@@ -3247,9 +4004,7 @@
                 a.click();
                 URL.revokeObjectURL(url);
                 alert('数据备份导出成功！');
-            } catch (e) {
-                alert('导出失败：' + e.message);
-            }
+            } catch (e) { alert('导出失败：' + e.message); }
         }
 
         async function importAllData() {
@@ -3262,10 +4017,7 @@
                 try {
                     const text = await file.text();
                     const data = JSON.parse(text);
-                    if (!data.appData || !data.files) {
-                        alert('无效的备份文件');
-                        return;
-                    }
+                    if (!data.appData || !data.files) { alert('无效的备份文件'); return; }
                     const mode = confirm('选择导入方式：\n「确定」= 覆盖所有现有数据\n「取消」= 追加数据（可能重复）');
                     if (mode) {
                         await clearDB();
@@ -3279,15 +4031,13 @@
                     } else {
                         alert('追加模式暂不支持，请选择覆盖模式');
                     }
-                } catch (err) {
-                    alert('导入失败：' + err.message);
-                }
+                } catch (err) { alert('导入失败：' + err.message); }
             };
             input.click();
         }
 
         // ============================================================
-        //  🎨 外观设置
+        //  🎨 外观
         // ============================================================
         const bgPresets = [
             { id: 'bg-preset-default', label: '默认', color: '#f5f2ed' },
@@ -3455,6 +4205,255 @@
         }
 
         // ============================================================
+        //  💕 心情
+        // ============================================================
+        const MY_MOODS = [
+            { emoji: '😊', name: '开心' },
+            { emoji: '🥰', name: '想你了' },
+            { emoji: '😭', name: '难过' },
+            { emoji: '😤', name: '生气' },
+            { emoji: '😌', name: '平静' },
+            { emoji: '😴', name: '疲惫' },
+            { emoji: '🤩', name: '兴奋' },
+            { emoji: '😔', name: '委屈' },
+            { emoji: '🥱', name: '无聊' },
+            { emoji: '🤔', name: '期待' }
+        ];
+
+        const MOOD_LOCATIONS = [
+            '在家里', '在咖啡馆', '在公园', '在地铁上', '在公司',
+            '在图书馆', '在健身房', '在天台', '在超市', '在路边小店',
+            '在家园', '在画室', '在画展'
+        ];
+        const MOOD_DOINGS = [
+            '看书', '喝咖啡', '听音乐', '发呆', '散步',
+            '工作', '打游戏', '刷手机', '写东西', '放空自己',
+            '在画画', '在开画展'
+        ];
+        const MOOD_FEELINGS = [
+            '开心', '想你了', '有点累', '平静', '兴奋',
+            '期待', '慵懒', '委屈', '无聊', '满足'
+        ];
+
+        function getRandomTime() {
+            const h = Math.floor(Math.random() * 24);
+            const m = Math.floor(Math.random() * 60);
+            const period = h >= 12 ? '下午' : '上午';
+            const displayH = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+            return period + ' ' + String(displayH).padStart(2, ' ') + ':' + String(m).padStart(2, '0');
+        }
+
+        function getRandomMood() {
+            return {
+                time: getRandomTime(),
+                location: MOOD_LOCATIONS[Math.floor(Math.random() * MOOD_LOCATIONS.length)],
+                doing: MOOD_DOINGS[Math.floor(Math.random() * MOOD_DOINGS.length)],
+                feeling: MOOD_FEELINGS[Math.floor(Math.random() * MOOD_FEELINGS.length)]
+            };
+        }
+
+        function renderMoodPage() {
+            const grid = document.getElementById('myMoodGrid');
+            grid.innerHTML = MY_MOODS.map(m =>
+                `<div class="mood-option ${appData.myMood === m.name ? 'active' : ''}" onclick="selectMyMood('${m.name}')">
+                        <span class="emoji">${m.emoji}</span>
+                        <span class="name">${m.name}</span>
+                    </div>`
+            ).join('');
+
+            const responseDisplay = document.getElementById('moodResponseDisplay');
+            if (appData.moodResponse) {
+                responseDisplay.textContent = '💬 ' + appData.moodResponse;
+            } else {
+                responseDisplay.textContent = '💬 对方还没有回应...';
+            }
+
+            document.getElementById('moodPartnerName').textContent = getPartnerName();
+            const mood = appData.mood || DEFAULT_DATA.mood;
+            document.getElementById('moodTime').textContent = mood.time || '--:--';
+            document.getElementById('moodLocation').textContent = mood.location || '未设置';
+            document.getElementById('moodDoing').textContent = mood.doing || '未设置';
+            document.getElementById('moodFeeling').textContent = mood.feeling || '未设置';
+
+            if (mood.nextUpdate) {
+                const remaining = Math.max(0, mood.nextUpdate - Date.now());
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                if (remaining > 0) {
+                    document.getElementById('moodNextUpdate').textContent =
+                        `⏰ 下次更新：约 ${minutes} 分 ${seconds} 秒后`;
+                } else {
+                    document.getElementById('moodNextUpdate').textContent = '⏰ 即将更新...';
+                }
+            } else {
+                document.getElementById('moodNextUpdate').textContent = '⏰ 计算中...';
+            }
+        }
+
+        function selectMyMood(name) {
+            appData.myMood = name;
+            const cards = appData.replyLibrary.cards || [];
+            let response = '';
+            if (cards.length > 0) {
+                const shuffled = [...cards].sort(() => Math.random() - 0.5);
+                response = shuffled[0].content;
+            } else {
+                const responses = ['收到啦～', '我知道了', '好的呢', '嗯嗯', '好呀'];
+                response = responses[Math.floor(Math.random() * responses.length)];
+            }
+            appData.moodResponse = `${getPartnerName()} 回应：${response}`;
+            saveAllData();
+            renderMoodPage();
+
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            appData.messages.push({
+                sender: 'system',
+                type: 'system',
+                content: `💕 ${getMyName()} 的心情：${name}，${getPartnerName()} 回应：${response}`,
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            });
+            saveAllData();
+            renderMessages();
+        }
+
+        function randomizeMood() {
+            const newMood = getRandomMood();
+            appData.mood.time = newMood.time;
+            appData.mood.location = newMood.location;
+            appData.mood.doing = newMood.doing;
+            appData.mood.feeling = newMood.feeling;
+            const nextDelay = 16 * 60 * 1000 + Math.random() * 164 * 60 * 1000;
+            appData.mood.nextUpdate = Date.now() + nextDelay;
+            saveAllData();
+            renderMoodPage();
+
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
+            appData.messages.push({
+                sender: 'system',
+                type: 'system',
+                content: `💕 ${getPartnerName()} 此时此刻：${appData.mood.time} · ${appData.mood.location} · ${appData.mood.doing} · ${appData.mood.feeling}`,
+                time: timeShort,
+                displayTime: displayTime,
+                date: dateStr
+            });
+            saveAllData();
+            renderMessages();
+        }
+
+        function startMoodAutoRefresh() {
+            setInterval(() => {
+                const mood = appData.mood || DEFAULT_DATA.mood;
+                if (mood.nextUpdate && Date.now() >= mood.nextUpdate) {
+                    randomizeMood();
+                }
+            }, 10000);
+        }
+
+        // ============================================================
+        //  📌 选择弹窗
+        // ============================================================
+        let pickerCallback = null;
+
+        function openMoodPicker(type) {
+            let options = [];
+            let title = '';
+            switch (type) {
+                case 'time':
+                    title = '选择时间';
+                    const times = [];
+                    for (let h = 0; h < 24; h++) {
+                        for (let m = 0; m < 60; m += 5) {
+                            const period = h >= 12 ? '下午' : '上午';
+                            const displayH = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+                            times.push(period + ' ' + String(displayH).padStart(2, ' ') + ':' + String(m).padStart(2, '0'));
+                        }
+                    }
+                    options = times;
+                    break;
+                case 'location':
+                    title = '选择地点';
+                    options = MOOD_LOCATIONS;
+                    break;
+                case 'doing':
+                    title = '选择在做的事';
+                    options = MOOD_DOINGS;
+                    break;
+                case 'feeling':
+                    title = '选择心情';
+                    options = MOOD_FEELINGS;
+                    break;
+                default:
+                    return;
+            }
+            pickerCallback = function(value) {
+                const mood = appData.mood || DEFAULT_DATA.mood;
+                switch (type) {
+                    case 'time':
+                        mood.time = value;
+                        break;
+                    case 'location':
+                        mood.location = value;
+                        break;
+                    case 'doing':
+                        mood.doing = value;
+                        break;
+                    case 'feeling':
+                        mood.feeling = value;
+                        break;
+                }
+                appData.mood = mood;
+                saveAllData();
+                renderMoodPage();
+                const now = new Date();
+                const dateStr = getDateStr();
+                const displayTime = formatTimeWithDate();
+                const timeShort = formatTimeShort();
+                appData.messages.push({
+                    sender: 'system',
+                    type: 'system',
+                    content: `💕 ${getPartnerName()} 更新了状态：${appData.mood.time} · ${appData.mood.location} · ${appData.mood.doing} · ${appData.mood.feeling}`,
+                    time: timeShort,
+                    displayTime: displayTime,
+                    date: dateStr
+                });
+                saveAllData();
+                renderMessages();
+            };
+            showPicker(title, options);
+        }
+
+        function showPicker(title, options) {
+            const overlay = document.getElementById('pickerOverlay');
+            document.getElementById('pickerTitle').textContent = title;
+            const container = document.getElementById('pickerOptions');
+            container.innerHTML = options.map(opt =>
+                `<div class="picker-option" onclick="selectPickerOption('${opt.replace(/'/g, "\\'")}')">${opt}</div>`
+            ).join('');
+            overlay.classList.add('show');
+        }
+
+        function selectPickerOption(value) {
+            if (pickerCallback) {
+                pickerCallback(value);
+                pickerCallback = null;
+            }
+            closePicker();
+        }
+
+        function closePicker() {
+            document.getElementById('pickerOverlay').classList.remove('show');
+            pickerCallback = null;
+        }
+
+        // ============================================================
         //  ⚙️ 聊天设置
         // ============================================================
         function loadChatSettings() {
@@ -3480,6 +4479,12 @@
             const toggle = document.getElementById('autoSendToggle');
             if (s.autoSend) toggle.classList.add('on');
             else toggle.classList.remove('on');
+            const concatToggle = document.getElementById('concatCardsToggle');
+            if (s.concatCards !== undefined ? s.concatCards : true) {
+                concatToggle.classList.add('on');
+            } else {
+                concatToggle.classList.remove('on');
+            }
         }
 
         function saveChatSettings() {
@@ -3491,6 +4496,7 @@
             s.autoSendInterval = parseInt(document.getElementById('autoSendInterval').value) || 31;
             s.fontSize = parseInt(document.getElementById('fontSizeRange').value) || 15;
             s.autoSend = document.getElementById('autoSendToggle').classList.contains('on');
+            s.concatCards = document.getElementById('concatCardsToggle').classList.contains('on');
             s.fontFamily = document.getElementById('fontFamilySelect').value;
             document.documentElement.style.setProperty('--font-size', s.fontSize + 'px');
             document.documentElement.style.setProperty('--font-family', s.fontFamily);
@@ -3513,7 +4519,7 @@
         }
 
         // ============================================================
-        //  ✏️ 修改昵称
+        //  ✏️ 昵称
         // ============================================================
         function editMyName() {
             const current = getMyName();
@@ -3524,7 +4530,7 @@
                 document.getElementById('myNameDisplay').textContent = newName.trim();
                 document.getElementById('myAvatarLabel').textContent = newName.trim();
                 renderMessages();
-                renderMood();
+                renderMoodPage();
                 alert('昵称已修改！');
             }
         }
@@ -3537,10 +4543,11 @@
                 saveAllData();
                 document.getElementById('partnerNameDisplay').textContent = newName.trim();
                 document.getElementById('partnerAvatarLabel').textContent = newName.trim();
+                document.getElementById('moodPartnerName').textContent = newName.trim();
                 updateLetterNames();
                 document.getElementById('callName').textContent = newName.trim();
                 renderMessages();
-                renderMood();
+                renderMoodPage();
                 alert('昵称已修改！');
             }
         }
@@ -3551,7 +4558,7 @@
         }
 
         // ============================================================
-        //  ✉️ 信件系统
+        //  ✉️ 信件
         // ============================================================
         function switchLetterTab(tab) {
             letterTab = tab;
@@ -3580,12 +4587,16 @@
             const textarea = document.getElementById('letterContent');
             const content = textarea.value.trim();
             if (!content) { alert('请写下你想说的话～'); return; }
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
             const letter = {
                 id: 'l' + Date.now(),
                 sender: 'me',
-                content,
-                time: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit',
-                    minute: '2-digit' }),
+                content: content,
+                time: displayTime,
+                date: dateStr,
                 replied: false,
                 status: '等待回信…',
                 sendTime: Date.now()
@@ -3630,12 +4641,16 @@
             if (idx === -1) return;
             sent[idx].replied = true;
             sent[idx].status = '✅ 已收到回信';
+            const now = new Date();
+            const dateStr = getDateStr();
+            const displayTime = formatTimeWithDate();
+            const timeShort = formatTimeShort();
             const reply = {
                 id: 'lr' + Date.now(),
                 sender: 'partner',
-                content,
-                time: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit',
-                    minute: '2-digit' }),
+                content: content,
+                time: displayTime,
+                date: dateStr,
                 fromLetterId: letterId
             };
             appData.letters.received.push(reply);
@@ -3646,7 +4661,7 @@
         setInterval(checkLetterReplies, 5 * 60 * 1000);
 
         // ============================================================
-        //  📞 通话系统（含后台保活）
+        //  📞 通话
         // ============================================================
         let callState = null,
             callTimerInterval = null;
@@ -3667,8 +4682,7 @@
         }
 
         function initiateCall() {
-            document.getElementById('plusPanel').classList.remove('show');
-            document.getElementById('emojiPicker').classList.remove('show');
+            closePlusPanel();
             const panel = document.getElementById('call-panel');
             if (panel.classList.contains('show') && callState && callState.status === 'connected') return;
             callState = { status: 'calling', isIncoming: false, isMini: false, timer: 0 };
@@ -3884,6 +4898,19 @@
             loadChatSettings();
             startAutoBehaviors();
             scheduleRandomCall();
+            initMusicAudio();
+            initMusicDrag();
+            if (appData.music.playlist && appData.music.playlist.length > 0) {
+                if (appData.music.isPlaying) {
+                    playMusic(appData.music.currentIndex || 0);
+                }
+            }
+            setInterval(autoWork, 10 * 60 * 1000 + Math.random() * 20 * 60 * 1000);
+            startMoodAutoRefresh();
+            if (!appData.mood.time || appData.mood.time === '--:--') {
+                randomizeMood();
+            }
+
             document.getElementById('chatInput').addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') { e.preventDefault();
                     sendMessage(); }
@@ -3893,8 +4920,8 @@
                 const picker = document.getElementById('emojiPicker');
                 if (!e.target.closest('.plus-btn') && !e.target.closest('#plusPanel') && !e.target.closest(
                         '#emojiPicker')) {
-                    plus.classList.remove('show');
-                    picker.classList.remove('show');
+                    if (plus) plus.classList.remove('show');
+                    if (picker) picker.classList.remove('show');
                 }
             });
             document.getElementById('page-chat').classList.add('active');
@@ -3908,8 +4935,10 @@
             document.getElementById('partnerNameDisplay').textContent = getPartnerName();
             document.getElementById('myAvatarLabel').textContent = getMyName();
             document.getElementById('partnerAvatarLabel').textContent = getPartnerName();
+            document.getElementById('moodPartnerName').textContent = getPartnerName();
             updateLetterNames();
             document.getElementById('callName').textContent = getPartnerName();
+            renderMoodPage();
 
             if (appData.appearance.customBgFileId) {
                 const data = await getFromDB(appData.appearance.customBgFileId);
@@ -3918,19 +4947,18 @@
                         `url(${data})`;
                 }
             }
-            renderMood();
-            resetMoodTimer();
 
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden && callState && callState.status === 'connected' && callStartTimestamp) {
                     updateCallTimerDisplay();
                 }
-                // 页面重新可见时刷新心情显示
-                if (!document.hidden) {
-                    renderMood();
-                    resetMoodTimer();
-                }
             });
+
+            if (appData.music.playlist && appData.music.playlist.length > 0 && appData.music.isPlaying) {
+                showMusicFloat();
+                updateMusicFloatInfo(appData.music.playlist[appData.music.currentIndex]?.name || '未命名');
+                updateMusicPlayBtn();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);
@@ -3943,12 +4971,15 @@
         window.sendMessage = sendMessage;
         window.insertEmoji = insertEmoji;
         window.togglePlusPanel = togglePlusPanel;
+        window.closePlusPanel = closePlusPanel;
         window.toggleEmojiPicker = toggleEmojiPicker;
-        window.openStickerPicker = openStickerPicker;
-        window.sendStickerFromPicker = sendStickerFromPicker;
         window.showImagePicker = showImagePicker;
         window.sendImageFromGallery = sendImageFromGallery;
         window.sendImageFromCamera = sendImageFromCamera;
+        window.openRedPacket = openRedPacket;
+        window.closeRedPacket = closeRedPacket;
+        window.sendRedPacket = sendRedPacket;
+        window.handleRedPacketAction = handleRedPacketAction;
         window.switchLibTab = switchLibTab;
         window.renderLibrary = renderLibrary;
         window.renderAppearance = renderAppearance;
@@ -3988,12 +5019,32 @@
         window.toggleGroupCollapse = toggleGroupCollapse;
         window.exportAllData = exportAllData;
         window.importAllData = importAllData;
-        window.renderMood = renderMood;
-        window.refreshAllMood = refreshAllMood;
-        window.editMoodField = editMoodField;
-        window.selectMoodOption = selectMoodOption;
+        window.renderMoodPage = renderMoodPage;
+        window.selectMyMood = selectMyMood;
+        window.randomizeMood = randomizeMood;
+        window.openMoodPicker = openMoodPicker;
+        window.closePicker = closePicker;
         window.quoteMessage = quoteMessage;
         window.deleteMessage = deleteMessage;
+        window.addMusic = addMusic;
+        window.removeMusic = removeMusic;
+        window.playMusic = playMusic;
+        window.musicTogglePlay = musicTogglePlay;
+        window.musicNext = musicNext;
+        window.musicPrev = musicPrev;
+        window.toggleMusicFloat = toggleMusicFloat;
+        window.closeMusicFloat = closeMusicFloat;
+        window.toggleMusicSize = toggleMusicSize;
+        window.renderMusicPage = renderMusicPage;
+        window.openStickerPicker = function() {
+            closePlusPanel();
+            togglePlusPanel();
+            setTimeout(() => {
+                loadStickersForPanel();
+                document.getElementById('stickerPanel').classList.add('show');
+            }, 100);
+        };
+        window.sendStickerFromPanel = sendStickerFromPanel;
     </script>
 </body>
 </html>
